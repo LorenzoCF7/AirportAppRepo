@@ -3,9 +3,10 @@
 Sistema completo de seguimiento de vuelos en tiempo real, compra de billetes y gestión de reservas.
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F?logo=springboot)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-6DB33F?logo=springboot)
 ![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk)
 ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite)
 
 ## 🌟 Características
 
@@ -15,6 +16,22 @@ Sistema completo de seguimiento de vuelos en tiempo real, compra de billetes y g
 - **👛 Wallet** - Gestión de billetes comprados
 - **📊 Dashboard** - Estadísticas de vuelos activos, programados y aterrizados
 - **🎭 Modo Mock** - Funciona sin API keys externas
+
+## 🛠️ Stack Tecnológico
+
+| Capa | Tecnología | Versión | Descripción |
+|------|------------|---------|-------------|
+| **Backend** | Spring Boot | 4.0.1 | Framework Java para API REST |
+| | Spring Data JPA | - | Persistencia y ORM |
+| | MySQL | 8+ | Base de datos relacional |
+| | Lombok | - | Reducción de boilerplate |
+| | Jakarta Validation | - | Validación de datos |
+| **Frontend** | React | 19 | Librería UI |
+| | Vite | 6 | Build tool y dev server |
+| | Axios | - | Cliente HTTP |
+| | Leaflet | - | Mapas interactivos |
+| | GSAP | - | Animaciones avanzadas |
+| | CSS Modules | - | Estilos con scope |
 
 ## 📁 Estructura del Repositorio
 
@@ -127,28 +144,3 @@ amadeus.api.secret=
 ```javascript
 export const API_BASE_URL = 'http://localhost:8080/api';
 ```
-
-## 🛠️ Stack Tecnológico
-
-### Backend
-- Spring Boot 3.4
-- Spring Data JPA
-- MySQL
-- Lombok
-- Jakarta Validation
-
-### Frontend
-- React 19
-- Vite 6
-- Axios
-- Leaflet (mapas)
-- GSAP (animaciones)
-- CSS Modules
-
-## 📝 Licencia
-
-MIT License
-
-## 👨‍💻 Autor
-
-Desarrollado con ❤️
