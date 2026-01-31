@@ -1,0 +1,316 @@
+/* ========================================
+   FlightCard ChromaGrid Styles
+   ======================================== */
+
+.flightCard {
+  position: relative;
+  padding: 2rem;
+  border-radius: 16px;
+  color: white;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--card-gradient);
+}
+
+.flightCard:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.12);
+  border-color: var(--card-border, rgba(255, 255, 255, 0.3));
+}
+
+/* ChromaGrid spotlight effect */
+.flightCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--spotlight-color, rgba(255, 255, 255, 0.25)),
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+}
+
+.flightCard:hover::before {
+  opacity: 1;
+}
+
+/* ========================================
+   Card Pattern Background
+   ======================================== */
+
+.cardPattern {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+  z-index: 0;
+}
+
+/* ========================================
+   Card Header
+   ======================================== */
+
+.flightCardHeader {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.airlineSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.airlineName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: white;
+}
+
+.flightCode {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: white;
+}
+
+/* ========================================
+   Price Tag
+   ======================================== */
+
+.priceTag {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  padding: 0.5rem 0.875rem;
+  border-radius: 24px;
+  gap: 0.625rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.priceIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.priceText {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+/* ========================================
+   Route Visual
+   ======================================== */
+
+.routeVisual {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2.5rem 0 2rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.airportInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.iataLarge {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.05em;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: white;
+}
+
+.citySmall {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.timeInfo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  color: white;
+}
+
+/* ========================================
+   Flight Path
+   ======================================== */
+
+.flightPath {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pathLine {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+.pathLine::after {
+  content: '✈';
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  font-size: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.durationBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: #374151;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   Date Badge
+   ======================================== */
+
+.flightDateBadge {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin-bottom: 1.5rem;
+  width: fit-content;
+  color: white;
+}
+
+/* ========================================
+   Class Options Buttons
+   ======================================== */
+
+.classOptions {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.classBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 0.875rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.classBtn:hover:not(:disabled) {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.classBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.classBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.classLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.classPrice {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #10b981;
+  letter-spacing: -0.025em;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .flightCard {
+    padding: 1.5rem;
+  }
+
+  .routeVisual {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .iataLarge {
+    font-size: 1.75rem;
+  }
+}

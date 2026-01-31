@@ -1,0 +1,416 @@
+/* Purchase Ticket Form - CSS Modules */
+
+.purchaseModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 6rem;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.purchaseModal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeModal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.closeModal:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: rotate(90deg);
+}
+
+.modalHeader {
+  padding: 1.5rem;
+  padding-right: 4rem;
+  border-bottom: 2px solid #f0f0f0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.modalHeader h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.stepIndicator {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.step {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.step.active {
+  background: white;
+  color: #667eea;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.modalContent {
+  padding: 1.5rem;
+}
+
+.flightInfoSection {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  border-radius: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.flightInfoSection h3 {
+  margin: 0 0 0.875rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.flightSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.airlineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.airline {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #333;
+}
+
+.flightNum {
+  font-weight: 600;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.routeDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.location {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.iata {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #667eea;
+}
+
+.city {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.arrow {
+  color: #667eea;
+  display: flex;
+  align-items: center;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.formSection {
+  margin-bottom: 1.5rem;
+}
+
+.formSection h3 {
+  margin: 0 0 0.875rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+  font-size: 1.05rem;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.formGroup input:disabled,
+.formGroup select:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.formGroup small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.875rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btnCancel,
+.btnBack {
+  padding: 0.75rem 1.25rem;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.btnCancel:hover,
+.btnBack:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.btnContinue,
+.btnSubmit {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btnContinue:hover,
+.btnSubmit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btnContinue:disabled,
+.btnSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.seatSelectionStep {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.confirmationStep {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.confirmationSummary {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.confirmationSummary h3 {
+  margin: 0 0 1.25rem 0;
+  color: #667eea;
+  font-size: 1.2rem;
+}
+
+.summarySection {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.summarySection:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.summarySection h4 {
+  margin: 0 0 0.65rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.summarySection p {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.priceTotal {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #667eea;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .purchaseModal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .modalHeader {
+    padding: 1.25rem;
+    padding-right: 3.5rem;
+  }
+  
+  .modalHeader h2 {
+    font-size: 1.3rem;
+  }
+
+  .stepIndicator {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modalContent {
+    padding: 1.25rem;
+  }
+
+  .routeDisplay {
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .btnCancel,
+  .btnBack,
+  .btnContinue,
+  .btnSubmit {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,167 @@
+/* ========================================
+   NotificationToast - Toast Notification Component
+   ======================================== */
+
+.notificationContainer {
+  position: fixed;
+  top: 7rem;
+  right: 2rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+/* ========================================
+   Toast
+   ======================================== */
+
+.notificationToast {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid;
+  min-width: 320px;
+  max-width: 400px;
+  pointer-events: auto;
+  animation: slideInRight 0.3s ease-out;
+  transition: all 0.2s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notificationToast:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   Toast Variants
+   ======================================== */
+
+.notificationSuccess {
+  border-left-color: #10b981;
+}
+
+.notificationSuccess .notificationIcon {
+  color: #10b981;
+}
+
+.notificationError {
+  border-left-color: #ef4444;
+}
+
+.notificationError .notificationIcon {
+  color: #ef4444;
+}
+
+.notificationInfo {
+  border-left-color: #3b82f6;
+}
+
+.notificationInfo .notificationIcon {
+  color: #3b82f6;
+}
+
+.notificationWarning {
+  border-left-color: #f59e0b;
+}
+
+.notificationWarning .notificationIcon {
+  color: #f59e0b;
+}
+
+/* ========================================
+   Icon
+   ======================================== */
+
+.notificationIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+}
+
+/* ========================================
+   Content
+   ======================================== */
+
+.notificationContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notificationTitle {
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notificationMessage {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ========================================
+   Close Button
+   ======================================== */
+
+.notificationClose {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.notificationClose:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .notificationContainer {
+    top: auto;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .notificationToast {
+    min-width: 0;
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,19 @@
+/* CardStacker Component - Stacked Cards Layout */
+
+.cardStacker {
+  display: flex;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.stacked {
+  margin-left: -8rem;
+  box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .stacked {
+    margin-left: -4rem;
+  }
+}

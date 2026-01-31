@@ -1,0 +1,481 @@
+/* ========================================
+   MAPA EN TIEMPO REAL - CSS MODULES
+   ======================================== */
+
+/* Prevenir scroll cuando el mapa está activo */
+:global(body:has(.realtime-map-active)) {
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.realtimeMapContainer {
+  position: fixed;
+  top: 0;
+  left: 70px;
+  right: 0;
+  width: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background: #000000;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  z-index: 1;
+  cursor: none;
+  animation: slideInMap 0.6s ease-out;
+  transition: left 0.25s ease;
+}
+
+/* Cursor none solo para elementos interactivos del mapa, no para todo */
+.realtimeMapContainer :global(.leaflet-container),
+.realtimeMapContainer :global(.leaflet-tile),
+.realtimeMapContainer :global(.leaflet-marker-pane),
+.realtimeMapContainer :global(.plane-icon),
+.flightListItem {
+  cursor: none;
+}
+
+/* Excluir el sidebar y el panel de vuelos del cursor:none */
+.realtimeMapContainer :global([data-sidebar]),
+.realtimeMapContainer :global([data-sidebar]) *,
+.flightsPanel :global(.leaflet-popup),
+.flightsPanel :global(.leaflet-popup) * {
+  cursor: auto;
+}
+
+@keyframes slideInMap {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ocultar atribuciones y controles de Leaflet */
+:global(.leaflet-control-attribution),
+:global(.leaflet-control-zoom) {
+  display: none;
+}
+
+/* Estilos para contenedores Leaflet */
+:global(.leaflet-container),
+:global(.leaflet-tile-container),
+:global(.leaflet-tile-pane),
+:global(.leaflet-pane),
+:global(.leaflet-map-pane) {
+  background: #000000;
+}
+
+:global(.leaflet-container) {
+  border: none;
+  outline: none;
+}
+
+:global(.leaflet-tile) {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Wrapper del mapa */
+.mapWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  z-index: 1;
+  overflow: hidden;
+  background: #000000;
+  width: 100%;
+  height: 100vh;
+}
+
+.mapWrapper :global(.leaflet-container) {
+  flex: 1;
+  z-index: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+}
+
+/* Z-index Leaflet layers */
+:global(.leaflet-top),
+:global(.leaflet-bottom),
+:global(.leaflet-control-zoom) {
+  z-index: 500;
+}
+
+:global(.leaflet-pane),
+:global(.leaflet-map-pane),
+:global(.leaflet-tile-pane) {
+  z-index: 100;
+}
+
+:global(.leaflet-overlay-pane) {
+  z-index: 200;
+}
+
+:global(.leaflet-marker-pane) {
+  z-index: 300;
+}
+
+:global(.leaflet-popup-pane) {
+  z-index: 400;
+}
+
+/* Panel lateral de vuelos */
+.flightsPanel {
+  width: 320px;
+  height: 100vh;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(102, 126, 234, 0.3);
+  overflow-y: hidden;
+  z-index: 600;
+  position: relative;
+  animation: slideInPanel 0.6s ease-out 0.3s both;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+@keyframes slideInPanel {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+  margin: 0;
+  flex-shrink: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.panelHeader svg {
+  color: #667eea;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.4));
+}
+
+.panelHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: white;
+  font-weight: 700;
+  flex: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.flightsList {
+  padding: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  height: calc(100vh - 100px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.flightListItem {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  cursor: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.flightListItem:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateX(-5px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.flightListItem.selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  transform: translateX(-5px);
+}
+
+.flightListItem.following {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%);
+  border-color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  animation: followingPulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+.flightListItem.following .liveBadge {
+  background: #10b981;
+  color: white;
+}
+
+@keyframes followingPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), 0 0 40px rgba(16, 185, 129, 0.4);
+  }
+}
+
+.flightListHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.flightListHeader strong {
+  flex: 1;
+  font-size: 1.1rem;
+}
+
+.rotating {
+  animation: rotateIcon 3s linear infinite;
+}
+
+@keyframes rotateIcon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.liveBadge {
+  background: #ff0000;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.liveBadge.pulse {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.flightListRoute {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.flightListData {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.noActiveFlights {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+  color: #999;
+  text-align: center;
+}
+
+.noActiveFlightsText {
+  margin-bottom: 0.5rem;
+}
+
+.noActiveFlightsHint {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  text-align: center;
+  display: block;
+}
+
+/* Estilos para la ruta del vuelo en la lista */
+.flightRouteInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.routeOrigin {
+  font-weight: bold;
+  color: #667eea;
+}
+
+.routeArrow {
+  opacity: 0.6;
+}
+
+.routeDestination {
+  font-weight: bold;
+  color: #764ba2;
+}
+
+.flightScheduleInfo {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+.mapLoading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: white;
+}
+
+.spinningPlane {
+  color: #667eea;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Estilos para el popup del mapa */
+.flightPopup {
+  min-width: 200px;
+}
+
+.popupHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.popupContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.popupRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.popupFooter {
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+  font-size: 0.85rem;
+  color: #999;
+  text-align: center;
+}
+
+/* Estilos para iconos de avión */
+:global(.plane-icon) {
+  background: transparent;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: planeFloat 3s ease-in-out infinite;
+}
+
+:global(.plane-icon:hover) {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+}
+
+@keyframes planeFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Ruta de vuelo */
+.flightPath {
+  animation: pathPulse 2s ease-in-out infinite;
+}
+
+@keyframes pathPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .flightsPanel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .realtimeMapContainer {
+    height: calc(100vh - 140px);
+  }
+  
+  .mapWrapper {
+    flex-direction: column-reverse;
+  }
+  
+  .flightsPanel {
+    width: 100%;
+    max-height: 200px;
+    border-left: none;
+    border-top: 2px solid #f0f0f0;
+  }
+}

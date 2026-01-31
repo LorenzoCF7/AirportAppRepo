@@ -1,0 +1,49 @@
+/* ========================================
+   Target Component - Crosshair Cursor
+   ======================================== */
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.cursorContained {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lineHorizontal {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+  transform: translateY(50%);
+  opacity: 0;
+}
+
+.lineVertical {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  pointer-events: none;
+  transform: translateX(50%);
+  opacity: 0;
+}

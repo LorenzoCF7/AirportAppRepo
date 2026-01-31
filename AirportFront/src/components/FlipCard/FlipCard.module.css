@@ -1,0 +1,400 @@
+/* ============================================
+   TARJETA EN EL GRID (estado normal)
+   ============================================ */
+.flipCardContainer {
+  position: relative;
+  perspective: 1200px;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Tarjeta en el grid con animación de entrada */
+.flipCardContainer.gridCard {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.flipCardContainer.gridCard.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Estado expandido - modal centrado */
+.flipCardContainer.expanded {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 90vw;
+  max-width: 1100px;
+  height: 80vh;
+  min-height: 500px;
+  max-height: 700px;
+  margin: auto;
+  z-index: 1000000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.flipCardContainer.expanded.modalVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease-out;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.flipCardInner.flipped {
+  transform: rotateY(180deg) translateZ(0);
+  -webkit-transform: rotateY(180deg) translateZ(0);
+}
+
+.flipCardFront,
+.flipCardBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1.25rem;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* GPU acceleration */
+  will-change: transform;
+  -webkit-font-smoothing: antialiased;
+}
+
+.flipCardFront {
+  z-index: 2;
+  transform: rotateY(0deg) translateZ(0);
+  -webkit-transform: rotateY(0deg) translateZ(0);
+  overflow: hidden;
+}
+
+.flipCardBack {
+  transform: rotateY(180deg) translateZ(0);
+  -webkit-transform: rotateY(180deg) translateZ(0);
+  background: white;
+  overflow-y: auto;
+  overflow-x: hidden;
+  pointer-events: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Scroll invisible pero funcional */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Chrome, Safari, Opera - scroll invisible */
+.flipCardBack::-webkit-scrollbar {
+  display: none;
+}
+
+/* Overlay de fondo cuando la tarjeta está expandida */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 999999;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modalOverlay.overlayVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Estilos para FlightDetails dentro del FlipCard */
+.flipCardBack :global(.modal-overlay) {
+  position: relative;
+  background: transparent;
+  padding: 0;
+  display: block;
+  overflow: visible;
+  backdrop-filter: none;
+}
+
+.flipCardBack :global(.modal-content) {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  max-height: 100%;
+  height: 100%;
+  box-shadow: none;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  animation: none;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.flipCardBack :global(.modal-header) {
+  border-radius: 1.25rem 1.25rem 0 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.flipCardBack :global(.modal-body) {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.85rem 0.85rem 1.25rem 0.85rem;
+  box-sizing: border-box;
+  opacity: 1;
+  background: white;
+  border-radius: 0 0 1.25rem 1.25rem;
+  margin: 0;
+  margin-bottom: -1px;
+}
+
+/* Hacer el contenido más compacto para mejor visualización */
+.flipCardBack :global(.modal-body .detail-section) {
+  margin-bottom: 0.6rem;
+}
+
+.flipCardBack :global(.modal-body .detail-section:last-child) {
+  margin-bottom: 0;
+}
+
+.flipCardBack :global(.modal-body .airports-section) {
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.flipCardBack :global(.modal-body .airport-detail) {
+  padding: 0.75rem;
+}
+
+.flipCardBack :global(.modal-body .section-title) {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.flipCardBack :global(.modal-body .detail-grid) {
+  gap: 0.75rem;
+}
+
+.flipCardBack :global(.modal-body .status-banner) {
+  padding: 0.6rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.flipCardBack :global(.modal-body .live-section),
+.flipCardBack :global(.modal-body .landed-section) {
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.flipCardBack :global(.modal-body .airport-code-large) {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.flipCardBack :global(.modal-body .time-info) {
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.flipCardBack :global(.modal-body .airport-header) {
+  margin-bottom: 0.5rem;
+}
+
+.flipCardBack :global(.modal-body .live-data-grid) {
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.flipCardBack :global(.modal-body .airport-name) {
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.flipCardBack :global(.modal-body .time-item) {
+  padding: 0.4rem;
+}
+
+.flipCardBack :global(.modal-body .detail-item) {
+  padding: 0;
+}
+
+/* Scrollbar estilizado */
+.flipCardBack :global(.modal-body::-webkit-scrollbar) {
+  width: 6px;
+}
+
+.flipCardBack :global(.modal-body::-webkit-scrollbar-track) {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.flipCardBack :global(.modal-body::-webkit-scrollbar-thumb) {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.flipCardBack :global(.modal-body::-webkit-scrollbar-thumb:hover) {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .flipCardContainer.expanded {
+    width: 95vw;
+    height: 92vh;
+    max-height: 100vh;
+  }
+
+  .flipCardBack :global(.modal-body) {
+    padding: 0.85rem;
+  }
+
+  .flipCardBack :global(.modal-body .detail-section) {
+    margin-bottom: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .airports-section) {
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-detail) {
+    padding: 0.65rem;
+  }
+
+  .flipCardBack :global(.modal-body .section-title) {
+    font-size: 0.95rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .flipCardBack :global(.modal-body .detail-grid) {
+    gap: 0.65rem;
+  }
+
+  .flipCardBack :global(.modal-body .status-banner) {
+    padding: 0.55rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .flipCardBack :global(.modal-body .live-section),
+  .flipCardBack :global(.modal-body .landed-section) {
+    padding: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-code-large) {
+    font-size: 1.75rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .flipCardBack :global(.modal-body .time-info) {
+    gap: 0.45rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .flipCardBack :global(.modal-body .live-data-grid) {
+    gap: 0.65rem;
+    margin-bottom: 0.45rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flipCardContainer.expanded {
+    width: 98vw;
+    height: 96vh;
+  }
+
+  .flipCardBack :global(.modal-body) {
+    padding: 0.7rem;
+    height: calc(100% - 60px);
+  }
+
+  .flipCardBack :global(.modal-body .detail-section) {
+    margin-bottom: 0.5rem;
+  }
+
+  .flipCardBack :global(.modal-body .airports-section) {
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-detail) {
+    padding: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .section-title) {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .flipCardBack :global(.modal-body .detail-grid) {
+    gap: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .status-banner) {
+    padding: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .flipCardBack :global(.modal-body .live-section),
+  .flipCardBack :global(.modal-body .landed-section) {
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-code-large) {
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .flipCardBack :global(.modal-body .time-info) {
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-header) {
+    margin-bottom: 0.4rem;
+  }
+
+  .flipCardBack :global(.modal-body .live-data-grid) {
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .flipCardBack :global(.modal-body .airport-name) {
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .flipCardBack :global(.modal-body .time-item) {
+    padding: 0.35rem;
+  }
+
+  .flipCardBack :global(.modal-body .detail-item) {
+    gap: 0.35rem;
+  }
+}

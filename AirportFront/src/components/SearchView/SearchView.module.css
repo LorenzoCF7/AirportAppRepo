@@ -1,0 +1,139 @@
+.searchView {
+  width: 100%;
+  min-height: 100vh;
+  background: #efefef;
+  padding: 0;
+  position: relative;
+}
+
+.viewHeader {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 2.5rem;
+  background: #FFFFFF;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E7EB;
+}
+
+.contentSection {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: block;
+  min-width: 0;
+  overflow: visible;
+  background: #FFFFFF;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E7EB;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2937;
+  text-shadow: none;
+  margin: 0;
+}
+
+.lastUpdate {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.flightsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  max-width: 100%;
+  width: 100%;
+  min-height: 0;
+  grid-auto-rows: minmax(450px, auto);
+  align-items: stretch;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f0f0f0;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #c62828;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .flightsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .flightsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1300px) {
+  .flightsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1301px) {
+  .flightsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

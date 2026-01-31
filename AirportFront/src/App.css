@@ -1,0 +1,83 @@
+/* App Container - Diseño Standalone */
+
+liferay-custom-element-react * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+liferay-custom-element-react .app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #F9FAFB;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Vista de mapa - Layout especial */
+liferay-custom-element-react .app-container.map-view {
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+liferay-custom-element-react .app-container.map-view .main-content {
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+liferay-custom-element-react .app-container.map-view:has([data-sidebar="true"]:hover) .main-content {
+  padding-left: 0;
+}
+
+liferay-custom-element-react .main-content {
+  flex: 1;
+  padding: 2rem;
+  padding-left: calc(70px + 2rem);
+  background: #F9FAFB;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  height: 100%;
+}
+
+liferay-custom-element-react .main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+liferay-custom-element-react .main-content::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+liferay-custom-element-react .main-content::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+liferay-custom-element-react .main-content::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+  background-clip: content-box;
+}
+
+@media (max-width: 768px) {
+  liferay-custom-element-react .app-container {
+    flex-direction: column;
+  }
+}
+

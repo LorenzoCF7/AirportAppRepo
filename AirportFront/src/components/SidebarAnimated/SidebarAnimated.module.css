@@ -1,0 +1,316 @@
+/* SidebarAnimated - CSS Modules - APP STANDALONE */
+
+/* WRAPPER: Fondo negro que ocupa TODA la altura de la pantalla */
+.sidebarAnimatedWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 70px;
+  background: rgba(30, 41, 59, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  cursor: auto;
+}
+
+.sidebarAnimatedWrapper *,
+.sidebarAnimatedWrapper *::before,
+.sidebarAnimatedWrapper *::after {
+  cursor: auto;
+}
+
+.sidebarAnimatedWrapper:hover {
+  width: 240px;
+}
+
+/* Gradiente decorativo sobre el fondo */
+.sidebarAnimatedWrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, 
+    rgba(102, 126, 234, 0.1) 0%, 
+    transparent 30%,
+    transparent 70%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: 1;
+  transition: opacity 0.25s ease;
+}
+
+/* CONTENEDOR DE ICONOS: Siempre centrado verticalmente en la pantalla */
+.sidebarStickyContainer {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 70px;
+  pointer-events: none;
+  z-index: 102;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebarAnimatedWrapper:hover .sidebarStickyContainer {
+  width: 240px;
+}
+
+/* ICONOS */
+.sidebarAnimated {
+  width: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 0;
+  z-index: 101;
+  overflow: visible;
+  transition: width 0.25s ease;
+  pointer-events: auto;
+}
+
+.sidebarAnimatedWrapper:hover .sidebarAnimated {
+  width: 240px;
+}
+
+/* Prelayers */
+.sidebarPrelayers {
+  display: none;
+}
+
+/* Header */
+.sidebarHeader {
+  padding: 0 0 1.25rem 0;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.25);
+  margin-bottom: 1.5rem;
+  display: flex;
+  padding-left: 11px;
+}
+
+.sidebarLogoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sidebarLogo {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  transition: transform 0.25s;
+}
+
+.sidebarAnimated:hover .sidebarLogo {
+  transform: scale(1.05);
+}
+
+.sidebarLogoWrapper h2 {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s 0.05s, max-width 0.25s;
+}
+
+.sidebarAnimatedWrapper:hover .sidebarLogoWrapper h2 {
+  opacity: 1;
+  max-width: 200px;
+}
+
+/* Nav */
+.sidebarNav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.sidebarNavItem {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 11px;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+}
+
+.sidebarNavItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #667EEA 0%, #764BA2 100%);
+  border-radius: 0 2px 2px 0;
+  transition: transform 0.2s;
+}
+
+.sidebarNavItem:hover {
+  background: rgba(102, 126, 234, 0.15);
+  color: white;
+  transform: translateX(2px);
+}
+
+.sidebarNavItem:hover::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.sidebarNavItem svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.sidebarNavItem:hover svg {
+  transform: scale(1.1);
+}
+
+.sidebarNavItemLabel {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.2s 0.05s, max-width 0.25s;
+}
+
+.sidebarAnimatedWrapper:hover .sidebarNavItemLabel {
+  opacity: 1;
+  max-width: 200px;
+}
+
+.sidebarNavItem.active {
+  background: rgba(102, 126, 234, 0.25);
+  color: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.sidebarNavItem.active::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.navSeparator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
+  margin: 0.5rem 0.5rem;
+}
+
+/* Footer */
+.sidebarFooter {
+  padding: 0;
+  border-top: 1px solid rgba(102, 126, 234, 0.25);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.2s 0.05s, max-height 0.25s, padding 0.25s;
+}
+
+.sidebarAnimatedWrapper:hover .sidebarFooter {
+  opacity: 1;
+  max-height: 100px;
+  padding: 1rem 0.875rem;
+}
+
+.apiStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.15); }
+}
+
+.apiStatus span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Folder */
+.sidebarFolderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 11px;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  height: 100px;
+}
+
+.sidebarFolder {
+  cursor: pointer;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  transform: scale(0.85);
+}
+
+.sidebarFolder:hover {
+  transform: scale(0.95);
+}
+
+.sidebarFolderContainer .folderLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  margin-top: 0.5rem;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  height: 15px;
+  opacity: 0;
+  transition: opacity 0.2s 0.05s;
+}
+
+.sidebarAnimatedWrapper:hover .sidebarFolderContainer .folderLabel {
+  opacity: 1;
+}
+
+.sidebarToggle {
+  display: none;
+}

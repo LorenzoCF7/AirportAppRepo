@@ -1,0 +1,186 @@
+/* ChromaGrid Component - Chroma Card Grid with Spotlight Effects */
+
+.chromaGrid {
+  --r: 500px;
+  --cols: 3;
+  --rows: auto;
+
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-auto-rows: auto;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.chromaCard {
+  position: relative;
+  border-radius: var(--border-radius-lg);
+  background: var(--bg-secondary);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  border: 2px solid transparent;
+  --card-border: transparent;
+  --card-gradient: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+}
+
+.chromaCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--border-radius-lg);
+  padding: 2px;
+  background: var(--card-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.chromaCard:hover::before {
+  opacity: 1;
+}
+
+.chromaCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle var(--r) at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.chromaCard:hover::after {
+  opacity: 1;
+}
+
+.chromaImgWrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.chromaImgWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.chromaCard:hover .chromaImgWrapper img {
+  transform: scale(1.1);
+}
+
+.chromaInfo {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  background: var(--bg-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.handle {
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.role {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.location {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.location::before {
+  content: '📍';
+}
+
+/* Overlay for mouse effects */
+.chromaOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--r) at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.chromaGrid:hover .chromaOverlay {
+  opacity: 1;
+}
+
+/* Fade effect */
+.chromaFade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle calc(var(--r) * 1.5) at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+
+.chromaGrid:hover .chromaFade {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .chromaGrid {
+    --cols: 2;
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .chromaGrid {
+    --cols: 1;
+    padding: var(--spacing-md);
+  }
+
+  .chromaImgWrapper {
+    height: 150px;
+  }
+
+  .name {
+    font-size: 1.125rem;
+  }
+}
