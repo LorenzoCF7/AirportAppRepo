@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 
+import Header from './components/Header/Header'
 import SidebarAnimated from './components/SidebarAnimated/SidebarAnimated'
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner'
 import NotificationToast from './components/NotificationToast/NotificationToast'
 import TicketsModal from './components/TicketsModal/TicketsModal'
+import LoginRegisterModal from './components/LoginRegisterModal/LoginRegisterModal'
+import { useAuth } from './context/AuthContext'
 import { flightService } from './services/flightService'
 import { flightSimulator } from './services/flightSimulator'
 import { APP_VIEW, STORAGE_KEYS, SCROLL_OFFSET, SIMULATOR_INTERVAL } from './constants'
@@ -20,7 +23,9 @@ function App() {
   const mainContentRef = useRef(null);
   const appContainerRef = useRef(null);
   const isFirstRender = useRef(true);
+  const { isAuthenticated } = useAuth();
   const [isTicketsModalOpen, setIsTicketsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
   const [activeView, setActiveView] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.ACTIVE_VIEW) || APP_VIEW.DASHBOARD;
@@ -90,6 +95,16 @@ function App() {
         ViewComponent = RealTimeMap;
         break;
       case APP_VIEW.SHOP:
+        // Proteger acceso a FlightShop
+        if (!isAuthenticated) {
+          setIsLoginModalOpen(true);
+          setActiveView(APP_VIEW.DASHBOARD);
+          return (
+            <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+              <DashboardView />
+            </Suspense>
+          );
+        }
         ViewComponent = FlightShop;
         break;
       case APP_VIEW.WALLET:
@@ -109,11 +124,18 @@ function App() {
 
   return (
     <div ref={appContainerRef} className={`app-container ${activeView === APP_VIEW.MAP ? 'map-view' : ''}`}>
+      <Header />
       <main className="main-content" ref={mainContentRef}>
         <SidebarAnimated 
           activeView={activeView} 
           onViewChange={setActiveView}
-          onOpenTicketsModal={() => setIsTicketsModalOpen(true)}
+          onOpenTicketsModal={() => {
+            if (isAuthenticated) {
+              setIsTicketsModalOpen(true);
+            } else {
+              setIsLoginModalOpen(true);
+            }
+          }}
         />
         {renderView()}
       </main>
@@ -127,6 +149,12 @@ function App() {
           setIsTicketsModalOpen(false);
           setActiveView('wallet');
         }}
+      />
+
+      {/* Modal de login */}
+      <LoginRegisterModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </div>
   )

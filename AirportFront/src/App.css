@@ -8,6 +8,7 @@ liferay-custom-element-react * {
 
 liferay-custom-element-react .app-container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   background: #F9FAFB;
@@ -35,7 +36,7 @@ liferay-custom-element-react .app-container.map-view {
 liferay-custom-element-react .app-container.map-view .main-content {
   padding: 0;
   overflow: hidden;
-  height: 100vh;
+  height: calc(100vh - 60px);
 }
 
 liferay-custom-element-react .app-container.map-view:has([data-sidebar="true"]:hover) .main-content {
