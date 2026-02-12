@@ -1,9 +1,9 @@
 package com.galacticos.AirportApp.service;
 
 import com.galacticos.AirportApp.config.JwtTokenProvider;
-import com.galacticos.AirportApp.dto.AuthResponse;
-import com.galacticos.AirportApp.dto.LoginRequest;
-import com.galacticos.AirportApp.dto.RegisterRequest;
+import com.galacticos.AirportApp.dto.request.LoginRequest;
+import com.galacticos.AirportApp.dto.request.RegisterRequest;
+import com.galacticos.AirportApp.dto.response.AuthResponse;
 import com.galacticos.AirportApp.entity.User;
 import com.galacticos.AirportApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

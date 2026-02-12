@@ -1,4 +1,4 @@
-package com.galacticos.AirportApp.dto;
+package com.galacticos.AirportApp.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
