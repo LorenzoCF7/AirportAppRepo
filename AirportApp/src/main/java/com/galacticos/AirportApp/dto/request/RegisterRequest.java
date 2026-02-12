@@ -1,4 +1,4 @@
-package com.galacticos.AirportApp.dto;
+package com.galacticos.AirportApp.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

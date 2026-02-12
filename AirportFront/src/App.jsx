@@ -45,6 +45,18 @@ function App() {
     }
   }, []);
 
+  // Manejar cambio de vista con protección de autenticación
+  const handleViewChange = useCallback((newView) => {
+    // Si intenta ir a SHOP sin autenticación, abrir modal de login
+    if (newView === APP_VIEW.SHOP && !isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return; // No cambiar la vista
+    }
+    
+    // Si está todo bien, cambiar la vista
+    setActiveView(newView);
+  }, [isAuthenticated]);
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.ACTIVE_VIEW, activeView);
     
@@ -95,16 +107,6 @@ function App() {
         ViewComponent = RealTimeMap;
         break;
       case APP_VIEW.SHOP:
-        // Proteger acceso a FlightShop
-        if (!isAuthenticated) {
-          setIsLoginModalOpen(true);
-          setActiveView(APP_VIEW.DASHBOARD);
-          return (
-            <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
-              <DashboardView />
-            </Suspense>
-          );
-        }
         ViewComponent = FlightShop;
         break;
       case APP_VIEW.WALLET:
@@ -124,11 +126,11 @@ function App() {
 
   return (
     <div ref={appContainerRef} className={`app-container ${activeView === APP_VIEW.MAP ? 'map-view' : ''}`}>
-      <Header />
+      <Header onLogout={() => setActiveView(APP_VIEW.DASHBOARD)} />
       <main className="main-content" ref={mainContentRef}>
         <SidebarAnimated 
           activeView={activeView} 
-          onViewChange={setActiveView}
+          onViewChange={handleViewChange}
           onOpenTicketsModal={() => {
             if (isAuthenticated) {
               setIsTicketsModalOpen(true);
@@ -147,7 +149,7 @@ function App() {
         onClose={() => setIsTicketsModalOpen(false)}
         onViewWallet={() => {
           setIsTicketsModalOpen(false);
-          setActiveView('wallet');
+          handleViewChange(APP_VIEW.WALLET);
         }}
       />
 

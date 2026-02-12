@@ -1,8 +1,8 @@
 package com.galacticos.AirportApp.controller;
 
-import com.galacticos.AirportApp.dto.AuthResponse;
-import com.galacticos.AirportApp.dto.LoginRequest;
-import com.galacticos.AirportApp.dto.RegisterRequest;
+import com.galacticos.AirportApp.dto.request.LoginRequest;
+import com.galacticos.AirportApp.dto.request.RegisterRequest;
+import com.galacticos.AirportApp.dto.response.AuthResponse;
 import com.galacticos.AirportApp.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,10 +3,18 @@ import { useAuth } from '../../context/AuthContext';
 import LoginRegisterModal from '../LoginRegisterModal/LoginRegisterModal';
 import styles from './Header.module.css';
 
-const Header = () => {
+const Header = ({ onLogout }) => {
   const { user, logout, isAuthenticated } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    if (onLogout) {
+      onLogout();
+    }
+  };
 
   return (
     <>
@@ -37,10 +45,7 @@ const Header = () => {
                     </div>
                     <button
                       className={styles.logoutBtn}
-                      onClick={() => {
-                        logout();
-                        setShowUserMenu(false);
-                      }}
+                      onClick={handleLogout}
                     >
                       Cerrar Sesión
                     </button>
