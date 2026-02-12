@@ -6,11 +6,16 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import { AuthProvider } from './context/AuthContext'
 
 class LiferayCustomElementReact extends HTMLElement {
 	connectedCallback() {
 		this.root = createRoot(this);
-		this.root.render(<App />);
+		this.root.render(
+			<AuthProvider>
+				<App />
+			</AuthProvider>
+		);
 	}
 
 	disconnectedCallback() {
