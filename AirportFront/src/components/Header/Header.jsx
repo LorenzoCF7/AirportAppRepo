@@ -1,73 +1,185 @@
 import { useState } from 'react';
+import {
+  Menu, X, Plane, Search, Map, ShoppingCart, Wallet,
+  Heart, User, LogOut, Plus, Bookmark, Globe, Sparkles,
+  Navigation, MessageSquare, Euro
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoginRegisterModal from '../LoginRegisterModal/LoginRegisterModal';
 import styles from './Header.module.css';
 
-const Header = ({ onLogout }) => {
+const mainNav = [
+  { id: 'dashboard', label: 'Vuelos',           Icon: Plane },
+  { id: 'search',    label: 'Búsqueda',          Icon: Search },
+  { id: 'map',       label: 'Mapa en Vivo',      Icon: Map },
+  { id: 'shop',      label: 'Comprar Billetes',  Icon: ShoppingCart },
+  { id: 'wallet',    label: 'Mi Cartera',        Icon: Wallet },
+  { id: null,        label: 'Planifica con IA',  Icon: Sparkles },
+];
+
+const discoverNav = [
+  { id: 'explore', label: 'Explorar destinos', Icon: Globe },
+  { id: null,      label: 'Vuelos directos',   Icon: Navigation },
+  { id: null,      label: 'Mejores precios',   Icon: Euro },
+];
+
+const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal }) => {
   const { user, logout, isAuthenticated } = useAuth();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loginOpen, setLoginOpen]   = useState(false);
+
+  const closeDrawer = () => setDrawerOpen(false);
+
+  const handleNavClick = (id) => {
+    if (id) onViewChange(id);
+    closeDrawer();
+  };
 
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    if (onLogout) {
-      onLogout();
-    }
+    closeDrawer();
+    if (onLogout) onLogout();
+  };
+
+  const handleTickets = () => {
+    onOpenTicketsModal();
+    closeDrawer();
   };
 
   return (
     <>
+      {/* ── TOP BAR ── */}
       <header className={styles.header}>
         <div className={styles.container}>
-          {/* Nombre de la App */}
-          <div className={styles.appName}>
-            <h1>✈️ AirportApp</h1>
+
+          <div className={styles.left}>
+            <button className={styles.menuBtn} onClick={() => setDrawerOpen(true)} aria-label="Menú">
+              <Menu size={22} />
+            </button>
+            <div className={styles.logo} onClick={() => onViewChange('dashboard')}>
+              <span className={styles.logoSquare}>
+                <Plane size={14} color="white" />
+              </span>
+              <span className={styles.logoText}>AirportApp</span>
+            </div>
           </div>
 
-          {/* Sección de autenticación */}
-          <div className={styles.authSection}>
+          <div className={styles.right}>
+            <button className={styles.iaBtn}>
+              <Plus size={13} strokeWidth={2.5} />
+              <span>IA</span>
+            </button>
+            <button className={styles.iconBtn} onClick={handleTickets} title="Mis Billetes">
+              <Heart size={17} />
+            </button>
             {isAuthenticated ? (
-              <div className={styles.userContainer}>
-                <button
-                  className={styles.userButton}
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                >
-                  <span className={styles.userIcon}>👤</span>
-                  <span className={styles.userName}>{user.username || user.email}</span>
-                  <span className={styles.dropdown}>▼</span>
-                </button>
-
-                {showUserMenu && (
-                  <div className={styles.userMenu}>
-                    <div className={styles.userInfo}>
-                      <p className={styles.userEmail}>{user.email}</p>
-                    </div>
-                    <button
-                      className={styles.logoutBtn}
-                      onClick={handleLogout}
-                    >
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
               <button
-                className={styles.loginBtn}
-                onClick={() => setIsLoginModalOpen(true)}
+                className={`${styles.iconBtn} ${activeView === 'profile' ? styles.iconBtnActive : ''}`}
+                onClick={() => onViewChange('profile')}
+                title={user?.username || user?.email}
               >
-                Iniciar Sesión
+                <User size={17} />
+              </button>
+            ) : (
+              <button className={styles.iconBtn} onClick={() => setLoginOpen(true)} title="Iniciar Sesión">
+                <User size={17} />
               </button>
             )}
           </div>
         </div>
       </header>
 
-      <LoginRegisterModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
+      {/* ── BACKDROP ── */}
+      {drawerOpen && <div className={styles.backdrop} onClick={closeDrawer} />}
+
+      {/* ── DRAWER ── */}
+      <div className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ''}`}>
+
+        {/* Header */}
+        <div className={styles.drawerTop}>
+          <div className={styles.drawerLogo}>
+            <span className={styles.drawerLogoSquare}>
+              <Plane size={13} color="white" />
+            </span>
+            <span className={styles.drawerLogoText}>AirportApp</span>
+          </div>
+          <button className={styles.closeBtn} onClick={closeDrawer} aria-label="Cerrar menú">
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className={styles.drawerNav}>
+
+          {/* Main navigation */}
+          <div className={styles.drawerGroup}>
+            {mainNav.map(({ id, label, Icon }) => (
+              <button
+                key={label}
+                className={`${styles.drawerItem} ${activeView === id ? styles.drawerItemActive : ''}`}
+                onClick={() => handleNavClick(id)}
+              >
+                <span className={styles.drawerIcon}><Icon size={19} /></span>
+                <span className={styles.drawerLabel}>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.drawerDivider} />
+
+          {/* Discover */}
+          <div className={styles.drawerGroup}>
+            {discoverNav.map(({ id, label, Icon }) => (
+              <button key={label} className={`${styles.drawerItem} ${activeView === id ? styles.drawerItemActive : ''}`} onClick={() => handleNavClick(id)}>
+                <span className={styles.drawerIcon}><Icon size={19} /></span>
+                <span className={styles.drawerLabel}>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.drawerDivider} />
+
+          {/* Tickets */}
+          <div className={styles.drawerGroup}>
+            <button className={styles.drawerItem} onClick={handleTickets}>
+              <span className={styles.drawerIcon}><Bookmark size={19} /></span>
+              <span className={styles.drawerLabel}>Mis Billetes</span>
+            </button>
+          </div>
+
+          <div className={styles.drawerDivider} />
+
+          {/* Auth + settings */}
+          <div className={styles.drawerGroup}>
+            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={closeDrawer}>
+              <span className={styles.drawerIcon}>🇪🇸</span>
+              <span className={styles.drawerLabel}>Español</span>
+            </button>
+            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={closeDrawer}>
+              <span className={styles.drawerIcon}><MessageSquare size={19} /></span>
+              <span className={styles.drawerLabel}>Escríbenos</span>
+            </button>
+
+            {isAuthenticated ? (
+              <>
+                <div className={styles.drawerUserEmail}>{user?.email}</div>
+                <button className={`${styles.drawerItem} ${styles.drawerItemLogout}`} onClick={handleLogout}>
+                  <span className={styles.drawerIcon}><LogOut size={19} /></span>
+                  <span className={styles.drawerLabel}>Cerrar Sesión</span>
+                </button>
+              </>
+            ) : (
+              <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={() => { setLoginOpen(true); closeDrawer(); }}>
+                <span className={styles.drawerIcon}><User size={19} /></span>
+                <span className={styles.drawerLabel}>Iniciar Sesión</span>
+              </button>
+            )}
+          </div>
+
+        </nav>
+      </div>
+
+      <LoginRegisterModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 };

@@ -1,0 +1,418 @@
+.page {
+  display: flex;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+/* ══════════════════════════
+   LEFT PANEL
+══════════════════════════ */
+.panel {
+  width: 420px;
+  min-width: 420px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+  z-index: 10;
+}
+
+/* ── Search box ── */
+.searchBox {
+  padding: 14px 14px 0;
+  flex-shrink: 0;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.searchField {
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchField:hover {
+  border-color: #111827;
+}
+
+.searchFieldFull {
+  grid-column: 1 / -1;
+  margin-bottom: 14px;
+}
+
+.searchCode {
+  font-weight: 700;
+  color: #111827;
+  font-size: 14px;
+}
+
+.searchPlaceholder {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ── Filters ── */
+.filters {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.filters::-webkit-scrollbar { display: none; }
+
+.filterChip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.filterChip:hover {
+  border-color: #111827;
+  background: #f9fafb;
+}
+
+/* ── Destination list ── */
+.list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.list::-webkit-scrollbar { width: 3px; }
+.list::-webkit-scrollbar-track { background: transparent; }
+.list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 2px; }
+
+.destCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+
+.destCard:hover {
+  background: #fafafa;
+}
+
+.destCardActive {
+  background: #f5f5f5;
+}
+
+.destThumb {
+  width: 96px;
+  height: 72px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.destInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.destName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.destMeta {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.destDirect {
+  font-size: 12px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.destStop {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.destRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  height: 72px;
+}
+
+.destPrice {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  margin-top: auto;
+}
+
+.heartBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d1d5db;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.heartBtn:hover {
+  color: #FF690F;
+}
+
+/* ══════════════════════════
+   DETAIL VIEW
+══════════════════════════ */
+.detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #374151;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.backBtn:hover {
+  background: #f9fafb;
+  transform: translateX(-1px);
+}
+
+.detailPhoto {
+  width: 100%;
+  height: 230px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.detailBody {
+  padding: 22px 20px 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.detailCity {
+  font-size: 28px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.detailDot {
+  color: #FF690F;
+}
+
+.detailCountry {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 22px;
+}
+
+.priceBox {
+  background: #f9fafb;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.priceLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.priceAmount {
+  font-size: 32px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.priceMeta {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.searchBtn {
+  width: 100%;
+  padding: 15px;
+  background: #FF690F;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, transform 0.1s;
+  margin-bottom: 20px;
+  letter-spacing: 0.01em;
+}
+
+.searchBtn:hover {
+  background: #E55A00;
+  transform: translateY(-1px);
+}
+
+.airlineRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.airlineLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.airlinePills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.airlinePill {
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* ══════════════════════════
+   MAP
+══════════════════════════ */
+.mapWrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+/* Leaflet popup override */
+:global(.explore-popup .leaflet-popup-content-wrapper) {
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  border: none;
+  padding: 0;
+}
+
+:global(.explore-popup .leaflet-popup-content) {
+  margin: 14px 18px;
+  line-height: 1.5;
+}
+
+:global(.explore-popup .leaflet-popup-tip-container) {
+  display: none;
+}
+
+/* ══════════════════════════
+   RESPONSIVE
+══════════════════════════ */
+@media (max-width: 768px) {
+  .panel {
+    width: 100%;
+    min-width: 100%;
+    height: 55%;
+  }
+
+  .page {
+    flex-direction: column;
+  }
+
+  .mapWrap {
+    height: 45%;
+  }
+}

@@ -39,14 +39,10 @@ liferay-custom-element-react .app-container.map-view .main-content {
   height: calc(100vh - 60px);
 }
 
-liferay-custom-element-react .app-container.map-view:has([data-sidebar="true"]:hover) .main-content {
-  padding-left: 0;
-}
 
 liferay-custom-element-react .main-content {
   flex: 1;
-  padding: 2rem;
-  padding-left: calc(70px + 2rem);
+  padding: 0;
   background: #F9FAFB;
   position: relative;
   z-index: 1;

@@ -5,7 +5,9 @@ export const APP_VIEW = {
   SEARCH: 'search',
   MAP: 'map',
   SHOP: 'shop',
-  WALLET: 'wallet'
+  WALLET: 'wallet',
+  EXPLORE: 'explore',
+  PROFILE: 'profile',
 };
 
 export const APP_VIEW_LABELS = {

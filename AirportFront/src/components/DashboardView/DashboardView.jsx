@@ -1,230 +1,268 @@
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, AlertCircle, Plane, PlaneTakeoff, TrendingUp, Clock, Calendar } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
+import { Plane, Search, ArrowLeftRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import FlipCard from '../FlipCard/FlipCard';
-import { flightService } from '../../services/flightService';
-import { flightSimulator } from '../../services/flightSimulator';
 import styles from './DashboardView.module.css';
 
-const DashboardView = () => {
-  const [flights, setFlights] = useState([]);
-  const [loading, setLoading] = useState(false); // Cambiado a false para renderizar inmediatamente
-  const [error, setError] = useState(null);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+const heroPhotos = [
+  { city: 'Marrakech', image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'Santorini', image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'Lisboa',    image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'Ámsterdam', image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'Tokio',     image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'París',     image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=600&h=320&q=80' },
+];
 
-  // React 19: useCallback para optimizar re-renders
-  const loadFlights = useCallback(async (forceRefresh = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Obtener vuelos (forzar refresh genera nuevos datos MOCK)
-      const response = await flightService.getAllFlights(forceRefresh);
-      const newFlights = response.data || [];
-      
-      // Si es refresh forzado, reinicializar el simulador con los nuevos datos
-      if (forceRefresh) {
-        console.log('🔄 Reinicializando simulador con nuevos vuelos...');
-        flightSimulator.clear(false); // Limpiar datos pero mantener el simulador corriendo
-        flightSimulator.initializeFlights(newFlights);
-      }
-      
-      setFlights(newFlights);
-      setLastUpdate(new Date());
-      
-      console.log('✅ Dashboard actualizado con', newFlights.length, 'vuelos');
-    } catch (err) {
-      setError('Error al cargar los vuelos. Por favor, intenta de nuevo.');
-      console.error('Error loading flights:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []); // Sin dependencias para evitar bucle infinito
+const dealCards = [
+  { city: 'Barcelona', time: '1 h 30 min, directo',   price: 45,  dateFrom: '5/6',  dateTo: '12/6',  image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Londres',   time: '2 h 10 min, directo',   price: 78,  dateFrom: '20/6', dateTo: '27/6',  image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'París',     time: '1 h 55 min, directo',   price: 63,  dateFrom: '7/6',  dateTo: '14/6',  image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Roma',      time: '2 h 20 min, directo',   price: 89,  dateFrom: '13/6', dateTo: '20/6',  image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Lisboa',    time: '2 h 05 min, directo',   price: 54,  dateFrom: '10/6', dateTo: '17/6',  image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Berlín',    time: '2 h 35 min, directo',   price: 71,  dateFrom: '15/6', dateTo: '22/6',  image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Ámsterdam', time: '2 h 25 min, directo',   price: 82,  dateFrom: '18/6', dateTo: '25/6',  image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Viena',     time: '2 h 45 min, directo',   price: 95,  dateFrom: '22/6', dateTo: '29/6',  image: 'https://images.unsplash.com/photo-1516550135131-9de3cb85cd33?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Praga',     time: '2 h 50 min, directo',   price: 67,  dateFrom: '1/7',  dateTo: '8/7',   image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Tokio',     time: '13 h 10 min, 1 escala', price: 420, dateFrom: '3/7',  dateTo: '17/7',  image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=500&h=280&q=80' },
+];
 
-  useEffect(() => {
-    loadFlights();
-    
-    // Escuchar eventos de cambio de estado del simulador
-    const handleFlightUpdate = () => {
-      // Recargar solo desde sessionStorage (sin hacer nueva llamada a API)
-      const stored = sessionStorage.getItem('flight_tracker_data');
-      if (stored) {
-        const data = JSON.parse(stored);
-        setFlights(data.data || []);
-        setLastUpdate(new Date());
-      }
-    };
-    
-    // Actualización automática cada 2 segundos desde sessionStorage
-    // Esto permite ver cambios en tiempo real mientras miras las tarjetas
-    const intervalId = setInterval(handleFlightUpdate, 2000);
-    
-    // Escuchar notificaciones de vuelos (despegue/aterrizaje)
-    window.addEventListener('flight-notification', handleFlightUpdate);
-    
-    return () => {
-      clearInterval(intervalId);
-      window.removeEventListener('flight-notification', handleFlightUpdate);
-    };
-  }, []); // Solo se ejecuta una vez al montar
+const destinationList = [
+  'Madrid', 'Londres', 'Barcelona', 'Roma', 'París', 'Nueva York',
+  'Palma', 'Ámsterdam', 'Tenerife', 'Berlín', 'Lisboa', 'Milán',
+];
 
-  // React 19: useMemo para cachear cálculos pesados
-  const stats = useMemo(() => ({
-    total: flights.length,
-    active: flights.filter(f => f.flight_status === 'active').length,
-    scheduled: flights.filter(f => f.flight_status === 'scheduled').length,
-    landed: flights.filter(f => f.flight_status === 'landed').length,
-  }), [flights]);
+const DashboardView = ({ onNavigate }) => {
+  const [tripType, setTripType] = useState('roundtrip');
+  const [heroSearch, setHeroSearch] = useState({
+    origin: '', destination: '', departureDate: '', returnDate: '',
+  });
 
-  // Ordenar vuelos por estado: active → scheduled → landed
-  const sortedFlights = useMemo(() => {
-    const statusOrder = {
-      'active': 1,
-      'scheduled': 2,
-      'landed': 3,
-      'cancelled': 4,
-      'delayed': 5
-    };
-    
-    return [...flights].sort((a, b) => {
-      const orderA = statusOrder[a.flight_status] || 999;
-      const orderB = statusOrder[b.flight_status] || 999;
-      return orderA - orderB;
-    });
-  }, [flights]);
+  const carouselRef = useRef(null);
+
+  const scrollCarousel = useCallback((dir) => {
+    if (!carouselRef.current) return;
+    const card = carouselRef.current.querySelector('[data-card]');
+    const step = card ? card.offsetWidth + 16 : 260;
+    carouselRef.current.scrollBy({ left: dir * step * 2, behavior: 'smooth' });
+  }, []);
+
+  const handleSwap = useCallback(() => {
+    setHeroSearch(prev => ({ ...prev, origin: prev.destination, destination: prev.origin }));
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    if (onNavigate) onNavigate('shop');
+  }, [onNavigate]);
 
   return (
-    <div className={styles.dashboardView}>
-      {/* Header - Renderizar inmediatamente sin animación para mejorar LCP */}
-      <div className={styles.viewHeader}>
-        <div className={styles.headerContent}>
-          <div>
-            <h1 className={styles.dashboardTitle}>
-              <Plane className={styles.titleIcon} />
-              Dashboard - Vuelos en Europa
+    <div className={styles.page}>
+
+      {/* ── HERO ── */}
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+
+          {/* Left */}
+          <div className={styles.heroLeft}>
+            <h1 className={styles.heroTitle}>
+              Compara ofertas de vuelos<br />en cientos de webs<span className={styles.titleDot}>.</span>
             </h1>
-            <p className={styles.dashboardSubtitle}>
-              Modo de prueba con datos simulados • Actualización manual
-            </p>
+
+            {/* Service tabs */}
+            <div className={styles.serviceTabs}>
+              <button className={`${styles.serviceTab} ${styles.serviceTabActive}`}>
+                <span className={styles.serviceIconBox} style={{ background: '#FF690F' }}>
+                  <Plane size={18} color="white" />
+                </span>
+                <span className={styles.serviceLabel}>Vuelos</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🏨</span>
+                <span className={styles.serviceLabel}>Alojamientos</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🚗</span>
+                <span className={styles.serviceLabel}>Coches</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🌴</span>
+                <span className={styles.serviceLabel}>Viajes</span>
+              </button>
+            </div>
+
+            {/* Trip options row */}
+            <div className={styles.tripOptions}>
+              <button
+                className={styles.tripOptionBtn}
+                onClick={() => setTripType(t => t === 'roundtrip' ? 'oneway' : 'roundtrip')}
+              >
+                {tripType === 'roundtrip' ? 'Ida y vuelta' : 'Solo ida'} ▾
+              </button>
+              <button className={styles.tripOptionBtn}>0 piezas ▾</button>
+            </div>
+
+            {/* Search bar */}
+            <div className={styles.searchBar}>
+              <div className={styles.sbField}>
+                <input
+                  className={styles.sbInput}
+                  placeholder="Origen"
+                  value={heroSearch.origin}
+                  onChange={e => setHeroSearch(p => ({ ...p, origin: e.target.value }))}
+                />
+                {heroSearch.origin && (
+                  <button className={styles.sbClear} onClick={() => setHeroSearch(p => ({ ...p, origin: '' }))}>×</button>
+                )}
+              </div>
+
+              <button className={styles.sbSwap} onClick={handleSwap}>
+                <ArrowLeftRight size={15} />
+              </button>
+
+              <div className={styles.sbField}>
+                <input
+                  className={styles.sbInput}
+                  placeholder="Destino"
+                  value={heroSearch.destination}
+                  onChange={e => setHeroSearch(p => ({ ...p, destination: e.target.value }))}
+                />
+              </div>
+
+              <div className={styles.sbDivider} />
+
+              <div className={styles.sbDates}>
+                <input
+                  type="date"
+                  className={styles.sbDateInput}
+                  value={heroSearch.departureDate}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={e => setHeroSearch(p => ({ ...p, departureDate: e.target.value }))}
+                />
+                {tripType === 'roundtrip' && (
+                  <>
+                    <span className={styles.sbDateSep}>—</span>
+                    <input
+                      type="date"
+                      className={styles.sbDateInput}
+                      value={heroSearch.returnDate}
+                      min={heroSearch.departureDate || new Date().toISOString().split('T')[0]}
+                      onChange={e => setHeroSearch(p => ({ ...p, returnDate: e.target.value }))}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className={styles.sbDivider} />
+
+              <div className={styles.sbPassengers}>
+                1 adulto, Turista
+              </div>
+
+              <button className={styles.sbSubmit} onClick={handleSearch}>
+                <Search size={20} />
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => loadFlights(true)}
-            disabled={loading}
-            className={styles.refreshButton}
-          >
-            <RefreshCw size={20} className={loading ? 'spinning' : ''} />
-            <span>Actualizar Vuelos</span>
-          </button>
+
+          {/* Right: photo grid */}
+          <div className={styles.heroRight}>
+            <div className={styles.photoGrid}>
+              {heroPhotos.map(photo => (
+                <div
+                  key={photo.city}
+                  className={styles.photoCard}
+                  style={{ backgroundImage: `url(${photo.image})` }}
+                >
+                  <div className={styles.photoOverlay} />
+                  <span className={styles.photoLabel}>{photo.city}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Stats Cards - SIN motion.div wrapper para prevenir override de estilos */}
-      <div className={styles.statsGrid}>
-        <StatsCard
-          value={stats.total}
-          label="Total Vuelos"
-          type="total"
-          icon={<PlaneTakeoff className="stat-icon" />}
-        />
-        <StatsCard
-          value={stats.active}
-          label="En Vuelo"
-          type="active"
-          icon={<TrendingUp className="stat-icon" />}
-          pulse
-        />
-        <StatsCard
-          value={stats.scheduled}
-          label="Programados"
-          type="scheduled"
-          icon={<Clock className="stat-icon" />}
-        />
-        <StatsCard
-          value={stats.landed}
-          label="Aterrizados"
-          type="landed"
-          icon={<Calendar className="stat-icon" />}
-        />
-      </div>
-
-      {/* Error Message */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={styles.errorMessage}
-          >
-            <AlertCircle size={20} />
-            <span>{error}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Flights Section */}
-      <div className={styles.contentSection}>
-        <div className={styles.sectionHeader}>
-          <h2>Vuelos Recientes</h2>
-          <span className={styles.lastUpdate}>
-            <Clock size={16} />
-            Última actualización: {lastUpdate.toLocaleTimeString('es-ES')}
-          </span>
+      {/* ── FEATURE CARDS ── */}
+      <section className={styles.features}>
+        <div className={styles.featuresInner}>
+          <div className={styles.featureCard}>
+            <div className={styles.airlineDots}>
+              {[0,1,2,3].map(i => <span key={i} className={styles.airlineDot} style={{ background: ['#FF690F','#fda085','#5b86e5','#36d1dc'][i] }} />)}
+            </div>
+            <h3 className={styles.featureTitle}>Compara y ahorra</h3>
+            <p className={styles.featureDesc}>Más ofertas. Más páginas. Una búsqueda.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.avatarRow}>
+              {['#FF690F','#5b86e5','#36d1dc'].map((c, i) => (
+                <span key={i} className={styles.avatar} style={{ background: c }}>
+                  {String.fromCharCode(65 + i)}
+                </span>
+              ))}
+            </div>
+            <h3 className={styles.featureTitle}>41.000.000+</h3>
+            <p className={styles.featureDesc}>búsquedas esta semana</p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.stars}>★★★★★</div>
+            <h3 className={styles.featureTitle}>Los viajeros nos adoran</h3>
+            <p className={styles.featureDesc}>Más de 1 millón de valoraciones en nuestra app</p>
+          </div>
         </div>
+      </section>
 
-        {loading ? (
-          <div className={styles.loadingContainer}>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              className={styles.loadingSpinner}
-            />
-            <p>Cargando vuelos...</p>
+      {/* ── DEAL CAROUSEL ── */}
+      <section className={styles.deals}>
+        <div className={styles.dealsInner}>
+          <div className={styles.dealsTitleRow}>
+            <h2 className={styles.dealsTitle}>Ofertas de vuelo disponibles</h2>
+            <div className={styles.carouselControls}>
+              <button className={styles.carouselBtn} onClick={() => scrollCarousel(-1)} aria-label="Anterior">
+                <ChevronLeft size={18} />
+              </button>
+              <button className={styles.carouselBtn} onClick={() => scrollCarousel(1)} aria-label="Siguiente">
+                <ChevronRight size={18} />
+              </button>
+              <button className={styles.exploreLink} onClick={handleSearch}>Explorar &rsaquo;</button>
+            </div>
           </div>
-        ) : sortedFlights.length === 0 ? (
-          <div className={styles.emptyState}>
-            <Plane size={48} style={{ opacity: 0.3 }} />
-            <p>No hay vuelos disponibles</p>
-            <button onClick={() => loadFlights(true)} className={styles.refreshButton}>
-              <RefreshCw size={20} />
-              <span>Cargar Vuelos</span>
-            </button>
-          </div>
-        ) : (
-          <div className={styles.flightsGrid}>
-            {sortedFlights.map((flight, index) => (
-              <FlipCard
-                key={flight.flight?.iata || flight.flightNumber || `flight-${index}`}
-                flight={flight}
-                index={index}
-              />
+          <div className={styles.carouselTrack} ref={carouselRef}>
+            {dealCards.map(deal => (
+              <button key={deal.city} className={styles.dealCard} data-card onClick={handleSearch}>
+                <div
+                  className={styles.dealPhoto}
+                  style={{ backgroundImage: `url(${deal.image})` }}
+                >
+                  <div className={styles.dealPhotoOverlay} />
+                </div>
+                <div className={styles.dealBody}>
+                  <h3 className={styles.dealCity}>{deal.city}</h3>
+                  <p className={styles.dealMeta}>{deal.time}</p>
+                  <p className={styles.dealDates}>{deal.dateFrom} → {deal.dateTo}</p>
+                  <p className={styles.dealPrice}>desde <strong>{deal.price} €</strong></p>
+                </div>
+              </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* ── DESTINATION LIST ── */}
+      <section className={styles.destList}>
+        <div className={styles.destListInner}>
+          <h2 className={styles.destListTitle}>Busca vuelos baratos por destino</h2>
+          <p className={styles.destListSub}>Busca y compara vuelos baratos</p>
+          <div className={styles.destGrid}>
+            {destinationList.map(dest => (
+              <button key={dest} className={styles.destItem} onClick={handleSearch}>
+                <span>Vuelos a {dest}</span>
+                <span className={styles.destChev}>▾</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 };
 
-// Stats Card Component - Memoizado para evitar re-renders innecesarios
-const StatsCard = memo(({ value, label, type, icon, pulse }) => {
-  return (
-    <div className={`${styles.statCard} ${styles[`statCard${type.charAt(0).toUpperCase() + type.slice(1)}`]}`}>
-      <div className={styles.statCardInner}>
-        <div className={styles.statHeader}>
-          <div className={`${styles.statIconWrapper} ${pulse ? styles.pulse : ''}`}>
-            {icon}
-          </div>
-        </div>
-        <div className={styles.statValue}>{value}</div>
-        <div className={styles.statLabel}>{label}</div>
-      </div>
-    </div>
-  );
-});
-
-StatsCard.displayName = 'StatsCard';
-
 export default DashboardView;
-export { StatsCard };

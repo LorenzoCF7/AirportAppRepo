@@ -10,9 +10,9 @@ liferay-custom-element-react {
      ======================================== */
   
   /* Colores primarios */
-  --color-primary: #8b5cf6;
-  --color-primary-light: #a78bfa;
-  --color-primary-dark: #7c3aed;
+  --color-primary: #FF690F;
+  --color-primary-light: #FF8540;
+  --color-primary-dark: #E55A00;
   --color-accent: #ec4899;  /* Color de acento para efectos especiales */
   
   /* Colores de estado de vuelo */
