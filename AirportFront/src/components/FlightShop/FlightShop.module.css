@@ -192,6 +192,45 @@
   to { transform: rotate(360deg); }
 }
 
+/* ── Filter banner ── */
+
+.filterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.filterBannerText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #c2410c;
+  letter-spacing: 0.02em;
+}
+
+.filterBannerClear {
+  background: none;
+  border: 1px solid #fb923c;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c2410c;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.filterBannerClear:hover {
+  background: #ffedd5;
+}
+
 /* ── Área de resultados ── */
 
 .resultsArea {

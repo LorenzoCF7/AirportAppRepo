@@ -11,6 +11,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -106,15 +107,15 @@ public class FlightServiceImpl implements FlightService {
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> fetchFromAviationStack() {
         List<Map<String, Object>> allFlights = new ArrayList<>();
-        List<String> selectedHubs = selectRandomAirports(7);
+        List<String> selectedHubs = selectRandomAirports(12);
 
         log.info("Consultando vuelos desde: {}", selectedHubs);
 
         for (String hub : selectedHubs) {
-            if (allFlights.size() >= 40) break;
+            if (allFlights.size() >= 80) break;
 
             try {
-                String url = String.format("%s/flights?access_key=%s&dep_iata=%s&limit=15",
+                String url = String.format("%s/flights?access_key=%s&dep_iata=%s&limit=20",
                         apiProperties.getAviationstack().getBaseUrl(),
                         apiProperties.getAviationstack().getApiKey(),
                         hub);
@@ -136,8 +137,7 @@ public class FlightServiceImpl implements FlightService {
             }
         }
 
-        // Adaptar vuelos para hoy
-        return adaptFlightsToToday(allFlights.stream().limit(50).toList());
+        return adaptFlightsToFuture(allFlights.stream().limit(80).toList());
     }
 
     private String getAmadeusAccessToken() {
@@ -477,15 +477,53 @@ public class FlightServiceImpl implements FlightService {
         }
     }
 
-    private List<Map<String, Object>> adaptFlightsToToday(List<Map<String, Object>> flights) {
-        LocalDate today = LocalDate.now();
-        return flights.stream()
-                .map(flight -> {
-                    Map<String, Object> adapted = new LinkedHashMap<>(flight);
-                    adapted.put("flight_date", today.toString());
-                    return adapted;
-                })
-                .toList();
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> adaptFlightsToFuture(List<Map<String, Object>> flights) {
+        LocalDateTime now = LocalDateTime.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (int i = 0; i < flights.size(); i++) {
+            Map<String, Object> flight = flights.get(i);
+            try {
+                Map<String, Object> rawDep = (Map<String, Object>) flight.get("departure");
+                Map<String, Object> rawArr = (Map<String, Object>) flight.get("arrival");
+
+                if (rawDep == null || rawArr == null) { result.add(flight); continue; }
+
+                String depScheduled = (String) rawDep.get("scheduled");
+                String arrScheduled = (String) rawArr.get("scheduled");
+
+                if (depScheduled == null || arrScheduled == null) { result.add(flight); continue; }
+
+                LocalDateTime depDt = LocalDateTime.parse(depScheduled.substring(0, 19));
+                LocalDateTime arrDt = LocalDateTime.parse(arrScheduled.substring(0, 19));
+                long durationMins = Math.max(Duration.between(depDt, arrDt).toMinutes(), 60);
+
+                // Spread flights across next 7 days so the shop always has variety
+                int dayOffset = i % 7;
+                LocalDateTime newDep = LocalDateTime.of(LocalDate.now().plusDays(dayOffset), depDt.toLocalTime());
+                // If the slot has already passed today or tomorrow, push one more day
+                if (newDep.isBefore(now.plusHours(2))) {
+                    newDep = newDep.plusDays(1);
+                }
+                LocalDateTime newArr = newDep.plusMinutes(durationMins);
+
+                Map<String, Object> newDepMap = new LinkedHashMap<>(rawDep);
+                Map<String, Object> newArrMap = new LinkedHashMap<>(rawArr);
+                newDepMap.put("scheduled", newDep.toString());
+                newArrMap.put("scheduled", newArr.toString());
+
+                Map<String, Object> adapted = new LinkedHashMap<>(flight);
+                adapted.put("departure", newDepMap);
+                adapted.put("arrival", newArrMap);
+                adapted.put("flight_date", newDep.toLocalDate().toString());
+                result.add(adapted);
+            } catch (Exception e) {
+                log.warn("Error adaptando fechas del vuelo: {}", e.getMessage());
+                result.add(flight);
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")

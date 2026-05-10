@@ -1,394 +1,213 @@
 import { useState, useEffect } from 'react';
-import { Ticket, Plane, Calendar, MapPin, User, CreditCard, X, AlertCircle } from 'lucide-react';
+import { Ticket, Plane, Calendar, User, CreditCard, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { ticketService } from '../../services/ticketService';
-import { formatDate, formatTime } from '../../utils/formatters';
+import { formatDate } from '../../utils/formatters';
 import { useScrollLock } from '../../hooks';
-import TicketsModal from '../TicketsModal/TicketsModal';
 import styles from './WalletView.module.css';
+
+const IATA_CITIES = {
+  BCN: 'Barcelona', MAD: 'Madrid', LHR: 'Londres', CDG: 'París',
+  AMS: 'Ámsterdam', FCO: 'Roma', FRA: 'Frankfurt', MUC: 'Múnich',
+  LIS: 'Lisboa', VIE: 'Viena', ZRH: 'Zúrich', PRG: 'Praga',
+  ARN: 'Estocolmo', CPH: 'Copenhague', DUB: 'Dublín', ATH: 'Atenas',
+  WAW: 'Varsovia', BRU: 'Bruselas', HEL: 'Helsinki', OSL: 'Oslo',
+  SVQ: 'Sevilla', VLC: 'Valencia', AGP: 'Málaga', BIO: 'Bilbao',
+  TFS: 'Tenerife', LPA: 'Gran Canaria', PMI: 'Palma', BER: 'Berlín',
+  MXP: 'Milán', GVA: 'Ginebra', EDI: 'Edimburgo', DUS: 'Düsseldorf',
+  JFK: 'Nueva York', LAX: 'Los Ángeles', ORY: 'París Orly', MAN: 'Mánchester',
+};
+
+const getCityName = (iata, fallback) => IATA_CITIES[iata] || fallback || iata;
+
+const getClassLabel = (cls) => {
+  switch ((cls || '').toLowerCase()) {
+    case 'economy':  return 'Turista';
+    case 'business': return 'Business';
+    case 'first':    return 'Primera';
+    default:         return cls || '—';
+  }
+};
 
 const WalletView = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isTicketsModalOpen, setIsTicketsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [filter, setFilter] = useState('all'); // all, confirmed, cancelled
-  const [ticketToCancel, setTicketToCancel] = useState(null); // Para confirmación
+  const [filter, setFilter] = useState('all');
+  const [ticketToCancel, setTicketToCancel] = useState(null);
 
-  // Bloquear scroll cuando el modal está abierto
   useScrollLock(!!selectedTicket);
 
-  useEffect(() => {
-    loadTickets();
-  }, []);
+  useEffect(() => { loadTickets(); }, []);
 
   const loadTickets = async () => {
     try {
       setLoading(true);
       setError(null);
       await ticketService.initialize();
-      const userTickets = await ticketService.getUserTickets();
-      setTickets(userTickets);
-    } catch (err) {
-      console.error('Error cargando billetes:', err);
-      setError('No se pudieron cargar los billetes. Por favor, inténtalo de nuevo.');
+      setTickets(await ticketService.getUserTickets());
+    } catch {
+      setError('No se pudieron cargar los billetes.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelTicket = async (ticketId) => {
-    // Mostrar modal de confirmación
-    setTicketToCancel(ticketId);
-  };
-
-  const confirmCancelTicket = async () => {
+  const confirmCancel = async () => {
     if (!ticketToCancel) return;
-
     try {
       await ticketService.cancelTicket(ticketToCancel);
-      await loadTickets(); // Recargar lista
+      await loadTickets();
       setSelectedTicket(null);
       setTicketToCancel(null);
-      
-      // Notificación centralizada
       window.dispatchEvent(new CustomEvent('flight-notification', {
-        detail: {
-          title: '🗑️ Billete Cancelado',
-          message: 'El billete ha sido cancelado correctamente',
-          type: 'success'
-        }
+        detail: { title: 'Billete cancelado', message: 'El billete ha sido cancelado.', type: 'success' }
       }));
-    } catch (err) {
-      console.error('Error cancelando billete:', err);
-      
-      // Notificación de error centralizada
+    } catch {
       window.dispatchEvent(new CustomEvent('flight-notification', {
-        detail: {
-          title: '❌ Error',
-          message: 'No se pudo cancelar el billete. Inténtalo de nuevo.',
-          type: 'error'
-        }
+        detail: { title: 'Error', message: 'No se pudo cancelar el billete.', type: 'error' }
       }));
     }
   };
 
-  const getTicketStatusClass = (status) => {
-    switch (status) {
-      case 'confirmed':
-        return 'statusConfirmed';
-      case 'cancelled':
-        return 'statusCancelled';
-      case 'pending':
-        return 'statusPending';
-      default:
-        return '';
-    }
-  };
-
-  const getTicketClassLabel = (ticketClass) => {
-    switch (ticketClass) {
-      case 'economy':
-        return 'Turista';
-      case 'business':
-        return 'Business';
-      case 'first':
-        return 'Primera Clase';
-      default:
-        return ticketClass;
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    card.style.setProperty('--mouse-x', `${x}%`);
-    card.style.setProperty('--mouse-y', `${y}%`);
-  };
-
-  const filteredTickets = tickets.filter(ticket => {
-    if (filter === 'all') return true;
-    return ticket.ticketStatus === filter;
-  });
-
-  const ticketStats = {
-    total: tickets.length,
+  const stats = {
+    total:     tickets.length,
     confirmed: tickets.filter(t => t.ticketStatus === 'confirmed').length,
-    cancelled: tickets.filter(t => t.ticketStatus === 'cancelled').length
+    cancelled: tickets.filter(t => t.ticketStatus === 'cancelled').length,
   };
 
-  if (loading) {
-    return (
-      <div className={styles.walletView}>
-        <div className={styles.walletHeader}>
-          <h1>
-            <Ticket size={32} />
-            Mi Billetera de Vuelos
-          </h1>
-        </div>
-        <div className={styles.loadingState}>
-          <div className={styles.spinner}></div>
-          <p>Cargando billetes...</p>
-        </div>
-      </div>
-    );
-  }
+  const filtered = tickets.filter(t => filter === 'all' || t.ticketStatus === filter);
 
-  if (error) {
-    return (
-      <div className={styles.walletView}>
-        <div className={styles.walletHeader}>
-          <h1>
-            <Ticket size={32} />
-            Mi Billetera de Vuelos
-          </h1>
-        </div>
-        <div className={styles.errorState}>
-          <AlertCircle size={48} />
-          <p>{error}</p>
-          <button onClick={loadTickets} className={styles.retryButton}>
-            Reintentar
-          </button>
-        </div>
+  if (loading) return (
+    <div className={styles.page}>
+      <div className={styles.centered}><div className={styles.spinner} /><p>Cargando billetes...</p></div>
+    </div>
+  );
+
+  if (error) return (
+    <div className={styles.page}>
+      <div className={styles.centered}>
+        <AlertCircle size={40} className={styles.errorIcon} />
+        <p>{error}</p>
+        <button className={styles.retryBtn} onClick={loadTickets}><RefreshCw size={15} /> Reintentar</button>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className={styles.walletView}>
-      <div className={styles.walletHeader}>
-        <div className={styles.headerContent}>
-          <h1>
-            <Ticket size={32} />
-            Mi Billetera de Vuelos
-          </h1>
-          <div className={styles.walletStats}>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Total</span>
-              <span className={styles.statValue}>{ticketStats.total}</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Confirmados</span>
-              <span className={`${styles.statValue} ${styles.confirmed}`}>{ticketStats.confirmed}</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Cancelados</span>
-              <span className={`${styles.statValue} ${styles.cancelled}`}>{ticketStats.cancelled}</span>
-            </div>
-          </div>
+    <div className={styles.page}>
+
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.title}><Ticket size={24} /> Mis Billetes</h1>
+          <p className={styles.subtitle}>{stats.total} billete{stats.total !== 1 ? 's' : ''} en tu cartera</p>
         </div>
-        
-        <div className={styles.filterButtons}>
-          <button 
-            className={filter === 'all' ? styles.active : ''}
-            onClick={() => setFilter('all')}
-          >
-            Todos
-          </button>
-          <button 
-            className={filter === 'confirmed' ? styles.active : ''}
-            onClick={() => setFilter('confirmed')}
-          >
-            Confirmados
-          </button>
-          <button 
-            className={filter === 'cancelled' ? styles.active : ''}
-            onClick={() => setFilter('cancelled')}
-          >
-            Cancelados
-          </button>
+        <div className={styles.statsRow}>
+          <div className={`${styles.statPill} ${styles.statTotal}`}>
+            <span className={styles.statNum}>{stats.total}</span>
+            <span className={styles.statLabel}>Total</span>
+          </div>
+          <div className={`${styles.statPill} ${styles.statConfirmed}`}>
+            <span className={styles.statNum}>{stats.confirmed}</span>
+            <span className={styles.statLabel}>Confirmados</span>
+          </div>
+          <div className={`${styles.statPill} ${styles.statCancelled}`}>
+            <span className={styles.statNum}>{stats.cancelled}</span>
+            <span className={styles.statLabel}>Cancelados</span>
+          </div>
         </div>
       </div>
 
-      {filteredTickets.length === 0 ? (
-        <div className={styles.emptyState}>
-          <Ticket size={64} />
-          <h2>No tienes billetes {filter !== 'all' ? filter + 's' : ''}</h2>
-          <p>Los billetes que compres aparecerán aquí</p>
+      {/* Filters */}
+      <div className={styles.filters}>
+        {['all', 'confirmed', 'cancelled'].map(f => (
+          <button
+            key={f}
+            className={`${styles.filterBtn} ${filter === f ? styles.filterActive : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === 'all' ? 'Todos' : f === 'confirmed' ? 'Confirmados' : 'Cancelados'}
+          </button>
+        ))}
+      </div>
+
+      {/* Empty state */}
+      {filtered.length === 0 ? (
+        <div className={styles.centered}>
+          <Ticket size={52} className={styles.emptyIcon} />
+          <h2 className={styles.emptyTitle}>No hay billetes</h2>
+          <p className={styles.emptyDesc}>
+            {filter === 'all' ? 'Compra tu primer vuelo para verlo aquí.' : `No tienes billetes ${filter === 'confirmed' ? 'confirmados' : 'cancelados'}.`}
+          </p>
         </div>
       ) : (
-        <div className={styles.ticketsGrid}>
-          {filteredTickets.map(ticket => (
-            <div 
-              key={ticket.id} 
-              className={`${styles.ticketCard} ${styles[getTicketStatusClass(ticket.ticketStatus)]}`}
+        <div className={styles.grid}>
+          {filtered.map(ticket => (
+            <BoardingPass
+              key={ticket.id}
+              ticket={ticket}
               onClick={() => setSelectedTicket(ticket)}
-              onMouseMove={handleMouseMove}
-            >
-              <div className={styles.ticketHeaderCard}>
-                <div className={styles.airlineInfo}>
-                  <span className={styles.airlineName}>{ticket.airlineName}</span>
-                  <span className={styles.flightNumber}>{ticket.flightIATA}</span>
-                </div>
-                <span className={`${styles.ticketStatus} ${styles[ticket.ticketStatus]}`}>
-                  {ticket.ticketStatus === 'confirmed' ? 'Confirmado' : 'Cancelado'}
-                </span>
-              </div>
-
-              <div className={styles.flightRoute}>
-                <div className={styles.airport}>
-                  <span className={styles.iata}>{ticket.departureIATA}</span>
-                  <span className={styles.city}>{ticket.departureCity}</span>
-                </div>
-                <div className={styles.routeLine}>
-                  <Plane size={20} />
-                </div>
-                <div className={styles.airport}>
-                  <span className={styles.iata}>{ticket.arrivalIATA}</span>
-                  <span className={styles.city}>{ticket.arrivalCity}</span>
-                </div>
-              </div>
-
-              <div className={styles.ticketDetails}>
-                <div className={styles.detail}>
-                  <Calendar size={16} />
-                  <span>{formatDate(ticket.departureDate)} - {ticket.departureTime}</span>
-                </div>
-                <div className={styles.detail}>
-                  <User size={16} />
-                  <span>{ticket.passengerName}</span>
-                </div>
-                <div className={styles.detail}>
-                  <CreditCard size={16} />
-                  <span>{ticket.price} {ticket.currency} - {getTicketClassLabel(ticket.ticketClass)}</span>
-                </div>
-              </div>
-
-              <div className={styles.bookingReference}>
-                Ref: <strong>{ticket.bookingReference}</strong>
-              </div>
-            </div>
+            />
           ))}
         </div>
       )}
 
-      {/* Modal de detalles del billete */}
+      {/* Detail modal */}
       {selectedTicket && (
-        <div className={styles.ticketModalOverlay} onClick={() => setSelectedTicket(null)}>
-          <div className={styles.ticketModal} onClick={(e) => e.stopPropagation()}>
-            <button 
-              className={styles.closeModal}
-              onClick={() => setSelectedTicket(null)}
-            >
-              <X size={24} />
-            </button>
+        <div className={styles.overlay} onClick={() => setSelectedTicket(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <button className={styles.closeBtn} onClick={() => setSelectedTicket(null)}><X size={20} /></button>
 
-            <div className={styles.modalHeader}>
-              <h2>Detalles del Billete</h2>
-              <span className={`${styles.ticketStatus} ${styles[selectedTicket.ticketStatus]}`}>
+            <div className={styles.modalTop}>
+              <div>
+                <div className={styles.modalAirline}>{selectedTicket.airlineName}</div>
+                <div className={styles.modalFlight}>{selectedTicket.flightIATA}</div>
+              </div>
+              <span className={`${styles.badge} ${styles[selectedTicket.ticketStatus]}`}>
                 {selectedTicket.ticketStatus === 'confirmed' ? 'Confirmado' : 'Cancelado'}
               </span>
             </div>
 
-            <div className={styles.modalContent}>
-              <div className={styles.infoSection}>
-                <h3><Plane size={20} /> Información del Vuelo</h3>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Aerolínea</label>
-                    <span>{selectedTicket.airlineName} ({selectedTicket.airlineIATA})</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Número de Vuelo</label>
-                    <span>{selectedTicket.flightIATA}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Clase</label>
-                    <span>{getTicketClassLabel(selectedTicket.ticketClass)}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Asiento</label>
-                    <span>{selectedTicket.seatNumber}</span>
-                  </div>
-                </div>
+            {/* Route banner */}
+            <div className={styles.modalRoute}>
+              <div className={styles.modalAirport}>
+                <div className={styles.modalIata}>{selectedTicket.departureIATA}</div>
+                <div className={styles.modalCity}>{getCityName(selectedTicket.departureIATA, selectedTicket.departureCity)}</div>
+                <div className={styles.modalTime}>{selectedTicket.departureTime}</div>
               </div>
-
-              <div className={styles.infoSection}>
-                <h3><MapPin size={20} /> Salida</h3>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Aeropuerto</label>
-                    <span>{selectedTicket.departureAirport} ({selectedTicket.departureIATA})</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Ciudad</label>
-                    <span>{selectedTicket.departureCity}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Fecha</label>
-                    <span>{formatDate(selectedTicket.departureDate)}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Hora</label>
-                    <span>{selectedTicket.departureTime}</span>
-                  </div>
-                </div>
+              <div className={styles.modalRouteViz}>
+                <div className={styles.modalDot} />
+                <div className={styles.modalLine} />
+                <Plane size={18} className={styles.modalPlane} />
+                <div className={styles.modalLine} />
+                <div className={styles.modalDot} />
               </div>
-
-              <div className={styles.infoSection}>
-                <h3><MapPin size={20} /> Llegada</h3>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Aeropuerto</label>
-                    <span>{selectedTicket.arrivalAirport} ({selectedTicket.arrivalIATA})</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Ciudad</label>
-                    <span>{selectedTicket.arrivalCity}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Fecha</label>
-                    <span>{formatDate(selectedTicket.arrivalDate)}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Hora</label>
-                    <span>{selectedTicket.arrivalTime}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.infoSection}>
-                <h3><User size={20} /> Información del Pasajero</h3>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Nombre</label>
-                    <span>{selectedTicket.passengerName}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Documento</label>
-                    <span>{selectedTicket.passengerDocument}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.infoSection}>
-                <h3><CreditCard size={20} /> Información de Pago</h3>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Precio</label>
-                    <span className={styles.price}>{selectedTicket.price} {selectedTicket.currency}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Referencia de Reserva</label>
-                    <span className={styles.bookingRef}>{selectedTicket.bookingReference}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Fecha de Compra</label>
-                    <span>{formatDate(selectedTicket.purchaseDate.split('T')[0])} {formatTime(selectedTicket.purchaseDate)}</span>
-                  </div>
-                </div>
+              <div className={`${styles.modalAirport} ${styles.modalAirportRight}`}>
+                <div className={styles.modalIata}>{selectedTicket.arrivalIATA}</div>
+                <div className={styles.modalCity}>{getCityName(selectedTicket.arrivalIATA, selectedTicket.arrivalCity)}</div>
+                <div className={styles.modalTime}>{selectedTicket.arrivalTime}</div>
               </div>
             </div>
 
+            {/* Info grid */}
+            <div className={styles.modalGrid}>
+              <InfoRow icon={<Calendar size={15} />} label="Fecha salida" value={`${formatDate(selectedTicket.departureDate)} · ${selectedTicket.departureTime}`} />
+              <InfoRow icon={<Calendar size={15} />} label="Fecha llegada" value={`${formatDate(selectedTicket.arrivalDate)} · ${selectedTicket.arrivalTime}`} />
+              <InfoRow icon={<Plane size={15} />}    label="Aeropuerto salida"  value={`${selectedTicket.departureAirport} (${selectedTicket.departureIATA})`} />
+              <InfoRow icon={<Plane size={15} />}    label="Aeropuerto llegada" value={`${selectedTicket.arrivalAirport} (${selectedTicket.arrivalIATA})`} />
+              <InfoRow icon={<User size={15} />}     label="Pasajero"    value={selectedTicket.passengerName} />
+              <InfoRow icon={<User size={15} />}     label="Documento"   value={selectedTicket.passengerDocument || '—'} />
+              <InfoRow icon={<Ticket size={15} />}   label="Asiento"     value={selectedTicket.seatNumber || '—'} />
+              <InfoRow icon={<Ticket size={15} />}   label="Clase"       value={getClassLabel(selectedTicket.ticketClass)} />
+              <InfoRow icon={<CreditCard size={15} />} label="Precio"    value={`${selectedTicket.price} ${selectedTicket.currency}`} highlight />
+              <InfoRow icon={<CreditCard size={15} />} label="Referencia" value={selectedTicket.bookingReference} mono />
+            </div>
+
             {selectedTicket.ticketStatus === 'confirmed' && (
-              <div className={styles.modalActions}>
-                <button 
-                  className={styles.cancelTicketButton}
-                  onClick={() => handleCancelTicket(selectedTicket.id)}
-                >
-                  Cancelar Billete
+              <div className={styles.modalFooter}>
+                <button className={styles.cancelBtn} onClick={() => setTicketToCancel(selectedTicket.id)}>
+                  Cancelar billete
                 </button>
               </div>
             )}
@@ -396,48 +215,95 @@ const WalletView = () => {
         </div>
       )}
 
-      {/* Modal de confirmación de cancelación */}
+      {/* Cancel confirmation */}
       {ticketToCancel && (
-        <div className={styles.modalOverlay} onClick={() => setTicketToCancel(null)}>
-          <div className={styles.confirmationModal} onClick={(e) => e.stopPropagation()}>
-            <AlertCircle size={48} className={styles.warningIcon} />
-            <h3>¿Cancelar Billete?</h3>
-            <p>Esta acción no se puede deshacer. ¿Estás seguro de que quieres cancelar este billete?</p>
-            <div className={styles.confirmationActions}>
-              <button 
-                className={styles.btnCancelAction}
-                onClick={() => setTicketToCancel(null)}
-              >
-                No, mantener
-              </button>
-              <button 
-                className={styles.btnConfirmAction}
-                onClick={confirmCancelTicket}
-              >
-                Sí, cancelar
-              </button>
+        <div className={styles.overlay} style={{ zIndex: 10001 }} onClick={() => setTicketToCancel(null)}>
+          <div className={styles.confirmModal} onClick={e => e.stopPropagation()}>
+            <AlertCircle size={40} className={styles.warnIcon} />
+            <h3>¿Cancelar este billete?</h3>
+            <p>Esta acción no se puede deshacer.</p>
+            <div className={styles.confirmBtns}>
+              <button className={styles.keepBtn} onClick={() => setTicketToCancel(null)}>Mantener</button>
+              <button className={styles.confirmCancelBtn} onClick={confirmCancel}>Sí, cancelar</button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Modal de billetes con tarjetas interactivas */}
-      <TicketsModal 
-        isOpen={isTicketsModalOpen} 
-        onClose={() => setIsTicketsModalOpen(false)}
-        onViewWallet={() => {
-          setIsTicketsModalOpen(false);
-          // La vista de billetera ya está visible
-        }}
-        onTicketClick={(ticket) => {
-          setIsTicketsModalOpen(false);
-          setTimeout(() => {
-            setSelectedTicket(ticket);
-          }, 100);
-        }}
-      />
     </div>
   );
 };
+
+const BoardingPass = ({ ticket, onClick }) => (
+  <div
+    className={`${styles.pass} ${ticket.ticketStatus === 'cancelled' ? styles.passCancelled : styles.passConfirmed}`}
+    onClick={onClick}
+  >
+    {/* Airline + status */}
+    <div className={styles.passTop}>
+      <div>
+        <div className={styles.passAirline}>{ticket.airlineName}</div>
+        <div className={styles.passFlightNum}>{ticket.flightIATA}</div>
+      </div>
+      <span className={`${styles.badge} ${styles[ticket.ticketStatus]}`}>
+        {ticket.ticketStatus === 'confirmed' ? 'CONFIRMADO' : 'CANCELADO'}
+      </span>
+    </div>
+
+    {/* Route */}
+    <div className={styles.passRoute}>
+      <div className={styles.passAirport}>
+        <div className={styles.passIata}>{ticket.departureIATA}</div>
+        <div className={styles.passCity}>{getCityName(ticket.departureIATA, ticket.departureCity)}</div>
+      </div>
+      <div className={styles.passViz}>
+        <div className={styles.passLineFull} />
+        <Plane size={16} className={styles.passPlane} />
+      </div>
+      <div className={`${styles.passAirport} ${styles.passAirportRight}`}>
+        <div className={styles.passIata}>{ticket.arrivalIATA}</div>
+        <div className={styles.passCity}>{getCityName(ticket.arrivalIATA, ticket.arrivalCity)}</div>
+      </div>
+    </div>
+
+    {/* Details row */}
+    <div className={styles.passDetails}>
+      <div className={styles.passDetail}>
+        <span className={styles.passDetailLabel}>FECHA</span>
+        <span className={styles.passDetailValue}>{formatDate(ticket.departureDate)}</span>
+      </div>
+      <div className={styles.passDetail}>
+        <span className={styles.passDetailLabel}>HORA</span>
+        <span className={styles.passDetailValue}>{ticket.departureTime}</span>
+      </div>
+      <div className={styles.passDetail}>
+        <span className={styles.passDetailLabel}>CLASE</span>
+        <span className={styles.passDetailValue}>{getClassLabel(ticket.ticketClass)}</span>
+      </div>
+      <div className={styles.passDetail}>
+        <span className={styles.passDetailLabel}>ASIENTO</span>
+        <span className={styles.passDetailValue}>{ticket.seatNumber || '—'}</span>
+      </div>
+    </div>
+
+    {/* Tear-off + reference */}
+    <div className={styles.passTear} />
+    <div className={styles.passRef}>
+      <span className={styles.passRefLabel}>RESERVA</span>
+      <span className={styles.passRefCode}>{ticket.bookingReference}</span>
+    </div>
+  </div>
+);
+
+const InfoRow = ({ icon, label, value, highlight, mono }) => (
+  <div className={styles.infoRow}>
+    <div className={styles.infoIcon}>{icon}</div>
+    <div className={styles.infoContent}>
+      <span className={styles.infoLabel}>{label}</span>
+      <span className={`${styles.infoValue} ${highlight ? styles.infoHighlight : ''} ${mono ? styles.infoMono : ''}`}>
+        {value}
+      </span>
+    </div>
+  </div>
+);
 
 export default WalletView;

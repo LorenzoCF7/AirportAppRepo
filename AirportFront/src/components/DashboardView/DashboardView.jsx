@@ -3,6 +3,40 @@ import { Plane, Search, ArrowLeftRight, ChevronLeft, ChevronRight } from 'lucide
 
 import styles from './DashboardView.module.css';
 
+const AIRPORTS = [
+  { city: 'Madrid',       iata: 'MAD' },
+  { city: 'Barcelona',    iata: 'BCN' },
+  { city: 'Londres',      iata: 'LHR' },
+  { city: 'París',        iata: 'CDG' },
+  { city: 'Roma',         iata: 'FCO' },
+  { city: 'Ámsterdam',    iata: 'AMS' },
+  { city: 'Berlín',       iata: 'BER' },
+  { city: 'Lisboa',       iata: 'LIS' },
+  { city: 'Milán',        iata: 'MXP' },
+  { city: 'Nueva York',   iata: 'JFK' },
+  { city: 'Palma',        iata: 'PMI' },
+  { city: 'Tenerife',     iata: 'TFS' },
+  { city: 'Frankfurt',    iata: 'FRA' },
+  { city: 'Zúrich',       iata: 'ZRH' },
+  { city: 'Viena',        iata: 'VIE' },
+  { city: 'Praga',        iata: 'PRG' },
+  { city: 'Copenhague',   iata: 'CPH' },
+  { city: 'Estocolmo',    iata: 'ARN' },
+  { city: 'Dublín',       iata: 'DUB' },
+  { city: 'Atenas',       iata: 'ATH' },
+  { city: 'Varsovia',     iata: 'WAW' },
+  { city: 'Bruselas',     iata: 'BRU' },
+  { city: 'Helsinki',     iata: 'HEL' },
+  { city: 'Oslo',         iata: 'OSL' },
+  { city: 'Sevilla',      iata: 'SVQ' },
+  { city: 'Valencia',     iata: 'VLC' },
+  { city: 'Málaga',       iata: 'AGP' },
+  { city: 'Bilbao',       iata: 'BIO' },
+  { city: 'Gran Canaria', iata: 'LPA' },
+  { city: 'Múnich',       iata: 'MUC' },
+  { city: 'Edimburgo',    iata: 'EDI' },
+];
+
 const heroPhotos = [
   { city: 'Marrakech', image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=600&h=320&q=80' },
   { city: 'Santorini', image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&h=320&q=80' },
@@ -13,30 +47,61 @@ const heroPhotos = [
 ];
 
 const dealCards = [
-  { city: 'Barcelona', time: '1 h 30 min, directo',   price: 45,  dateFrom: '5/6',  dateTo: '12/6',  image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Londres',   time: '2 h 10 min, directo',   price: 78,  dateFrom: '20/6', dateTo: '27/6',  image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'París',     time: '1 h 55 min, directo',   price: 63,  dateFrom: '7/6',  dateTo: '14/6',  image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Roma',      time: '2 h 20 min, directo',   price: 89,  dateFrom: '13/6', dateTo: '20/6',  image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Lisboa',    time: '2 h 05 min, directo',   price: 54,  dateFrom: '10/6', dateTo: '17/6',  image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Berlín',    time: '2 h 35 min, directo',   price: 71,  dateFrom: '15/6', dateTo: '22/6',  image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Ámsterdam', time: '2 h 25 min, directo',   price: 82,  dateFrom: '18/6', dateTo: '25/6',  image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Viena',     time: '2 h 45 min, directo',   price: 95,  dateFrom: '22/6', dateTo: '29/6',  image: 'https://images.unsplash.com/photo-1516550135131-9de3cb85cd33?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Praga',     time: '2 h 50 min, directo',   price: 67,  dateFrom: '1/7',  dateTo: '8/7',   image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Tokio',     time: '13 h 10 min, 1 escala', price: 420, dateFrom: '3/7',  dateTo: '17/7',  image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Barcelona', iata: 'BCN', time: '1 h 30 min, directo',   price: 45,  dateFrom: '5/6',  dateTo: '12/6',  image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Londres',   iata: 'LHR', time: '2 h 10 min, directo',   price: 78,  dateFrom: '20/6', dateTo: '27/6',  image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'París',     iata: 'CDG', time: '1 h 55 min, directo',   price: 63,  dateFrom: '7/6',  dateTo: '14/6',  image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Roma',      iata: 'FCO', time: '2 h 20 min, directo',   price: 89,  dateFrom: '13/6', dateTo: '20/6',  image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Lisboa',    iata: 'LIS', time: '2 h 05 min, directo',   price: 54,  dateFrom: '10/6', dateTo: '17/6',  image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Berlín',    iata: 'BER', time: '2 h 35 min, directo',   price: 71,  dateFrom: '15/6', dateTo: '22/6',  image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Ámsterdam', iata: 'AMS', time: '2 h 25 min, directo',   price: 82,  dateFrom: '18/6', dateTo: '25/6',  image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Viena',     iata: 'VIE', time: '2 h 45 min, directo',   price: 95,  dateFrom: '22/6', dateTo: '29/6',  image: 'https://images.unsplash.com/photo-1516550135131-9de3cb85cd33?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Praga',     iata: 'PRG', time: '2 h 50 min, directo',   price: 67,  dateFrom: '1/7',  dateTo: '8/7',   image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Tokio',     iata: 'TYO', time: '13 h 10 min, 1 escala', price: 420, dateFrom: '3/7',  dateTo: '17/7',  image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=500&h=280&q=80' },
 ];
 
 const destinationList = [
-  'Madrid', 'Londres', 'Barcelona', 'Roma', 'París', 'Nueva York',
-  'Palma', 'Ámsterdam', 'Tenerife', 'Berlín', 'Lisboa', 'Milán',
+  { city: 'Madrid',     iata: 'MAD' },
+  { city: 'Londres',    iata: 'LHR' },
+  { city: 'Barcelona',  iata: 'BCN' },
+  { city: 'Roma',       iata: 'FCO' },
+  { city: 'París',      iata: 'CDG' },
+  { city: 'Nueva York', iata: 'JFK' },
+  { city: 'Palma',      iata: 'PMI' },
+  { city: 'Ámsterdam',  iata: 'AMS' },
+  { city: 'Tenerife',   iata: 'TFS' },
+  { city: 'Berlín',     iata: 'BER' },
+  { city: 'Lisboa',     iata: 'LIS' },
+  { city: 'Milán',      iata: 'MXP' },
 ];
+
+const filterAirports = (query) => {
+  if (!query || query.length < 1) return [];
+  const q = query.toLowerCase().replace(/\s*\([a-z]{3}\)$/i, '').trim();
+  return AIRPORTS.filter(a =>
+    a.city.toLowerCase().includes(q) || a.iata.toLowerCase().includes(q)
+  ).slice(0, 6);
+};
+
+const extractIata = (text) => {
+  const match = text.match(/\(([A-Z]{3})\)/i);
+  if (match) return match[1].toUpperCase();
+  if (/^[A-Z]{3}$/i.test(text.trim())) return text.trim().toUpperCase();
+  const found = AIRPORTS.find(a => a.city.toLowerCase() === text.toLowerCase().trim());
+  return found ? found.iata : text.trim().toUpperCase();
+};
 
 const DashboardView = ({ onNavigate }) => {
   const [tripType, setTripType] = useState('roundtrip');
   const [heroSearch, setHeroSearch] = useState({
     origin: '', destination: '', departureDate: '', returnDate: '',
   });
+  const [showOriginDrop, setShowOriginDrop] = useState(false);
+  const [showDestDrop, setShowDestDrop] = useState(false);
 
   const carouselRef = useRef(null);
+
+  const originSuggestions = filterAirports(heroSearch.origin);
+  const destSuggestions   = filterAirports(heroSearch.destination);
 
   const scrollCarousel = useCallback((dir) => {
     if (!carouselRef.current) return;
@@ -50,8 +115,22 @@ const DashboardView = ({ onNavigate }) => {
   }, []);
 
   const handleSearch = useCallback(() => {
-    if (onNavigate) onNavigate('shop');
-  }, [onNavigate]);
+    if (!onNavigate) return;
+    const originIata = heroSearch.origin ? extractIata(heroSearch.origin) : '';
+    const destIata   = heroSearch.destination ? extractIata(heroSearch.destination) : '';
+    const params = (originIata || destIata) ? { origin: originIata, destination: destIata } : null;
+    onNavigate('shop', params);
+  }, [onNavigate, heroSearch]);
+
+  const selectOrigin = (airport) => {
+    setHeroSearch(p => ({ ...p, origin: `${airport.city} (${airport.iata})` }));
+    setShowOriginDrop(false);
+  };
+
+  const selectDest = (airport) => {
+    setHeroSearch(p => ({ ...p, destination: `${airport.city} (${airport.iata})` }));
+    setShowDestDrop(false);
+  };
 
   return (
     <div className={styles.page}>
@@ -66,7 +145,29 @@ const DashboardView = ({ onNavigate }) => {
               Compara ofertas de vuelos<br />en cientos de webs<span className={styles.titleDot}>.</span>
             </h1>
 
-            
+            {/**/}
+            <div className={styles.serviceTabs}>
+              <button className={`${styles.serviceTab} ${styles.serviceTabActive}`}>
+                <span className={styles.serviceIconBox} style={{ background: '#FF690F' }}>
+                  <Plane size={18} color="white" />
+                </span>
+                <span className={styles.serviceLabel}>Vuelos</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🏨</span>
+                <span className={styles.serviceLabel}>Alojamientos</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🚗</span>
+                <span className={styles.serviceLabel}>Coches</span>
+              </button>
+              <button className={styles.serviceTab}>
+                <span className={styles.serviceIconBox}>🌴</span>
+                <span className={styles.serviceLabel}>Viajes</span>
+              </button>
+            </div>
+
+            {/**/}
             <div className={styles.tripOptions}>
               <button
                 className={styles.tripOptionBtn}
@@ -79,15 +180,32 @@ const DashboardView = ({ onNavigate }) => {
 
             {/**/}
             <div className={styles.searchBar}>
+
+              {/* Origin */}
               <div className={styles.sbField}>
                 <input
                   className={styles.sbInput}
                   placeholder="Origen"
                   value={heroSearch.origin}
-                  onChange={e => setHeroSearch(p => ({ ...p, origin: e.target.value }))}
+                  onChange={e => {
+                    setHeroSearch(p => ({ ...p, origin: e.target.value }));
+                    setShowOriginDrop(true);
+                  }}
+                  onFocus={() => setShowOriginDrop(true)}
+                  onBlur={() => setTimeout(() => setShowOriginDrop(false), 150)}
                 />
                 {heroSearch.origin && (
                   <button className={styles.sbClear} onClick={() => setHeroSearch(p => ({ ...p, origin: '' }))}>×</button>
+                )}
+                {showOriginDrop && originSuggestions.length > 0 && (
+                  <ul className={styles.suggestions}>
+                    {originSuggestions.map(a => (
+                      <li key={a.iata} className={styles.suggestionItem} onMouseDown={() => selectOrigin(a)}>
+                        <span className={styles.suggestionCity}>{a.city}</span>
+                        <span className={styles.suggestionIata}>{a.iata}</span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
 
@@ -95,13 +213,32 @@ const DashboardView = ({ onNavigate }) => {
                 <ArrowLeftRight size={15} />
               </button>
 
+              {/* Destination */}
               <div className={styles.sbField}>
                 <input
                   className={styles.sbInput}
                   placeholder="Destino"
                   value={heroSearch.destination}
-                  onChange={e => setHeroSearch(p => ({ ...p, destination: e.target.value }))}
+                  onChange={e => {
+                    setHeroSearch(p => ({ ...p, destination: e.target.value }));
+                    setShowDestDrop(true);
+                  }}
+                  onFocus={() => setShowDestDrop(true)}
+                  onBlur={() => setTimeout(() => setShowDestDrop(false), 150)}
                 />
+                {heroSearch.destination && (
+                  <button className={styles.sbClear} onClick={() => setHeroSearch(p => ({ ...p, destination: '' }))}>×</button>
+                )}
+                {showDestDrop && destSuggestions.length > 0 && (
+                  <ul className={styles.suggestions}>
+                    {destSuggestions.map(a => (
+                      <li key={a.iata} className={styles.suggestionItem} onMouseDown={() => selectDest(a)}>
+                        <span className={styles.suggestionCity}>{a.city}</span>
+                        <span className={styles.suggestionIata}>{a.iata}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               <div className={styles.sbDivider} />
@@ -204,7 +341,12 @@ const DashboardView = ({ onNavigate }) => {
           </div>
           <div className={styles.carouselTrack} ref={carouselRef}>
             {dealCards.map(deal => (
-              <button key={deal.city} className={styles.dealCard} data-card onClick={handleSearch}>
+              <button
+                key={deal.city}
+                className={styles.dealCard}
+                data-card
+                onClick={() => onNavigate && onNavigate('shop', { destination: deal.iata })}
+              >
                 <div
                   className={styles.dealPhoto}
                   style={{ backgroundImage: `url(${deal.image})` }}
@@ -230,8 +372,12 @@ const DashboardView = ({ onNavigate }) => {
           <p className={styles.destListSub}>Busca y compara vuelos baratos</p>
           <div className={styles.destGrid}>
             {destinationList.map(dest => (
-              <button key={dest} className={styles.destItem} onClick={handleSearch}>
-                <span>Vuelos a {dest}</span>
+              <button
+                key={dest.city}
+                className={styles.destItem}
+                onClick={() => onNavigate && onNavigate('shop', { destination: dest.iata })}
+              >
+                <span>Vuelos a {dest.city}</span>
                 <span className={styles.destChev}>▾</span>
               </button>
             ))}

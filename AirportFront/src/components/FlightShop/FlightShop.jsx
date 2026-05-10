@@ -13,6 +13,15 @@ const parseDuration = (formatted) => {
   return hours * 60 + mins;
 };
 
+const isUpcoming = (flight) => {
+  const dt = flight.departure?.dateTime;
+  if (dt) return new Date(dt) > new Date();
+  const date = flight.departure?.date;
+  const time = flight.departure?.time || '00:00';
+  if (!date) return true;
+  return new Date(`${date}T${time}`) > new Date();
+};
+
 const FlightShop = ({ initialParams = null }) => {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +48,7 @@ const FlightShop = ({ initialParams = null }) => {
       setLoading(true);
       const allResp = await commercialFlightService.getFeaturedFlights(false);
       const filtered = (allResp.data || []).filter(flight => {
+        if (!isUpcoming(flight)) return false;
         if (origin && flight.origin.iata !== origin.toUpperCase()) return false;
         if (destination && flight.destination.iata !== destination.toUpperCase()) return false;
         return true;
@@ -55,7 +65,7 @@ const FlightShop = ({ initialParams = null }) => {
     try {
       setLoading(true);
       const response = await commercialFlightService.getFeaturedFlights(forceRefresh);
-      setFlights(response.data || []);
+      setFlights((response.data || []).filter(isUpcoming));
     } catch (error) {
       console.error('Error cargando vuelos:', error);
     } finally {
@@ -71,19 +81,15 @@ const FlightShop = ({ initialParams = null }) => {
         await loadFeaturedFlights(false);
         return;
       }
-      if (!searchParams.origin || !searchParams.destination || !searchParams.departureDate) {
-        const allResp = await commercialFlightService.getFeaturedFlights();
-        const filtered = (allResp.data || []).filter(flight => {
-          if (searchParams.origin && flight.origin.iata !== searchParams.origin.toUpperCase()) return false;
-          if (searchParams.destination && flight.destination.iata !== searchParams.destination.toUpperCase()) return false;
-          if (searchParams.departureDate && flight.departure.date !== searchParams.departureDate) return false;
-          return true;
-        });
-        setFlights(filtered);
-        return;
-      }
-      const response = await commercialFlightService.searchFlights(searchParams);
-      setFlights(response.data || []);
+      const allResp = await commercialFlightService.getFeaturedFlights(false);
+      const filtered = (allResp.data || []).filter(flight => {
+        if (!isUpcoming(flight)) return false;
+        if (searchParams.origin && flight.origin.iata !== searchParams.origin.toUpperCase()) return false;
+        if (searchParams.destination && flight.destination.iata !== searchParams.destination.toUpperCase()) return false;
+        if (searchParams.departureDate && flight.departure.date !== searchParams.departureDate) return false;
+        return true;
+      });
+      setFlights(filtered);
     } catch (error) {
       console.error('Error buscando vuelos:', error);
     } finally {
@@ -270,6 +276,28 @@ const FlightShop = ({ initialParams = null }) => {
           <RefreshCw size={15} className={loading ? styles.spinning : ''} />
         </button>
       </div>
+
+      {/* Filter banner */}
+      {(searchParams.origin || searchParams.destination) && (
+        <div className={styles.filterBanner}>
+          <span className={styles.filterBannerText}>
+            {searchParams.origin && searchParams.destination
+              ? `${searchParams.origin} → ${searchParams.destination}`
+              : searchParams.destination
+                ? `Vuelos a ${searchParams.destination}`
+                : `Vuelos desde ${searchParams.origin}`}
+          </span>
+          <button
+            className={styles.filterBannerClear}
+            onClick={() => {
+              setSearchParams({ origin: '', destination: '', departureDate: '', cabinClass: 'economy' });
+              loadFeaturedFlights(false);
+            }}
+          >
+            × Ver todos
+          </button>
+        </div>
+      )}
 
       {/* Área de resultados */}
       <div className={styles.resultsArea}>

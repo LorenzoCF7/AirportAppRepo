@@ -1,6 +1,6 @@
 .page {
   display: flex;
-  height: calc(100vh - 56px);
+  height: 100%;
   overflow: hidden;
 }
 
@@ -8,6 +8,7 @@
 .panel {
   width: 420px;
   min-width: 420px;
+  min-height: 0;
   background: white;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -79,6 +80,134 @@
   font-size: 13px;
 }
 
+.searchFieldOpen {
+  border-color: #111827;
+}
+
+.destInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  font-family: inherit;
+  padding: 0;
+}
+
+.destInput::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: #9ca3af;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.clearBtn:hover { color: #374151; }
+
+/* Chip dropdowns */
+.chipDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 100;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 8px;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chipOption {
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+
+.chipOption:hover { background: #f3f4f6; }
+
+.chipOptionActive {
+  background: #f3f4f6;
+  font-weight: 700;
+  color: #111827;
+}
+
+.filterChipActive {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+/* Date dropdown */
+.chipDropdownRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px;
+}
+
+.dateLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.dateInput {
+  flex: 1;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #111827;
+  outline: none;
+}
+
+.dateInput:focus { border-color: #111827; }
+
+.applyBtn {
+  margin-top: 4px;
+  padding: 9px;
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.applyBtn:hover { background: #374151; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /**/
 .filters {
   display: flex;
@@ -118,6 +247,7 @@
 .list {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .loadingState {

@@ -23,7 +23,7 @@
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
-  padding-top: 0;
+  padding-top: 56px;
 }
 
 .app-container.map-view .main-content {

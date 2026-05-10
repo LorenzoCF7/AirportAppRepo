@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ArrowLeft, Heart, ChevronDown, Plane } from 'lucide-react';
+import { ArrowLeft, Heart, ChevronDown, X, Calendar } from 'lucide-react';
 import { useScrollLock } from '../../hooks';
 import { commercialFlightService } from '../../services/commercialFlightService';
 import { getAirportCoordinates } from '../../constants/airports';
@@ -272,11 +272,23 @@ const DestDetail = ({ dest, onBack, onNavigate, originCode }) => {
 // ── Componente principal ─────────────────────────────────────────────────────
 
 const ExploreView = ({ onNavigate }) => {
-  const [selected, setSelected] = useState(null);
-  const [allFlights, setAllFlights] = useState([]);
+  const [selected, setSelected]             = useState(null);
+  const [allFlights, setAllFlights]         = useState([]);
   const [availableOrigins, setAvailableOrigins] = useState([]);
   const [selectedOriginCode, setSelectedOriginCode] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]               = useState(true);
+
+  // Filters
+  const [destFilter, setDestFilter]   = useState('');
+  const [dateFrom, setDateFrom]       = useState('');
+  const [dateTo, setDateTo]           = useState('');
+  const [stopsFilter, setStopsFilter] = useState('all');   // 'all' | 'direct'
+  const [priceSort, setPriceSort]     = useState('asc');   // 'asc' | 'desc'
+  const [durationSort, setDurationSort] = useState(false); // false | true
+
+  // Dropdown state for filter chips and date field
+  const [openChip, setOpenChip]     = useState(null); // 'stops'|'price'|'duration'|'date'|null
+  const filterRef                   = useRef(null);
 
   useScrollLock(true);
 
@@ -308,21 +320,71 @@ const ExploreView = ({ onNavigate }) => {
     fetchAll();
   }, []);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handler = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) setOpenChip(null);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const originInfo = useMemo(() => {
     if (!selectedOriginCode) return null;
     const coords = getAirportCoordinates(selectedOriginCode);
     return coords ? { code: selectedOriginCode, city: ORIGIN_CITIES[selectedOriginCode] || selectedOriginCode, ...coords } : null;
   }, [selectedOriginCode]);
 
-  const destinations = useMemo(() => {
+  // Apply date filter to flights before computing destinations
+  const baseFlights = useMemo(() => {
     if (!allFlights.length || !selectedOriginCode) return [];
-    return flightsToDestinations(allFlights.filter(f => f.origin.iata === selectedOriginCode));
-  }, [allFlights, selectedOriginCode]);
+    return allFlights
+      .filter(f => f.origin.iata === selectedOriginCode)
+      .filter(f => !dateFrom || f.departure.date >= dateFrom)
+      .filter(f => !dateTo   || f.departure.date <= dateTo);
+  }, [allFlights, selectedOriginCode, dateFrom, dateTo]);
+
+  const destinations = useMemo(() => flightsToDestinations(baseFlights), [baseFlights]);
+
+  const parseDurMins = useCallback((d) => {
+    if (!d?.formatted) return 999;
+    const h = parseInt(d.formatted.match(/(\d+)h/)?.[1] || 0);
+    const m = parseInt(d.formatted.match(/(\d+)m/)?.[1] || 0);
+    return h * 60 + m;
+  }, []);
+
+  const visibleDests = useMemo(() => {
+    let list = destinations;
+
+    // Destination text filter
+    if (destFilter.trim()) {
+      const q = destFilter.toLowerCase();
+      list = list.filter(d => d.city.toLowerCase().includes(q) || d.code.toLowerCase().includes(q));
+    }
+
+    // Stops filter
+    if (stopsFilter === 'direct') list = list.filter(d => d.direct);
+
+    // Sort
+    if (durationSort) {
+      list = [...list].sort((a, b) => parseDurMins(a.duration) - parseDurMins(b.duration));
+    } else {
+      list = [...list].sort((a, b) => priceSort === 'asc' ? a.price - b.price : b.price - a.price);
+    }
+
+    return list;
+  }, [destinations, destFilter, stopsFilter, priceSort, durationSort, parseDurMins]);
 
   const handleSelect = (dest) => setSelected(dest);
   const handleBack   = () => setSelected(null);
 
-  const sorted = [...destinations].sort((a, b) => a.price - b.price);
+  const toggleChip = (name) => setOpenChip(prev => prev === name ? null : name);
+
+  const dateLabel = dateFrom || dateTo
+    ? `${dateFrom || '—'}  →  ${dateTo || '—'}`
+    : 'Cualquier momento y duración';
+
+  const clearDates = (e) => { e.stopPropagation(); setDateFrom(''); setDateTo(''); };
 
   return (
     <div className={styles.page}>
@@ -332,13 +394,14 @@ const ExploreView = ({ onNavigate }) => {
           <DestDetail dest={selected} onBack={handleBack} onNavigate={onNavigate} originCode={selectedOriginCode} />
         ) : (
           <>
-            <div className={styles.searchBox}>
+            <div className={styles.searchBox} ref={filterRef}>
               <div className={styles.searchRow}>
+                {/* Origin */}
                 <div className={styles.searchField}>
                   <select
                     className={styles.originSelect}
                     value={selectedOriginCode || ''}
-                    onChange={e => { setSelectedOriginCode(e.target.value); setSelected(null); }}
+                    onChange={e => { setSelectedOriginCode(e.target.value); setSelected(null); setDestFilter(''); }}
                     disabled={availableOrigins.length === 0}
                   >
                     {availableOrigins.map(o => (
@@ -346,35 +409,138 @@ const ExploreView = ({ onNavigate }) => {
                     ))}
                   </select>
                 </div>
-                <div className={styles.searchField}>
-                  <span className={styles.searchPlaceholder}>Destino</span>
+
+                {/* Destination filter */}
+                <div className={styles.searchField} style={{ position: 'relative' }}>
+                  <input
+                    className={styles.destInput}
+                    placeholder="Destino"
+                    value={destFilter}
+                    onChange={e => setDestFilter(e.target.value)}
+                  />
+                  {destFilter && (
+                    <button className={styles.clearBtn} onClick={() => setDestFilter('')}>
+                      <X size={13} />
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className={`${styles.searchField} ${styles.searchFieldFull}`}>
-                <span className={styles.searchPlaceholder}>Cualquier momento y duración</span>
+
+              {/* Date range field */}
+              <div
+                className={`${styles.searchField} ${styles.searchFieldFull} ${openChip === 'date' ? styles.searchFieldOpen : ''}`}
+                onClick={() => toggleChip('date')}
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+              >
+                <Calendar size={14} style={{ color: '#9ca3af', flexShrink: 0 }} />
+                <span className={dateFrom || dateTo ? styles.searchCode : styles.searchPlaceholder} style={{ flex: 1, marginLeft: 6 }}>
+                  {dateLabel}
+                </span>
+                {(dateFrom || dateTo) && (
+                  <button className={styles.clearBtn} onClick={clearDates}><X size={13} /></button>
+                )}
+                <ChevronDown size={13} style={{ color: '#9ca3af', flexShrink: 0 }} />
               </div>
+
+              {/* Date dropdown */}
+              {openChip === 'date' && (
+                <div className={styles.chipDropdown}>
+                  <div className={styles.chipDropdownRow}>
+                    <label className={styles.dateLabel}>Salida</label>
+                    <input
+                      type="date"
+                      className={styles.dateInput}
+                      value={dateFrom}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={e => setDateFrom(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.chipDropdownRow}>
+                    <label className={styles.dateLabel}>Vuelta</label>
+                    <input
+                      type="date"
+                      className={styles.dateInput}
+                      value={dateTo}
+                      min={dateFrom || new Date().toISOString().split('T')[0]}
+                      onChange={e => setDateTo(e.target.value)}
+                    />
+                  </div>
+                  <button className={styles.applyBtn} onClick={() => setOpenChip(null)}>Aplicar</button>
+                </div>
+              )}
             </div>
 
-            <div className={styles.filters}>
-              {['Escalas', 'Precio', 'Duración del vuelo'].map(f => (
-                <button key={f} className={styles.filterChip}>
-                  {f} <ChevronDown size={13} />
+            {/* Filter chips */}
+            <div className={styles.filters} ref={null}>
+              {/* Escalas chip */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  className={`${styles.filterChip} ${stopsFilter !== 'all' ? styles.filterChipActive : ''}`}
+                  onClick={() => toggleChip('stops')}
+                >
+                  Escalas{stopsFilter === 'direct' ? ': Directo' : ''} <ChevronDown size={13} />
                 </button>
-              ))}
+                {openChip === 'stops' && (
+                  <div className={styles.chipDropdown}>
+                    {[['all', 'Todos los vuelos'], ['direct', 'Solo directos']].map(([val, label]) => (
+                      <button
+                        key={val}
+                        className={`${styles.chipOption} ${stopsFilter === val ? styles.chipOptionActive : ''}`}
+                        onClick={() => { setStopsFilter(val); setOpenChip(null); }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Precio chip */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  className={`${styles.filterChip} ${durationSort ? '' : styles.filterChipActive}`}
+                  onClick={() => toggleChip('price')}
+                >
+                  Precio <ChevronDown size={13} />
+                </button>
+                {openChip === 'price' && (
+                  <div className={styles.chipDropdown}>
+                    {[['asc', 'Más barato primero'], ['desc', 'Más caro primero']].map(([val, label]) => (
+                      <button
+                        key={val}
+                        className={`${styles.chipOption} ${!durationSort && priceSort === val ? styles.chipOptionActive : ''}`}
+                        onClick={() => { setPriceSort(val); setDurationSort(false); setOpenChip(null); }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Duración chip */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  className={`${styles.filterChip} ${durationSort ? styles.filterChipActive : ''}`}
+                  onClick={() => { setDurationSort(prev => !prev); setOpenChip(null); }}
+                >
+                  Duración del vuelo {durationSort ? '✓' : <ChevronDown size={13} />}
+                </button>
+              </div>
             </div>
 
             <div className={styles.list}>
               {loading ? (
                 <div className={styles.loadingState}>
-                  <Plane size={28} className={styles.loadingIcon} />
+                  <div className={styles.loadingIcon} style={{ width: 28, height: 28, border: '3px solid #e5e7eb', borderTopColor: '#111827', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
                   <p>Cargando destinos...</p>
                 </div>
-              ) : sorted.length === 0 ? (
+              ) : visibleDests.length === 0 ? (
                 <div className={styles.loadingState}>
                   <p>No hay destinos disponibles</p>
                 </div>
               ) : (
-                sorted.map(dest => (
+                visibleDests.map(dest => (
                   <DestCard
                     key={dest.id}
                     dest={dest}
