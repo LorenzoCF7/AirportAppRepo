@@ -15,7 +15,7 @@ liferay-custom-element-react {
   background: #F9FAFB;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -23,7 +23,7 @@ liferay-custom-element-react {
   margin: 0 !important;
   padding: 0 !important;
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
 }
 
 liferay-custom-element-react *,

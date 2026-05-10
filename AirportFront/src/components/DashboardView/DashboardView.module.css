@@ -1,603 +1,859 @@
-.dashboardView {
+/**/
+
+.page {
   width: 100%;
   min-height: 100vh;
-  background: #efefef;
-  padding: 0;
-  position: relative;
+  background: #f5f5f5;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
+/**/
+
+.hero {
+  background: #f2f2f2;
 }
 
-.dashboardHeader,
-.viewHeader {
-  position: relative;
-  z-index: 10;
-  margin-bottom: 2.5rem;
-  background: #FFFFFF;
-  border-radius: 1rem;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #E5E7EB;
-}
-
-.dashboardTitleContainer,
-.headerContent {
+.heroInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px 40px 56px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
+  gap: 48px;
+}
+
+.heroLeft {
+  flex: 1.2;
+  min-width: 0;
+}
+
+.heroTitle {
+  font-size: 2.75rem;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1.15;
+  margin: 0 0 32px;
+  letter-spacing: -0.03em;
+}
+
+.titleDot {
+  color: #FF690F;
+}
+
+/**/
+.serviceTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 1rem;
 }
 
-.dashboardTitleWrapper {
+.serviceTab {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  flex: 1;
+  gap: 6px;
+  padding: 12px 16px;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  min-width: 84px;
 }
 
-.dashboardIcon,
-.titleIconWrapper {
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0.5rem;
-  background: #5850EC;
-  border-radius: 0.75rem;
+.serviceTab:hover {
+  border-color: #111827;
+}
+
+.serviceTabActive {
+  border-color: #111827 !important;
+}
+
+.serviceIconBox {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.serviceLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+/**/
+.tripOptions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tripOptionBtn {
+  padding: 6px 14px;
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.tripOptionBtn:hover {
+  border-color: #111827;
+}
+
+/**/
+.searchBar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  height: 58px;
+  overflow: visible;
+}
+
+.sbField {
+  flex: 1.5;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.sbInput {
+  width: 100%;
+  height: 100%;
+  padding: 0 36px 0 16px;
   border: none;
-  box-shadow: 0 2px 8px rgba(88, 80, 236, 0.2);
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  background: transparent;
+  font-family: inherit;
 }
 
-.dashboardIcon svg,
-.titleIconWrapper svg,
-.titleIcon {
-  width: 1.5rem;
-  height: 1.5rem;
+.sbInput::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.sbClear {
+  position: absolute;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sbSwap {
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+.sbSwap:hover {
+  border-color: #111827;
+  color: #111827;
+}
+
+.sbDivider {
+  width: 1px;
+  height: 28px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.sbDates {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px;
+  flex: 1.2;
+  height: 100%;
+}
+
+.sbDateInput {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 90px;
+  max-width: 115px;
+}
+
+.sbDateSep {
+  color: #9ca3af;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.sbPassengers {
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.sbSubmit {
+  width: 58px;
+  height: 58px;
+  background: #FF690F;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   color: white;
-  filter: none;
+  flex-shrink: 0;
+  transition: background 0.2s;
 }
 
-.dashboardTitle {
-  font-size: 1.75rem;
+.sbSubmit:hover {
+  background: #E55A00;
+}
+
+/**/
+.heroRight {
+  flex: 1;
+  min-width: 0;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.photoCard {
+  border-radius: 14px;
+  height: 138px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #d1d5db;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.25s ease;
+}
+
+.photoCard:hover {
+  transform: scale(1.03);
+}
+
+.photoOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.45) 100%);
+  border-radius: inherit;
+}
+
+.photoLabel {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  color: white;
+  font-size: 13px;
   font-weight: 700;
-  color: #1F2937;
-  text-shadow: none;
-  letter-spacing: -0.02em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+/**/
+
+.features {
+  background: #f5f5f5;
+  padding: 28px 0;
+}
+
+.featuresInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.featureCard {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.airlineDots {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.airlineDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-left: -8px;
+  flex-shrink: 0;
+}
+
+.airlineDot:first-child {
+  margin-left: 0;
+}
+
+.avatarRow {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+  margin-left: -10px;
+  flex-shrink: 0;
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.stars {
+  font-size: 20px;
+  color: #f59e0b;
+  letter-spacing: -2px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.featureTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
   margin: 0;
 }
 
-.dashboardSubtitle {
-  font-size: 0.875rem;
-  color: #6B7280;
-  font-weight: 400;
-  margin-top: 0.25rem;
-  text-shadow: none;
+.featureDesc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
 }
 
-.refreshButton {
+/**/
+
+.deals {
+  background: #f5f5f5;
+  padding: 8px 0 36px;
+}
+
+.dealsInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.dealsTitleRow {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.75rem 1.5rem;
-  background: #5850EC;
-  backdrop-filter: none;
-  border: none;
-  border-radius: 0.5rem;
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dealsTitle {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.carouselBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #374151;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
 
-.refreshButton:hover {
-  background: #4338CA;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(88, 80, 236, 0.25);
+.carouselBtn:hover {
+  border-color: #FF690F;
+  color: #FF690F;
 }
 
-.refreshButton:active {
-  transform: translateY(0);
+.exploreLink {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s;
+  margin-left: 4px;
 }
 
-.refreshButton svg {
-  width: 1.125rem;
-  height: 1.125rem;
+.exploreLink:hover {
+  color: #FF690F;
 }
 
-.refreshButton.loading svg {
-  animation: spin 1s linear infinite;
+.carouselTrack {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+.carouselTrack::-webkit-scrollbar {
+  height: 4px;
+}
+
+.carouselTrack::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 2px;
+}
+
+.carouselTrack::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.carouselTrack::-webkit-scrollbar-thumb:hover {
+  background: #FF690F;
+}
+
+.dealCard {
+  background: white;
+  border-radius: 14px;
+  border: none;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: left;
+  font-family: inherit;
+  padding: 0;
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+}
+
+.dealCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.dealPhoto {
+  height: 165px;
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.3s ease;
+}
+
+.dealCard:hover .dealPhoto {
+  transform: scale(1.04);
+}
+
+.dealPhotoOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.18) 100%);
+}
+
+.dealBody {
+  padding: 16px;
+}
+
+.dealCity {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.dealMeta {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 2px;
+}
+
+.dealDates {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0 0 10px;
+}
+
+.dealPrice {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+}
+
+.dealPrice strong {
+  font-weight: 800;
+  font-size: 16px;
+  color: #111827;
+}
+
+/**/
+
+.destList {
+  background: white;
+  padding: 44px 0;
+}
+
+.destListInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.destListTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 6px;
+}
+
+.destListSub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 32px;
+}
+
+.destGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #f3f4f6;
+}
+
+.destItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px 14px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.destItem:hover {
+  color: #FF690F;
+}
+
+.destChev {
+  font-size: 13px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/**/
+
+.live {
+  background: #f5f5f5;
+  padding: 44px 0;
+}
+
+.liveInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.liveHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.liveTitle {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.liveSub {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.refreshBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  border-color: #FF690F;
+  color: #FF690F;
+}
+
+.refreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-.statsGrid {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  max-width: 80%;
-  margin: 0 auto 2.5rem;
-  padding: 0 2rem;
-  gap: 1.5rem;
-  align-items: stretch;
-}
-
-.statCard {
-  width: clamp(180px, 18vw, 240px);
-  height: clamp(180px, 18vw, 240px);
-  flex-shrink: 0;
-  background: var(--card-bg);
-  border-radius: 2rem;
-  padding: 2rem;
-  border: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.statCardHeader {
-  display: none;
-}
-
-.statCardInner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-  width: 100%;
-  gap: 0.75rem;
-}
-
-.statHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.statIconWrapper {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.statCard:hover .statIconWrapper {
-  transform: scale(1.05);
-}
-
-.statIconWrapper svg,
-.statIcon {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: white;
-  stroke: white;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  flex-shrink: 0;
-}
-
-.statInfo h3 {
-  display: none;
-}
-
-.statValue {
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: white;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.statLabel {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-}
-
-.statCardTotal {
-  --gradient: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-  --card-bg: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.9) 100%);
-  --shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.9) 100%);
-}
-
-.statCardActive {
-  --gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  --card-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(5, 150, 105, 0.9) 100%);
-  --shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(5, 150, 105, 0.9) 100%);
-}
-
-.statCardScheduled {
-  --gradient: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-  --card-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.9) 100%);
-  --shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.9) 100%);
-}
-
-.statCardLanded {
-  --gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-  --card-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.85) 0%, rgba(217, 119, 6, 0.9) 100%);
-  --shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.85) 0%, rgba(217, 119, 6, 0.9) 100%);
-}
-
-.flightsSection {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-}
-
-.contentSection {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  display: block;
-  min-width: 0;
-  overflow: visible;
-  background: #FFFFFF;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #E5E7EB;
-}
-
-.flightsHeader,
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.flightsHeader h2,
-.sectionHeader h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1F2937;
-  text-shadow: none;
-  margin: 0;
-}
-
-.lastUpdate {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.125rem;
-  background: #F3F4F6;
-  backdrop-filter: none;
-  border: 1px solid #E5E7EB;
-  border-radius: 0.5rem;
-  color: #6B7280;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.lastUpdate svg {
-  width: 1rem;
-  height: 1rem;
-  color: #6B7280;
-}
-
-.flightsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  max-width: 100%;
-  width: 100%;
-  min-height: 0;
-  grid-auto-rows: minmax(420px, auto);
-  align-items: stretch;
-}
-
-.loadingContainer,
-.loadingState,
-.errorState,
-.emptyState {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: #FFFFFF;
-  backdrop-filter: none;
-  border-radius: 1rem;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.loadingSpinner {
-  width: 3rem;
-  height: 3rem;
-  margin: 0 auto 1.5rem;
-  border: 3px solid #E5E7EB;
-  border-top-color: #5850EC;
-  border-radius: 50%;
+.spinning {
   animation: spin 1s linear infinite;
 }
 
-.loadingContainer p,
-.loadingState p,
-.errorState p,
-.emptyState p {
+/**/
+.statsRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: white;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+}
+
+.statActive  { border-color: #10b981; background: #f0fdf4; }
+.statScheduled { border-color: #3b82f6; background: #eff6ff; }
+.statLanded  { border-color: #f59e0b; background: #fffbeb; }
+
+.statNum {
+  font-size: 22px;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/**/
+.errorMsg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/**/
+.flightsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.flightsTitle {
   font-size: 1.125rem;
-  color: #64748B;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.updateBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #6b7280;
   font-weight: 500;
 }
 
-.errorMessage,
-.errorState {
-  border-left: 4px solid #EF4444;
+/**/
+.loadingBox,
+.emptyBox {
+  text-align: center;
+  padding: 52px 24px;
+  background: white;
+  border-radius: 14px;
 }
 
-.errorMessage p,
-.errorState p {
-  color: #EF4444;
-  font-weight: 600;
-}
-
-.pulseIndicator {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-}
-
-.pulseDot {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #10B981;
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #FF690F;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  margin: 0 auto 16px;
 }
 
-.pulseRing {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: 2px solid #10B981;
-  border-radius: 50%;
-  animation: pulseRing 2s ease-out infinite;
+.loadingBox p,
+.emptyBox p {
+  color: #6b7280;
+  font-size: 15px;
+  margin: 8px 0;
 }
 
-@keyframes pulseRing {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2);
-    opacity: 0;
-  }
+/**/
+.flightsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  grid-auto-rows: minmax(420px, auto);
 }
 
-@media (max-width: 768px) {
-  .dashboardView {
-    padding: 1rem;
+/**/
+
+@media (max-width: 1200px) {
+  .heroRight { display: none; }
+}
+
+@media (max-width: 960px) {
+  .heroInner,
+  .featuresInner,
+  .dealsInner,
+  .destListInner { padding-left: 24px; padding-right: 24px; }
+
+  .heroTitle { font-size: 2.1rem; }
+  .featuresInner { grid-template-columns: 1fr; }
+  .destGrid  { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .heroInner,
+  .featuresInner,
+  .dealsInner,
+  .destListInner { padding-left: 16px; padding-right: 16px; }
+
+  .heroTitle { font-size: 1.7rem; }
+
+  .searchBar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px;
+    gap: 6px;
+    border-radius: 10px;
   }
-  
-  .dashboardHeader,
-  .viewHeader {
-    padding: 1rem 1.5rem;
-  }
-  
-  .dashboardTitle {
-    font-size: 1.5rem;
-  }
-  
-  .dashboardSubtitle {
-    font-size: 0.75rem;
-  }
-  
-  .statsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-  }
-  
-  .statCard {
-    max-width: 180px;
-    height: 180px;
-    padding: 1.5rem;
-    border-radius: 1.5rem;
-  }
-  
-  .statIconWrapper {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-  
-  .statIconWrapper svg,
-  .statIcon {
-    width: 2rem;
-    height: 2rem;
-  }
-  
-  .statValue {
-    font-size: 2.5rem;
-  }
-  
-  .statLabel {
-    font-size: 0.65rem;
-  }
-  
-  .flightsGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .contentSection {
-    padding: 1rem;
-  }
-  
-  .sectionHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-  
-  .dashboardTitleContainer,
-  .headerContent {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .refreshButton {
+
+  .sbField,
+  .sbDates,
+  .sbPassengers {
     width: 100%;
-    justify-content: center;
+    padding: 10px 12px;
+    height: 44px;
   }
-}
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .statsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.25rem;
-  }
-  
-  .statCard {
-    max-width: 200px;
-    height: 200px;
-    padding: 1.75rem;
-  }
-  
-  .statIconWrapper {
-    width: 4rem;
-    height: 4rem;
-  }
-  
-  .statIconWrapper svg,
-  .statIcon {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-  
-  .statValue {
-    font-size: 3rem;
-  }
-  
-  .flightsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-  }
-  
-  .contentSection {
-    padding: 1.5rem;
-  }
-}
+  .sbDivider { display: none; }
+  .sbSwap { align-self: center; }
 
-@media (min-width: 1025px) {
-  .flightsGrid {
-    grid-template-columns: repeat(4, 1fr);
+  .sbSubmit {
+    width: 100%;
+    border-radius: 8px;
+    height: 48px;
   }
-}
 
-@media (min-width: 1025px) and (max-width: 1300px) {
-  .flightsGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1301px) {
-  .flightsGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1400px) {
-  .flightsGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Media query específica para portátiles pequeños */
-@media (max-width: 1366px) and (max-height: 800px) {
-  .statsGrid {
-    max-width: 90%;
-    gap: 1rem;
-  }
-  
-  .statCard {
-    width: clamp(160px, 15vw, 200px);
-    height: clamp(160px, 15vw, 200px);
-    padding: 1.5rem;
-    border-radius: 1.5rem;
-  }
-  
-  .statIconWrapper {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 1rem;
-  }
-  
-  .statIconWrapper svg,
-  .statIcon {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-  
-  .statValue {
-    font-size: 2.5rem;
-  }
-  
-  .statLabel {
-    font-size: 0.65rem;
-  }
-  
-  .flightsGrid {
-    grid-auto-rows: minmax(380px, auto);
-  }
-  
-  .contentSection {
-    padding: 1.5rem;
-  }
-  
-  .dashboardHeader,
-  .viewHeader {
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .dashboardTitle {
-    font-size: 1.5rem;
-  }
+  .dealCard { flex: 0 0 200px; }
+  .destGrid  { grid-template-columns: 1fr; }
 }

@@ -1,0 +1,142 @@
+.footer {
+  background: #111827;
+  color: #d1d5db;
+}
+
+.inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 52px 40px 40px;
+  display: grid;
+  grid-template-columns: 1.6fr repeat(4, 1fr);
+  gap: 40px;
+}
+
+/**/
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  user-select: none;
+}
+
+.logoSquare {
+  width: 30px;
+  height: 30px;
+  background: #FF690F;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-weight: 800;
+  color: white;
+}
+
+.tagline {
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/**/
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.colTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.colList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.colLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #9ca3af;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.colLink:hover {
+  color: #FF690F;
+}
+
+/**/
+.bottom {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px 40px;
+  border-top: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.bottomRight {
+  color: #6b7280;
+}
+
+/**/
+@media (max-width: 960px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    padding: 40px 24px 32px;
+    gap: 32px;
+  }
+
+  .brand {
+    grid-column: 1 / -1;
+  }
+
+  .bottom {
+    padding: 16px 24px;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    padding: 32px 16px 24px;
+  }
+
+  .bottom {
+    padding: 14px 16px;
+  }
+}

@@ -1,9 +1,12 @@
 .searchView {
   width: 100%;
   min-height: 100vh;
-  background: #efefef;
-  padding: 0;
+  background: #f8fafc;
+  padding: 2rem 24px;
   position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .viewHeader {

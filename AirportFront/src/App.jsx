@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 
 import Header from './components/Header/Header'
-import SidebarAnimated from './components/SidebarAnimated/SidebarAnimated'
+import Footer from './components/Footer/Footer'
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner'
 import NotificationToast from './components/NotificationToast/NotificationToast'
 import TicketsModal from './components/TicketsModal/TicketsModal'
@@ -12,12 +12,14 @@ import { flightSimulator } from './services/flightSimulator'
 import { APP_VIEW, STORAGE_KEYS, SCROLL_OFFSET, SIMULATOR_INTERVAL } from './constants'
 import './App.css'
 
-// Lazy loading de vistas para code splitting
+//
 const DashboardView = lazy(() => import('./components/DashboardView/DashboardView'))
 const SearchView = lazy(() => import('./components/SearchView/SearchView'))
 const RealTimeMap = lazy(() => import('./components/RealTimeMap/RealTimeMap'))
 const FlightShop = lazy(() => import('./components/FlightShop/FlightShop'))
 const WalletView = lazy(() => import('./components/WalletView/WalletView'))
+const ExploreView = lazy(() => import('./components/ExploreView/ExploreView'))
+const ProfileView = lazy(() => import('./components/ProfileView/ProfileView'))
 
 function App() {
   const mainContentRef = useRef(null);
@@ -31,7 +33,7 @@ function App() {
     return localStorage.getItem(STORAGE_KEYS.ACTIVE_VIEW) || APP_VIEW.DASHBOARD;
   });
 
-  // Scroll al contenedor cuando cambia la vista
+  //
   const scrollToContainer = useCallback(() => {
     if (appContainerRef.current) {
       const rect = appContainerRef.current.getBoundingClientRect();
@@ -45,15 +47,15 @@ function App() {
     }
   }, []);
 
-  // Manejar cambio de vista con protección de autenticación
+  //
   const handleViewChange = useCallback((newView) => {
-    // Si intenta ir a SHOP sin autenticación, abrir modal de login
-    if (newView === APP_VIEW.SHOP && !isAuthenticated) {
+    //
+    if ((newView === APP_VIEW.SHOP || newView === APP_VIEW.WALLET) && !isAuthenticated) {
       setIsLoginModalOpen(true);
-      return; // No cambiar la vista
+      return;
     }
     
-    // Si está todo bien, cambiar la vista
+    //
     setActiveView(newView);
   }, [isAuthenticated]);
 
@@ -97,55 +99,75 @@ function App() {
   }, []);
 
   const renderView = () => {
-    let ViewComponent;
-    
     switch (activeView) {
       case APP_VIEW.SEARCH:
-        ViewComponent = SearchView;
-        break;
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+            <SearchView />
+          </Suspense>
+        );
       case APP_VIEW.MAP:
-        ViewComponent = RealTimeMap;
-        break;
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+            <RealTimeMap />
+          </Suspense>
+        );
       case APP_VIEW.SHOP:
-        ViewComponent = FlightShop;
-        break;
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+            <FlightShop />
+          </Suspense>
+        );
       case APP_VIEW.WALLET:
-        ViewComponent = WalletView;
-        break;
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+            <WalletView />
+          </Suspense>
+        );
+      case APP_VIEW.EXPLORE:
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando mapa..." />}>
+            <ExploreView onNavigate={handleViewChange} />
+          </Suspense>
+        );
+      case APP_VIEW.PROFILE:
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando perfil..." />}>
+            <ProfileView onNavigate={handleViewChange} />
+          </Suspense>
+        );
       case APP_VIEW.DASHBOARD:
       default:
-        ViewComponent = DashboardView;
+        return (
+          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
+            <DashboardView onNavigate={handleViewChange} />
+          </Suspense>
+        );
     }
-
-    return (
-      <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
-        <ViewComponent />
-      </Suspense>
-    );
   }
 
   return (
-    <div ref={appContainerRef} className={`app-container ${activeView === APP_VIEW.MAP ? 'map-view' : ''}`}>
-      <Header onLogout={() => setActiveView(APP_VIEW.DASHBOARD)} />
+    <div ref={appContainerRef} className={`app-container ${(activeView === APP_VIEW.MAP || activeView === APP_VIEW.EXPLORE) ? 'map-view' : ''}`}>
+      <Header
+        activeView={activeView}
+        onViewChange={handleViewChange}
+        onLogout={() => setActiveView(APP_VIEW.DASHBOARD)}
+        onOpenTicketsModal={() => {
+          if (isAuthenticated) {
+            setIsTicketsModalOpen(true);
+          } else {
+            setIsLoginModalOpen(true);
+          }
+        }}
+      />
       <main className="main-content" ref={mainContentRef}>
-        <SidebarAnimated 
-          activeView={activeView} 
-          onViewChange={handleViewChange}
-          onOpenTicketsModal={() => {
-            if (isAuthenticated) {
-              setIsTicketsModalOpen(true);
-            } else {
-              setIsLoginModalOpen(true);
-            }
-          }}
-        />
         {renderView()}
+        {activeView !== APP_VIEW.MAP && activeView !== APP_VIEW.EXPLORE && <Footer />}
       </main>
       <NotificationToast />
-      
-      {/* Modal de billetes fuera del sidebar */}
-      <TicketsModal 
-        isOpen={isTicketsModalOpen} 
+
+      <TicketsModal
+        isOpen={isTicketsModalOpen}
         onClose={() => setIsTicketsModalOpen(false)}
         onViewWallet={() => {
           setIsTicketsModalOpen(false);
@@ -153,7 +175,6 @@ function App() {
         }}
       />
 
-      {/* Modal de login */}
       <LoginRegisterModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
