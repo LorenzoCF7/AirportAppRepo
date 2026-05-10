@@ -15,6 +15,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: 56px;
 }
 
 /**/
@@ -22,6 +23,7 @@
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
+  padding-top: 0;
 }
 
 .app-container.map-view .main-content {

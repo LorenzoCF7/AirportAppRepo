@@ -15,7 +15,6 @@ import './App.css'
 
 //
 const DashboardView = lazy(() => import('./components/DashboardView/DashboardView'))
-const SearchView = lazy(() => import('./components/SearchView/SearchView'))
 const RealTimeMap = lazy(() => import('./components/RealTimeMap/RealTimeMap'))
 const FlightShop = lazy(() => import('./components/FlightShop/FlightShop'))
 const WalletView = lazy(() => import('./components/WalletView/WalletView'))
@@ -103,12 +102,6 @@ function App() {
 
   const renderView = () => {
     switch (activeView) {
-      case APP_VIEW.SEARCH:
-        return (
-          <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
-            <SearchView />
-          </Suspense>
-        );
       case APP_VIEW.MAP:
         return (
           <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>

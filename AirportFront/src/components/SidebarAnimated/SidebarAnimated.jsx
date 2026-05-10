@@ -6,7 +6,6 @@ import styles from './SidebarAnimated.module.css';
 const SidebarAnimated = ({ activeView, onViewChange, onOpenTicketsModal }) => {
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'search', icon: Search, label: 'Búsqueda' },
     { id: 'map', icon: MapIcon, label: 'Mapa en Vivo' },
     { id: 'shop', icon: ShoppingCart, label: 'Comprar Billetes', separator: true },
   ];

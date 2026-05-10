@@ -66,29 +66,7 @@ const DashboardView = ({ onNavigate }) => {
               Compara ofertas de vuelos<br />en cientos de webs<span className={styles.titleDot}>.</span>
             </h1>
 
-            {/**/}
-            <div className={styles.serviceTabs}>
-              <button className={`${styles.serviceTab} ${styles.serviceTabActive}`}>
-                <span className={styles.serviceIconBox} style={{ background: '#FF690F' }}>
-                  <Plane size={18} color="white" />
-                </span>
-                <span className={styles.serviceLabel}>Vuelos</span>
-              </button>
-              <button className={styles.serviceTab}>
-                <span className={styles.serviceIconBox}>🏨</span>
-                <span className={styles.serviceLabel}>Alojamientos</span>
-              </button>
-              <button className={styles.serviceTab}>
-                <span className={styles.serviceIconBox}>🚗</span>
-                <span className={styles.serviceLabel}>Coches</span>
-              </button>
-              <button className={styles.serviceTab}>
-                <span className={styles.serviceIconBox}>🌴</span>
-                <span className={styles.serviceLabel}>Viajes</span>
-              </button>
-            </div>
-
-            {/**/}
+            
             <div className={styles.tripOptions}>
               <button
                 className={styles.tripOptionBtn}

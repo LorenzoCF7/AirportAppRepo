@@ -92,8 +92,8 @@
 
 .formGroup input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: #FF690F;
+  box-shadow: 0 0 0 3px rgba(255, 105, 15, 0.1);
 }
 
 .formGroup input:disabled {
@@ -112,7 +112,7 @@
 
 .submitBtn {
   padding: 12px;
-  background-color: #007bff;
+  background-color: #FF690F;
   color: white;
   border: none;
   border-radius: 6px;
@@ -124,7 +124,7 @@
 }
 
 .submitBtn:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #E55A0F;
 }
 
 .submitBtn:disabled {
@@ -150,7 +150,7 @@
 .toggleBtn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #FF690F;
   cursor: pointer;
   font-weight: 600;
   padding: 0;
@@ -160,7 +160,7 @@
 }
 
 .toggleBtn:hover:not(:disabled) {
-  color: #0056b3;
+  color: #E55A0F;
 }
 
 .toggleBtn:disabled {

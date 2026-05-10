@@ -10,7 +10,6 @@ import styles from './Header.module.css';
 
 const mainNav = [
   { id: 'dashboard', label: 'Vuelos',           Icon: Plane },
-  { id: 'search',    label: 'Búsqueda',          Icon: Search },
   { id: 'map',       label: 'Mapa en Vivo',      Icon: Map },
   { id: 'shop',      label: 'Comprar Billetes',  Icon: ShoppingCart },
   { id: 'wallet',    label: 'Mi Cartera',        Icon: Wallet },
