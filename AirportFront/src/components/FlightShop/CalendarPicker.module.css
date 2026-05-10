@@ -1,0 +1,165 @@
+.calendar {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.14);
+  padding: 16px;
+  width: 288px;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.navBtn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #374151;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.navBtn:hover { background: #f3f4f6; }
+
+.monthLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  text-transform: capitalize;
+}
+
+.dayHeaders {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+  gap: 2px;
+}
+
+.dayHeader {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.12s;
+  font-family: inherit;
+  padding: 0;
+  gap: 1px;
+}
+
+.day:hover:not(:disabled) { background: #f3f4f6; }
+
+.dayNum {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1;
+}
+
+/* Days outside current month */
+.dayOther {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Past days */
+.dayPast {
+  cursor: not-allowed;
+}
+.dayPast .dayNum {
+  color: #d1d5db;
+}
+
+/* Days with available flights */
+.dayAvail {
+  background: #fff7ed;
+}
+.dayAvail .dayNum {
+  color: #c2410c;
+  font-weight: 700;
+}
+.dayAvail:hover:not(:disabled) {
+  background: #fed7aa;
+}
+
+/* Today marker */
+.dayToday .dayNum {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Selected day */
+.daySelected {
+  background: #FF690F !important;
+  border-radius: 8px;
+}
+.daySelected .dayNum {
+  color: white !important;
+  font-weight: 800;
+}
+
+/* Flight availability dot */
+.dot {
+  width: 4px;
+  height: 4px;
+  background: #FF690F;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  background: #FF690F;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendText {
+  font-size: 11px;
+  color: #6b7280;
+}

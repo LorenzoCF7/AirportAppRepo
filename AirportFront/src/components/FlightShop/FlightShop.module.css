@@ -82,9 +82,17 @@
   flex: 1;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   background: white;
   min-width: 0;
+}
+
+.searchBarFields .searchField:first-child {
+  border-radius: 7px 0 0 7px;
+}
+
+.searchBarFields .searchField:last-child {
+  border-radius: 0 7px 7px 0;
 }
 
 .searchField {
@@ -652,6 +660,103 @@
   background: #374151;
   color: #6b7280;
   cursor: not-allowed;
+}
+
+/* ── Airport autocomplete suggestions ── */
+
+.suggestionsDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: -2px;
+  min-width: 220px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 500;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 7px;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+
+.suggestionItem:hover {
+  background: #f9fafb;
+}
+
+.suggestionCity {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #111827;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestionIata {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FF690F;
+  background: #fff7ed;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+/* ── Calendar date picker ── */
+
+.searchFieldCal {
+  flex: 0 0 auto;
+  min-width: 150px;
+}
+
+.calTrigger {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #111827;
+  cursor: pointer;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calTriggerFilled {
+  font-weight: 600;
+  color: #111827;
+}
+
+.calPlaceholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.calDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 500;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.14));
 }
 
 /* ── Responsive ── */
