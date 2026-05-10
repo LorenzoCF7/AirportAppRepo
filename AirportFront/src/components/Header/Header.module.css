@@ -346,6 +346,21 @@
   background: #fef2f2;
 }
 
+.drawerItemAi {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  color: #667eea;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+}
+
+.drawerItemAi .drawerIcon {
+  color: #667eea;
+}
+
+.drawerItemAi:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.16), rgba(118, 75, 162, 0.16));
+}
+
 .drawerUserEmail {
   padding: 8px 20px 4px;
   font-size: 12px;

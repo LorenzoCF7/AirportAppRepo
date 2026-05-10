@@ -14,7 +14,7 @@ const mainNav = [
   { id: 'map',       label: 'Mapa en Vivo',      Icon: Map },
   { id: 'shop',      label: 'Comprar Billetes',  Icon: ShoppingCart },
   { id: 'wallet',    label: 'Mi Cartera',        Icon: Wallet },
-  { id: null,        label: 'Planifica con IA',  Icon: Sparkles },
+  { id: null,        label: 'Planifica con IA',  Icon: Sparkles, action: 'ai' },
 ];
 
 const discoverNav = [
@@ -23,7 +23,7 @@ const discoverNav = [
   { id: null,      label: 'Mejores precios',   Icon: Euro },
 ];
 
-const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal }) => {
+const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal, onOpenAi }) => {
   const { user, logout, isAuthenticated } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loginOpen, setLoginOpen]   = useState(false);
@@ -31,8 +31,9 @@ const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal }) => {
 
   const closeDrawer = () => setDrawerOpen(false);
 
-  const handleNavClick = (id) => {
-    if (id) onViewChange(id);
+  const handleNavClick = (id, action) => {
+    if (action === 'ai') { onOpenAi?.(); }
+    else if (id) onViewChange(id);
     closeDrawer();
   };
 
@@ -67,7 +68,7 @@ const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal }) => {
           </div>
 
           <div className={styles.right}>
-            <button className={styles.iaBtn}>
+            <button className={styles.iaBtn} onClick={onOpenAi}>
               <Plus size={13} strokeWidth={2.5} />
               <span>IA</span>
             </button>
@@ -112,11 +113,11 @@ const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal }) => {
         <nav className={styles.drawerNav}>
 
           <div className={styles.drawerGroup}>
-            {mainNav.map(({ id, label, Icon }) => (
+            {mainNav.map(({ id, label, Icon, action }) => (
               <button
                 key={label}
-                className={`${styles.drawerItem} ${activeView === id ? styles.drawerItemActive : ''}`}
-                onClick={() => handleNavClick(id)}
+                className={`${styles.drawerItem} ${activeView === id ? styles.drawerItemActive : ''} ${action === 'ai' ? styles.drawerItemAi : ''}`}
+                onClick={() => handleNavClick(id, action)}
               >
                 <span className={styles.drawerIcon}><Icon size={19} /></span>
                 <span className={styles.drawerLabel}>{label}</span>

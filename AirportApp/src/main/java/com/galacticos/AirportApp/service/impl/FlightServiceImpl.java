@@ -137,7 +137,7 @@ public class FlightServiceImpl implements FlightService {
         }
 
         // Adaptar vuelos para hoy
-        return adaptFlightsToToday(allFlights.stream().limit(20).toList());
+        return adaptFlightsToToday(allFlights.stream().limit(50).toList());
     }
 
     private String getAmadeusAccessToken() {
@@ -199,18 +199,59 @@ public class FlightServiceImpl implements FlightService {
         List<Map<String, Object>> flights = new ArrayList<>();
 
         String[][] routes = {
+                // España
                 {"MAD", "BCN", "Madrid-Barajas", "Barcelona-El Prat", "Iberia", "IB"},
-                {"LHR", "CDG", "London Heathrow", "Paris CDG", "British Airways", "BA"},
-                {"FRA", "AMS", "Frankfurt", "Amsterdam Schiphol", "Lufthansa", "LH"},
-                {"FCO", "MUC", "Rome Fiumicino", "Munich", "Alitalia", "AZ"},
-                {"BCN", "LIS", "Barcelona-El Prat", "Lisbon", "Vueling", "VY"},
                 {"MAD", "LHR", "Madrid-Barajas", "London Heathrow", "Iberia", "IB"},
+                {"MAD", "CDG", "Madrid-Barajas", "Paris CDG", "Iberia", "IB"},
+                {"MAD", "FRA", "Madrid-Barajas", "Frankfurt", "Iberia", "IB"},
+                {"MAD", "FCO", "Madrid-Barajas", "Rome Fiumicino", "Iberia", "IB"},
+                {"MAD", "AMS", "Madrid-Barajas", "Amsterdam Schiphol", "Vueling", "VY"},
+                {"MAD", "MUC", "Madrid-Barajas", "Munich", "Lufthansa", "LH"},
+                {"SVQ", "CDG", "Sevilla", "Paris CDG", "Vueling", "VY"},
+                {"SVQ", "BCN", "Sevilla", "Barcelona-El Prat", "Vueling", "VY"},
+                {"SVQ", "LHR", "Sevilla", "London Heathrow", "Ryanair", "FR"},
+                {"SVQ", "MAD", "Sevilla", "Madrid-Barajas", "Iberia Express", "I2"},
+                {"SVQ", "FRA", "Sevilla", "Frankfurt", "Ryanair", "FR"},
+                {"BCN", "LIS", "Barcelona-El Prat", "Lisbon", "Vueling", "VY"},
+                {"BCN", "CDG", "Barcelona-El Prat", "Paris CDG", "Air France", "AF"},
+                {"BCN", "FRA", "Barcelona-El Prat", "Frankfurt", "Vueling", "VY"},
+                {"BCN", "LHR", "Barcelona-El Prat", "London Heathrow", "British Airways", "BA"},
+                {"BCN", "AMS", "Barcelona-El Prat", "Amsterdam Schiphol", "KLM", "KL"},
+                {"BCN", "FCO", "Barcelona-El Prat", "Rome Fiumicino", "Vueling", "VY"},
+                {"VLC", "CDG", "Valencia", "Paris CDG", "Air France", "AF"},
+                {"VLC", "LHR", "Valencia", "London Heathrow", "Ryanair", "FR"},
+                {"VLC", "BCN", "Valencia", "Barcelona-El Prat", "Iberia Express", "I2"},
+                {"VLC", "MAD", "Valencia", "Madrid-Barajas", "Iberia", "IB"},
+                {"AGP", "LHR", "Málaga", "London Heathrow", "British Airways", "BA"},
+                {"AGP", "CDG", "Málaga", "Paris CDG", "Vueling", "VY"},
+                {"AGP", "BCN", "Málaga", "Barcelona-El Prat", "Vueling", "VY"},
+                {"AGP", "FRA", "Málaga", "Frankfurt", "Lufthansa", "LH"},
+                {"BIO", "CDG", "Bilbao", "Paris CDG", "Air France", "AF"},
+                {"BIO", "LHR", "Bilbao", "London Heathrow", "British Airways", "BA"},
+                {"BIO", "MAD", "Bilbao", "Madrid-Barajas", "Iberia", "IB"},
+                {"PMI", "LHR", "Palma de Mallorca", "London Heathrow", "British Airways", "BA"},
+                {"PMI", "DUS", "Palma de Mallorca", "Dusseldorf", "Eurowings", "EW"},
+                {"PMI", "FRA", "Palma de Mallorca", "Frankfurt", "Lufthansa", "LH"},
+                {"PMI", "CDG", "Palma de Mallorca", "Paris CDG", "Air France", "AF"},
+                {"TFS", "LHR", "Tenerife Sur", "London Heathrow", "British Airways", "BA"},
+                {"TFS", "BCN", "Tenerife Sur", "Barcelona-El Prat", "Vueling", "VY"},
+                {"TFS", "MAD", "Tenerife Sur", "Madrid-Barajas", "Iberia", "IB"},
+                {"LPA", "LHR", "Gran Canaria", "London Heathrow", "Ryanair", "FR"},
+                {"LPA", "MAD", "Gran Canaria", "Madrid-Barajas", "Iberia", "IB"},
+                // Europa
+                {"LHR", "CDG", "London Heathrow", "Paris CDG", "British Airways", "BA"},
+                {"LHR", "AMS", "London Heathrow", "Amsterdam Schiphol", "British Airways", "BA"},
+                {"LHR", "FRA", "London Heathrow", "Frankfurt", "British Airways", "BA"},
+                {"LHR", "FCO", "London Heathrow", "Rome Fiumicino", "British Airways", "BA"},
                 {"CDG", "FCO", "Paris CDG", "Rome Fiumicino", "Air France", "AF"},
+                {"CDG", "AMS", "Paris CDG", "Amsterdam Schiphol", "Air France", "AF"},
+                {"CDG", "FRA", "Paris CDG", "Frankfurt", "Air France", "AF"},
+                {"FRA", "AMS", "Frankfurt", "Amsterdam Schiphol", "Lufthansa", "LH"},
+                {"FRA", "FCO", "Frankfurt", "Rome Fiumicino", "Lufthansa", "LH"},
                 {"AMS", "VIE", "Amsterdam Schiphol", "Vienna", "KLM", "KL"},
                 {"MUC", "ZRH", "Munich", "Zurich", "Lufthansa", "LH"},
                 {"LIS", "MAD", "Lisbon", "Madrid-Barajas", "TAP Portugal", "TP"},
-                {"BCN", "FRA", "Barcelona-El Prat", "Frankfurt", "Vueling", "VY"},
-                {"LHR", "AMS", "London Heathrow", "Amsterdam Schiphol", "British Airways", "BA"},
+                {"LIS", "CDG", "Lisbon", "Paris CDG", "TAP Portugal", "TP"},
                 {"VIE", "PRG", "Vienna", "Prague", "Austrian", "OS"},
                 {"CPH", "ARN", "Copenhagen", "Stockholm Arlanda", "SAS", "SK"},
                 {"DUB", "EDI", "Dublin", "Edinburgh", "Ryanair", "FR"},
@@ -218,38 +259,40 @@ public class FlightServiceImpl implements FlightService {
                 {"WAW", "BER", "Warsaw", "Berlin Brandenburg", "LOT", "LO"},
                 {"BRU", "GVA", "Brussels", "Geneva", "Brussels Airlines", "SN"},
                 {"HEL", "OSL", "Helsinki", "Oslo", "Finnair", "AY"},
-                {"PMI", "DUS", "Palma de Mallorca", "Dusseldorf", "Eurowings", "EW"}
+                {"FCO", "MUC", "Rome Fiumicino", "Munich", "ITA Airways", "AZ"},
         };
 
         LocalTime now = LocalTime.now();
         LocalDate today = LocalDate.now();
-        Random random = new Random(); // Sin seed para variación
+        Random random = new Random();
 
-        // Distribuir vuelos: ~7 aterrizados, ~6 en curso, ~7 programados
-        for (int i = 0; i < routes.length; i++) {
+        int total = routes.length;
+        int landedCount   = total / 3;
+        int activeCount   = total / 5;
+        // resto → scheduled
+
+        for (int i = 0; i < total; i++) {
             String[] route = routes[i];
-            
-            // Calcular horarios RELATIVOS a la hora actual
+
             LocalTime depTime;
             LocalTime arrTime;
             String status;
-            int flightDuration = 1 + (i % 3); // 1-3 horas de duración
-            
-            if (i < 7) {
-                // ATERRIZADOS: Salieron hace 2-5 horas, ya llegaron
+            int flightDuration = 1 + (i % 3);
+
+            if (i < landedCount) {
                 int hoursAgo = 2 + (i % 4);
                 depTime = now.minusHours(hoursAgo).minusMinutes(random.nextInt(30));
                 arrTime = depTime.plusHours(flightDuration).plusMinutes(random.nextInt(30));
                 status = "landed";
-            } else if (i < 13) {
-                // EN CURSO: Salieron hace 0-2 horas, llegarán en 0-2 horas
-                int minutesAgo = 15 + (i - 7) * 20 + random.nextInt(15);
+            } else if (i < landedCount + activeCount) {
+                int slot = i - landedCount;
+                int minutesAgo = 15 + slot * 12 + random.nextInt(10);
                 depTime = now.minusMinutes(minutesAgo);
-                arrTime = now.plusMinutes(10 + (i - 7) * 15 + random.nextInt(20));
+                arrTime = now.plusMinutes(20 + slot * 10 + random.nextInt(15));
                 status = "active";
             } else {
-                // PROGRAMADOS: Saldrán en 0.5-4 horas
-                int minutesUntil = 30 + (i - 13) * 30 + random.nextInt(20);
+                int slot = i - landedCount - activeCount;
+                int minutesUntil = 20 + slot * 15 + random.nextInt(15);
                 depTime = now.plusMinutes(minutesUntil);
                 arrTime = depTime.plusHours(flightDuration).plusMinutes(random.nextInt(30));
                 status = "scheduled";
@@ -288,13 +331,18 @@ public class FlightServiceImpl implements FlightService {
                 Map<String, Object> live = new LinkedHashMap<>();
                 
                 // Coordenadas de aeropuertos europeos para calcular posición
+                String[] airports = {
+                    "MAD","BCN","LHR","CDG","FRA","AMS","FCO","MUC","LIS","VIE",
+                    "PRG","CPH","ARN","DUB","EDI","ATH","WAW","BER","BRU","GVA",
+                    "HEL","OSL","PMI","DUS","SVQ","VLC","AGP","BIO","TFS","LPA","ZRH"
+                };
                 double[][] airportCoords = {
                     {40.4168, -3.7038},   // MAD
-                    {41.2974, 2.0833},    // BCN
+                    {41.2974,  2.0833},   // BCN
                     {51.4700, -0.4543},   // LHR
-                    {49.0097, 2.5479},    // CDG
-                    {50.0379, 8.5622},    // FRA
-                    {52.3105, 4.7683},    // AMS
+                    {49.0097,  2.5479},   // CDG
+                    {50.0379,  8.5622},   // FRA
+                    {52.3105,  4.7683},   // AMS
                     {41.8003, 12.2389},   // FCO
                     {48.3538, 11.7861},   // MUC
                     {38.7742, -9.1342},   // LIS
@@ -307,21 +355,22 @@ public class FlightServiceImpl implements FlightService {
                     {37.9364, 23.9445},   // ATH
                     {52.1657, 20.9671},   // WAW
                     {52.3667, 13.5033},   // BER
-                    {50.9014, 4.4844},    // BRU
-                    {46.2370, 6.1092},    // GVA
+                    {50.9014,  4.4844},   // BRU
+                    {46.2370,  6.1092},   // GVA
                     {60.3172, 24.9633},   // HEL
                     {60.1939, 11.1004},   // OSL
-                    {39.5517, 2.7388},    // PMI
-                    {51.2895, 6.7668}     // DUS
+                    {39.5517,  2.7388},   // PMI
+                    {51.2895,  6.7668},   // DUS
+                    {37.4180, -5.8931},   // SVQ
+                    {39.4893, -0.4816},   // VLC
+                    {36.6749, -4.4991},   // AGP
+                    {43.3011, -2.9106},   // BIO
+                    {28.0445, -16.5726},  // TFS
+                    {27.9319, -15.3866},  // LPA
+                    {47.4582,  8.5555},   // ZRH
                 };
-                
-                // Calcular progreso del vuelo (0.1 a 0.9)
+
                 double progress = 0.3 + (random.nextDouble() * 0.4);
-                
-                // Buscar coordenadas de origen y destino
-                String[] airports = {"MAD", "BCN", "LHR", "CDG", "FRA", "AMS", "FCO", "MUC", "LIS", "VIE", 
-                                    "PRG", "CPH", "ARN", "DUB", "EDI", "ATH", "WAW", "BER", "BRU", "GVA", 
-                                    "HEL", "OSL", "PMI", "DUS"};
                 
                 int depIdx = java.util.Arrays.asList(airports).indexOf(route[0]);
                 int arrIdx = java.util.Arrays.asList(airports).indexOf(route[1]);

@@ -7,6 +7,7 @@ import NotificationToast from './components/NotificationToast/NotificationToast'
 import TicketsModal from './components/TicketsModal/TicketsModal'
 import LoginRegisterModal from './components/LoginRegisterModal/LoginRegisterModal'
 import { useAuth } from './context/AuthContext'
+import AiAssistant from './components/AiAssistant/AiAssistant'
 import { flightService } from './services/flightService'
 import { flightSimulator } from './services/flightSimulator'
 import { APP_VIEW, STORAGE_KEYS, SCROLL_OFFSET, SIMULATOR_INTERVAL } from './constants'
@@ -28,6 +29,7 @@ function App() {
   const { isAuthenticated } = useAuth();
   const [isTicketsModalOpen, setIsTicketsModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(false);
   
   const [activeView, setActiveView] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.ACTIVE_VIEW) || APP_VIEW.DASHBOARD;
@@ -163,6 +165,7 @@ function App() {
             setIsLoginModalOpen(true);
           }
         }}
+        onOpenAi={() => setIsAiOpen(true)}
       />
       <main className="main-content" ref={mainContentRef}>
         {renderView()}
@@ -182,6 +185,12 @@ function App() {
       <LoginRegisterModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+      />
+
+      <AiAssistant
+        isOpen={isAiOpen}
+        onOpenChange={setIsAiOpen}
+        onNavigateToShop={(params) => handleViewChange(APP_VIEW.SHOP, params)}
       />
     </div>
   )
