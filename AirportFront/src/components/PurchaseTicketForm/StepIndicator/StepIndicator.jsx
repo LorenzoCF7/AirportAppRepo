@@ -2,9 +2,9 @@ import { memo } from 'react';
 import styles from '../PurchaseTicketForm.module.css';
 
 const STEPS = [
-  { id: 1, label: '1. Datos' },
+  { id: 1, label: '1. Pasajero' },
   { id: 2, label: '2. Asiento' },
-  { id: 3, label: '3. Confirmar' }
+  { id: 3, label: '3. Pagar' }
 ];
 
 // Indicador de pasos del formulario multi-step

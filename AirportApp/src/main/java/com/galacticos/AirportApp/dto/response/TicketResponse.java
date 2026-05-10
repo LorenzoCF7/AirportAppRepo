@@ -41,6 +41,13 @@ public class TicketResponse {
     private String passengerDocument;
     private String seatNumber;
     
+    // Extras / preferences
+    private String baggage;
+    private String meal;
+    private Boolean priorityBoarding;
+    private Boolean insurance;
+    private Boolean loungeAccess;
+
     // Ticket details
     private String ticketClass;
     private BigDecimal price;
@@ -70,6 +77,11 @@ public class TicketResponse {
                 .passengerName(ticket.getPassengerName())
                 .passengerDocument(ticket.getPassengerDocument())
                 .seatNumber(ticket.getSeatNumber())
+                .baggage(ticket.getBaggage())
+                .meal(ticket.getMeal())
+                .priorityBoarding(ticket.getPriorityBoarding())
+                .insurance(ticket.getInsurance())
+                .loungeAccess(ticket.getLoungeAccess())
                 .ticketClass(ticket.getTicketClass().name().toLowerCase())
                 .price(ticket.getPrice())
                 .currency(ticket.getCurrency())

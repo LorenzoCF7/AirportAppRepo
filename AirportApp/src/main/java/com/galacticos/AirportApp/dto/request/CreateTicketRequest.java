@@ -76,6 +76,16 @@ public class CreateTicketRequest {
     @Size(max = 5, message = "El número de asiento no puede exceder 5 caracteres")
     private String seatNumber;
 
+    private String baggage;
+
+    private String meal;
+
+    private Boolean priorityBoarding;
+
+    private Boolean insurance;
+
+    private Boolean loungeAccess;
+
     @NotNull(message = "La clase del billete es obligatoria")
     private TicketClass ticketClass;
 

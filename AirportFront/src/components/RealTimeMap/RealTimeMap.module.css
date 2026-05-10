@@ -130,6 +130,99 @@
   z-index: 400;
 }
 
+/* Cursor override para el panel lateral */
+.flightsPanel,
+.flightsPanel * {
+  cursor: auto;
+}
+
+/* Formulario de búsqueda en el panel */
+.searchForm {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  /* Anular defaults del navegador y del tema blanco de la app */
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: text;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+  font-size: 0.8rem;
+}
+
+.searchInput:focus {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.12) !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.searchInput:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Anular autocompletado del navegador (que pone fondo blanco) */
+.searchInput:-webkit-autofill,
+.searchInput:-webkit-autofill:hover,
+.searchInput:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.98) inset !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
+  caret-color: white;
+}
+
+.searchButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.searchButton:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: scale(1.05);
+}
+
+.searchButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.searchSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
 /* Panel lateral de vuelos */
 .flightsPanel {
   width: 320px;
@@ -145,6 +238,8 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  /* Desplazar contenido 56px para quedar bajo la navbar */
+  padding-top: 56px;
 }
 
 @keyframes slideInPanel {
@@ -195,7 +290,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
-  height: calc(100vh - 100px);
+  min-height: 0;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }

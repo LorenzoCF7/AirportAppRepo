@@ -1,309 +1,539 @@
-/* Purchase Ticket Form - CSS Modules */
+/* Purchase Ticket Form – CSS Modules */
+
+/* ── Overlay & Modal ── */
 
 .purchaseModalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding-top: 6rem;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  padding: 70px 1rem 1rem;
+  z-index: 1100;
+  animation: fadeIn 0.25s ease;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .purchaseModal {
   background: white;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 650px;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
   position: relative;
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.28s ease;
+  margin-bottom: 2rem;
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
+
+/* ── Close button ── */
 
 .closeModal {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.25);
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  color: white;
+  transition: background 0.2s;
   z-index: 10;
 }
 
 .closeModal:hover {
-  background: rgba(0, 0, 0, 0.2);
-  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.4);
 }
 
+/* ── Header ── */
+
 .modalHeader {
-  padding: 1.5rem;
-  padding-right: 4rem;
-  border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 1.4rem 1.5rem 1.25rem;
+  padding-right: 3.5rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  border-radius: 16px 16px 0 0;
+  border-radius: 18px 18px 0 0;
 }
 
 .modalHeader h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
+
+/* ── Step indicator ── */
 
 .stepIndicator {
   display: flex;
-  gap: 0.75rem;
-  justify-content: center;
+  gap: 0.5rem;
 }
 
 .step {
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  padding: 0.45rem 1rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
   font-weight: 600;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-  opacity: 0.6;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  opacity: 0.55;
+  white-space: nowrap;
 }
 
 .step.active {
-  background: white;
-  color: #667eea;
+  background: #FF690F;
+  color: white;
   opacity: 1;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 3px 10px rgba(255, 105, 15, 0.45);
 }
+
+/* ── Modal content ── */
 
 .modalContent {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem 1.5rem;
 }
 
+/* ── Flight summary ── */
+
 .flightInfoSection {
-  margin-bottom: 1.5rem;
-  padding: 1.25rem;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #f8faff;
   border-radius: 14px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
+  border: 1.5px solid #e8edf8;
 }
 
 .flightInfoSection h3 {
-  margin: 0 0 0.875rem 0;
+  margin: 0 0 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #667eea;
-  font-size: 1.1rem;
+  gap: 0.45rem;
+  color: #3b5bdb;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .flightSummary {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
+  gap: 0.75rem;
 }
 
 .airlineHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e8edf8;
 }
 
 .airline {
   font-weight: 700;
-  font-size: 1rem;
-  color: #333;
+  font-size: 0.95rem;
+  color: #111827;
 }
 
 .flightNum {
-  font-weight: 600;
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-  padding: 0.25rem 0.65rem;
+  font-weight: 700;
+  color: #3b5bdb;
+  background: rgba(59, 91, 219, 0.09);
+  padding: 0.22rem 0.65rem;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
 }
 
 .routeDisplay {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .location {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
 }
 
 .iata {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #667eea;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.02em;
 }
 
 .city {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.78rem;
+  color: #6b7280;
 }
 
 .time {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
 }
 
 .arrow {
-  color: #667eea;
+  color: #6b7280;
   display: flex;
   align-items: center;
+  opacity: 0.5;
 }
 
 .dateInfo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 0.875rem;
+  gap: 0.4rem;
+  color: #6b7280;
+  font-size: 0.82rem;
 }
+
+/* ── Form sections ── */
 
 .formSection {
   margin-bottom: 1.5rem;
+  padding: 1.1rem 1.25rem;
+  background: #fafafa;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 14px;
 }
 
-.formSection h3 {
-  margin: 0 0 0.875rem 0;
+.sectionTitle {
+  margin: 0 0 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #333;
-  font-size: 1.05rem;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
+.optionalTag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  margin-left: 0.25rem;
+}
+
+/* ── Two-column form rows ── */
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+}
+
+/* ── Form fields ── */
+
 .formGroup {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.875rem;
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   font-weight: 600;
-  color: #333;
-  font-size: 0.9rem;
+  color: #374151;
+  font-size: 0.82rem;
 }
 
 .formGroup input,
 .formGroup select {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  padding: 0.65rem 0.875rem;
+  border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #111827;
+  background: white;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
 }
 
 .formGroup input:focus,
 .formGroup select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  border-color: #FF690F;
+  box-shadow: 0 0 0 3px rgba(255, 105, 15, 0.12);
 }
 
 .formGroup input:disabled,
 .formGroup select:disabled {
   background: #f5f5f5;
+  color: #9ca3af;
   cursor: not-allowed;
 }
 
 .formGroup small {
   display: block;
-  margin-top: 0.5rem;
-  color: #666;
-  font-size: 0.8rem;
+  margin-top: 0.35rem;
+  color: #9ca3af;
+  font-size: 0.75rem;
 }
+
+/* ── Baggage grid ── */
+
+.baggageGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+}
+
+.baggageCard {
+  position: relative;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: white;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+}
+
+.baggageCard:hover {
+  border-color: #FF690F;
+  background: #fff8f5;
+}
+
+.baggageCardSelected {
+  border-color: #FF690F;
+  background: #fff8f5;
+}
+
+.baggageCardIcon {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.baggageCardLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+  display: block;
+}
+
+.baggageCardSub {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: block;
+  margin: 2px 0;
+}
+
+.baggageCardPrice {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FF690F;
+  display: block;
+  margin-top: 5px;
+}
+
+.baggageCheck {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 20px;
+  height: 20px;
+  background: #FF690F;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+/* ── Extras grid ── */
+
+.extrasGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.extraCard {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: white;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.extraCard:hover {
+  border-color: #FF690F;
+  background: #fff8f5;
+}
+
+.extraCardSelected {
+  border-color: #FF690F;
+  background: #fff8f5;
+}
+
+.extraIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.extraInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.extraLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.extraSub {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.extraPrice {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.extraCheckbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #d1d5db;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.extraCheckboxChecked {
+  background: #FF690F;
+  border-color: #FF690F;
+  color: white;
+}
+
+/* ── Running price bar ── */
+
+.priceSummaryBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111827;
+  color: white;
+  border-radius: 12px;
+  padding: 0.875rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.priceSummaryLabel {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.priceSummaryExtras {
+  font-size: 0.78rem;
+  opacity: 0.55;
+}
+
+.priceSummaryAmount {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* ── Form actions ── */
 
 .formActions {
   display: flex;
   gap: 0.875rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #f0f0f0;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid #f0f0f0;
 }
 
 .btnCancel,
 .btnBack {
-  padding: 0.75rem 1.25rem;
-  background: #f0f0f0;
+  padding: 0.7rem 1.25rem;
+  background: #f3f4f6;
   border: none;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.15s;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #374151;
 }
 
 .btnCancel:hover,
 .btnBack:hover {
-  background: #e0e0e0;
-  transform: translateY(-2px);
+  background: #e5e7eb;
 }
 
 .btnContinue,
 .btnSubmit {
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 0.7rem 1.5rem;
+  background: #FF690F;
   color: white;
   border: none;
   border-radius: 10px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.15s, transform 0.1s;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   font-size: 0.9rem;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(255, 105, 15, 0.35);
 }
 
 .btnContinue:hover,
 .btnSubmit:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+  background: #E55A00;
+  transform: translateY(-1px);
 }
 
 .btnContinue:disabled,
@@ -313,35 +543,181 @@
   transform: none;
 }
 
+/* ── Seat selection step ── */
+
 .seatSelectionStep {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
+
+/* ── Confirmation step ── */
 
 .confirmationStep {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
+.confirmSection {
+  background: #fafafa;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.confirmSectionTitle {
+  margin: 0 0 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.confirmGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 1rem;
+}
+
+.confirmItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.confirmLabel {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.confirmValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ── Price breakdown ── */
+
+.priceBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.priceDivider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.25rem 0;
+}
+
+.priceTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.priceTotalAmount {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+/* ── Payment section ── */
+
+.paymentSection {
+  background: #fafafa;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.cardVisual {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  color: white;
+  margin-bottom: 1.1rem;
+}
+
+.cardChip {
+  width: 34px;
+  height: 26px;
+  background: linear-gradient(135deg, #d4af37, #b8962e);
+  border-radius: 5px;
+  margin-bottom: 1.1rem;
+}
+
+.cardNumber {
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+  font-family: monospace;
+}
+
+.cardMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.cardHolder {
+  font-size: 0.7rem;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.cardExpiry {
+  font-size: 0.78rem;
+  opacity: 0.65;
+  letter-spacing: 0.05em;
+}
+
+.paymentNote {
+  margin: 0.875rem 0 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* ── Legacy (kept for backward compat) ── */
+
 .confirmationSummary {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  background: #fafafa;
   padding: 1.25rem;
   border-radius: 14px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
+  border: 1.5px solid #f0f0f0;
 }
 
 .confirmationSummary h3 {
-  margin: 0 0 1.25rem 0;
-  color: #667eea;
-  font-size: 1.2rem;
+  margin: 0 0 1rem;
+  color: #111827;
+  font-size: 1rem;
 }
 
 .summarySection {
-  margin-bottom: 1.25rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .summarySection:last-child {
@@ -351,55 +727,52 @@
 }
 
 .summarySection h4 {
-  margin: 0 0 0.65rem 0;
+  margin: 0 0 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #333;
-  font-size: 0.95rem;
+  gap: 0.4rem;
+  color: #374151;
+  font-size: 0.875rem;
 }
 
 .summarySection p {
-  margin: 0.5rem 0;
-  color: #666;
-  font-size: 0.9rem;
+  margin: 0.35rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
 .priceTotal {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #667eea;
-  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #111827;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .purchaseModalOverlay {
+    padding: 56px 0 0;
+    align-items: flex-end;
+  }
+
   .purchaseModal {
-    width: 95%;
-    max-height: 90vh;
+    border-radius: 18px 18px 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    margin-bottom: 0;
+    max-width: 100%;
   }
 
-  .modalHeader {
-    padding: 1.25rem;
-    padding-right: 3.5rem;
-  }
-  
-  .modalHeader h2 {
-    font-size: 1.3rem;
+  .formRow {
+    grid-template-columns: 1fr;
   }
 
-  .stepIndicator {
-    flex-direction: column;
-    gap: 0.5rem;
+  .baggageGrid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .modalContent {
-    padding: 1.25rem;
-  }
-
-  .routeDisplay {
-    flex-direction: column;
-    gap: 0.875rem;
+  .confirmGrid {
+    grid-template-columns: 1fr;
   }
 
   .formActions {

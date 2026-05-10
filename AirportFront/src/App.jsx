@@ -32,6 +32,7 @@ function App() {
   const [activeView, setActiveView] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.ACTIVE_VIEW) || APP_VIEW.DASHBOARD;
   });
+  const [shopInitialParams, setShopInitialParams] = useState(null);
 
   //
   const scrollToContainer = useCallback(() => {
@@ -48,14 +49,14 @@ function App() {
   }, []);
 
   //
-  const handleViewChange = useCallback((newView) => {
-    //
+  const handleViewChange = useCallback((newView, params = null) => {
     if ((newView === APP_VIEW.SHOP || newView === APP_VIEW.WALLET) && !isAuthenticated) {
       setIsLoginModalOpen(true);
       return;
     }
-    
-    //
+    if (newView === APP_VIEW.SHOP) {
+      setShopInitialParams(params || null);
+    }
     setActiveView(newView);
   }, [isAuthenticated]);
 
@@ -115,7 +116,10 @@ function App() {
       case APP_VIEW.SHOP:
         return (
           <Suspense fallback={<LoadingSpinner message="Cargando vista..." />}>
-            <FlightShop />
+            <FlightShop
+              key={shopInitialParams ? `${shopInitialParams.origin}-${shopInitialParams.destination}` : 'default'}
+              initialParams={shopInitialParams}
+            />
           </Suspense>
         );
       case APP_VIEW.WALLET:

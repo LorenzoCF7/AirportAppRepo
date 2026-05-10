@@ -22,12 +22,17 @@ class TicketService {
       }
     );
     
-    // Por ahora usamos un userId fijo hasta implementar auth
     this.currentUserId = 'user-default';
   }
 
-  // Obtiene el userId actual (temporal hasta implementar auth)
   getCurrentUserId() {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const userData = JSON.parse(stored);
+        return String(userData.id || userData.username || this.currentUserId);
+      }
+    } catch {}
     return this.currentUserId;
   }
 
@@ -81,7 +86,7 @@ class TicketService {
 
   // Crea un billete
   async createTicket(ticketData) {
-    const userId = this.getCurrentUserId();
+    const userId = ticketData.ownerUserId || this.getCurrentUserId();
     console.log('🎫 Creando ticket para usuario:', userId);
 
     const ticket = {
@@ -105,7 +110,12 @@ class TicketService {
       seatNumber: ticketData.seatNumber,
       ticketClass: (ticketData.ticketClass || 'economy').toUpperCase(),
       price: ticketData.price,
-      currency: ticketData.currency || 'EUR'
+      currency: ticketData.currency || 'EUR',
+      baggage: ticketData.baggage || 'none',
+      meal: ticketData.meal || 'none',
+      priorityBoarding: ticketData.priorityBoarding || false,
+      insurance: ticketData.insurance || false,
+      loungeAccess: ticketData.loungeAccess || false,
     };
 
     try {

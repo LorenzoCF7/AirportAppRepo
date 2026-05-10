@@ -81,6 +81,25 @@ public class Ticket {
     @Column(nullable = false, length = 5)
     private String seatNumber;
 
+    // Extras / preferences
+    @Column
+    private String baggage;
+
+    @Column
+    private String meal;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean priorityBoarding = false;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean insurance = false;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean loungeAccess = false;
+
     // Ticket details
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

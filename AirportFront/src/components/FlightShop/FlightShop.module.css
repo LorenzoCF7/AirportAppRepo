@@ -1,72 +1,185 @@
-/**/
-
 .flightShop {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f3f4f6 100%);
+  background: #f8fafc;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
-/**/
+/* ── Barra de búsqueda compacta ── */
 
-.shopHeader {
+.searchBar {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.shopHeader h1 {
-  color: #0f172a;
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.headerContent {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-.headerSubtitle {
-  color: #64748b;
-  font-size: 0.95rem;
-  margin: 0.5rem 0 0 0;
-}
-
-.refreshButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.searchBarForm {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.searchBarFields {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  min-width: 0;
+}
+
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.875rem;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  transition: background 0.12s;
+}
+
+.searchField:hover {
+  background: #f9fafb;
+}
+
+.fieldIcon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.searchFieldInput {
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: #111827;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.searchFieldInput::placeholder {
+  color: #9ca3af;
+}
+
+.searchFieldSelect {
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: #111827;
+  background: transparent;
+  flex: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+
+.clearBtn:hover {
+  color: #374151;
+}
+
+.swapBtn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.swapBtn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.searchDivider {
+  width: 1px;
+  height: 26px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.searchSubmitBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
   background: #FF690F;
   color: white;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s, transform 0.1s;
   white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
 }
 
-.refreshButton:hover:not(:disabled) {
+.searchSubmitBtn:hover:not(:disabled) {
   background: #E55A00;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 105, 15, 0.3);
+  transform: scale(1.02);
 }
 
-.refreshButton:disabled {
+.searchSubmitBtn:disabled {
   opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refreshBtn {
+  background: none;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  border-color: #FF690F;
+  color: #FF690F;
+}
+
+.refreshBtn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -79,260 +192,216 @@
   to { transform: rotate(360deg); }
 }
 
-/**/
+/* ── Área de resultados ── */
 
-.searchSection {
+.resultsArea {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabs de ordenación */
+.sortTabs {
+  display: flex;
+  align-items: center;
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 
-.searchForm {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.formRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.formField label {
+.sortTab {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.formField input,
-.formField select {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  background: #f8fafc;
-  color: #0f172a;
-  transition: all 0.2s;
-}
-
-.formField input:focus,
-.formField select:focus {
-  outline: none;
-  border-color: #FF690F;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-  background: white;
-}
-
-.formField input::placeholder {
-  color: #94a3b8;
-}
-
-/**/
-
-.searchActions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.btnSearch,
-.btnReset {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
+  padding: 0.9rem 1.4rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  background: none;
   cursor: pointer;
-  transition: all 0.2s;
-  flex: 1;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.btnSearch {
-  background: linear-gradient(135deg, #FF690F 0%, #E55A00 100%);
-  color: white;
+.sortTab:hover {
+  background: #f9fafb;
+  color: #111827;
 }
 
-.btnSearch:hover:not(:disabled) {
-  background: linear-gradient(135deg, #E55A00 0%, #c24a00 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 105, 15, 0.3);
-}
-
-.btnSearch:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btnReset {
-  background: white;
-  color: #0f172a;
-  border: 2px solid #e5e7eb;
-}
-
-.btnReset:hover {
-  background: #f8fafc;
-  border-color: #FF690F;
-  color: #FF690F;
-}
-
-/**/
-
-.flightsList {
-  background: transparent;
-  border-radius: 12px;
-  padding: 0;
-  box-shadow: none;
-  border: none;
-}
-
-.listHeader {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.listHeader h2 {
-  color: #0f172a;
-  font-size: 1.5rem;
+.sortTabActive {
+  color: #111827;
   font-weight: 700;
-  margin: 0;
+  border-bottom-color: #FF690F;
 }
 
-/**/
+.sortTabLabel {
+  font-weight: inherit;
+}
 
+.sortTabMeta {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.sortTabActive .sortTabMeta {
+  color: #6b7280;
+}
+
+.resultCount {
+  margin-left: auto;
+  padding: 0 1.25rem;
+  font-size: 0.82rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* Lista de vuelos */
+.flightList {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+/* Estado vacío */
 .emptyResults {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   gap: 1rem;
-  color: #64748b;
+  color: #6b7280;
   text-align: center;
   background: white;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
 }
 
 .emptyResults svg {
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 .emptyResults h3 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: #0f172a;
 }
 
 .emptyResults p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
-/**/
+.resetBtn {
+  padding: 0.7rem 1.5rem;
+  background: #FF690F;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
 
+.resetBtn:hover {
+  background: #E55A00;
+}
+
+/* Estado de carga */
 .loadingState {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
+  padding: 4rem 2rem;
   gap: 1rem;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #e5e7eb;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #e5e7eb;
   border-top-color: #FF690F;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
 .loadingState p {
-  color: #64748b;
-  font-size: 1rem;
+  color: #6b7280;
+  font-size: 0.95rem;
   margin: 0;
 }
 
-/**/
+/* ── Responsive ── */
 
-.flightsStacker {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem 0;
+@media (max-width: 900px) {
+  .searchBarFields {
+    flex-wrap: wrap;
+  }
+
+  .searchDivider {
+    display: none;
+  }
+
+  .searchField {
+    flex: 1 1 140px;
+    border-bottom: 1px solid #f3f4f6;
+  }
 }
 
-/**/
-
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .flightShop {
-    padding: 1rem;
+    padding: 0.875rem;
   }
 
-  .shopHeader {
-    padding: 1rem;
+  .searchBar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
-  .shopHeader h1 {
-    font-size: 1.5rem;
-  }
-
-  .headerContent {
+  .searchBarForm {
     flex-direction: column;
-    align-items: flex-start;
+    width: 100%;
   }
 
-  .refreshButton {
+  .searchBarFields {
+    width: 100%;
+    flex-direction: column;
+    border-radius: 8px;
+  }
+
+  .searchField {
+    width: 100%;
+    border-bottom: 1px solid #f3f4f6;
+    border-right: none;
+  }
+
+  .swapBtn {
+    display: none;
+  }
+
+  .searchSubmitBtn {
     width: 100%;
     justify-content: center;
   }
 
-  .searchSection {
-    padding: 1rem;
+  .sortTab {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
   }
 
-  .formRow {
-    grid-template-columns: 1fr;
-  }
-
-  .searchActions {
-    flex-direction: column;
-  }
-
-  .btnSearch,
-  .btnReset {
-    width: 100%;
-  }
-
-  .listHeader h2 {
-    font-size: 1.25rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .shopHeader h1 {
-    font-size: 1.25rem;
-  }
-
-  .headerSubtitle {
-    font-size: 0.85rem;
+  .sortTabMeta {
+    display: none;
   }
 }
