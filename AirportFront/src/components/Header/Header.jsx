@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Menu, X, Plane, Search, Map, ShoppingCart, Wallet,
   Heart, User, LogOut, Plus, Bookmark, Globe, Sparkles,
-  Navigation, MessageSquare, Euro
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoginRegisterModal from '../LoginRegisterModal/LoginRegisterModal';
@@ -10,7 +10,7 @@ import styles from './Header.module.css';
 
 const mainNav = [
   { id: 'dashboard', label: 'Vuelos',           Icon: Plane },
-  { id: 'map',       label: 'Mapa en Vivo',      Icon: Map },
+  { id: 'map',       label: 'Rastrear vuelo',       Icon: Map },
   { id: 'shop',      label: 'Comprar Billetes',  Icon: ShoppingCart },
   { id: 'wallet',    label: 'Mi Cartera',        Icon: Wallet },
   { id: null,        label: 'Planifica con IA',  Icon: Sparkles, action: 'ai' },
@@ -18,8 +18,6 @@ const mainNav = [
 
 const discoverNav = [
   { id: 'explore', label: 'Explorar destinos', Icon: Globe },
-  { id: null,      label: 'Vuelos directos',   Icon: Navigation },
-  { id: null,      label: 'Mejores precios',   Icon: Euro },
 ];
 
 const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal, onOpenAi }) => {

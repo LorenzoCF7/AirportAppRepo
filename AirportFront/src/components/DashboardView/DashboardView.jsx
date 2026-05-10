@@ -77,9 +77,16 @@ const destinationList = [
 const filterAirports = (query) => {
   if (!query || query.length < 1) return [];
   const q = query.toLowerCase().replace(/\s*\([a-z]{3}\)$/i, '').trim();
-  return AIRPORTS.filter(a =>
-    a.city.toLowerCase().includes(q) || a.iata.toLowerCase().includes(q)
-  ).slice(0, 6);
+  if (!q) return [];
+  const starts = AIRPORTS.filter(a =>
+    a.city.toLowerCase().startsWith(q) || a.iata.toLowerCase().startsWith(q)
+  );
+  if (starts.length >= 4) return starts.slice(0, 6);
+  const rest = AIRPORTS.filter(a =>
+    !starts.includes(a) &&
+    (a.city.toLowerCase().includes(q) || a.iata.toLowerCase().includes(q))
+  );
+  return [...starts, ...rest].slice(0, 6);
 };
 
 const extractIata = (text) => {

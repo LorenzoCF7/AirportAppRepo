@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plane, Calendar, MapPin, Search, TrendingUp, ArrowLeftRight, RefreshCw } from 'lucide-react';
+import { Plane, Calendar, MapPin, Search, TrendingUp, ArrowLeftRight, RefreshCw, ArrowRight, Check } from 'lucide-react';
 
 import PurchaseTicketForm from '../PurchaseTicketForm/PurchaseTicketForm';
 import FlightCard from './FlightCard';
@@ -22,18 +22,49 @@ const isUpcoming = (flight) => {
   return new Date(`${date}T${time}`) > new Date();
 };
 
+const buildFlightForPurchase = (flight, cabinClass) => ({
+  flight: { iata: flight.flightIATA, number: flight.flightNumber || flight.flightIATA },
+  flightNumber: flight.flightNumber || flight.flightIATA,
+  airline: { name: flight.airline.name, iata: flight.airline.iata },
+  departure: {
+    airport: flight.origin.airport,
+    iata: flight.origin.iata,
+    city: flight.origin.city,
+    scheduled: flight.departure.dateTime || `${flight.departure.date}T${flight.departure.time}:00`
+  },
+  arrival: {
+    airport: flight.destination.airport,
+    iata: flight.destination.iata,
+    city: flight.destination.city,
+    estimated: flight.arrival.dateTime || `${flight.arrival.date}T${flight.arrival.time}:00`,
+    scheduled: flight.arrival.dateTime || `${flight.arrival.date}T${flight.arrival.time}:00`
+  },
+  _commercialOffer: {
+    selectedClass: cabinClass,
+    price: flight.prices[cabinClass],
+    availableSeats: flight.availableSeats[cabinClass]
+  }
+});
+
 const FlightShop = ({ initialParams = null }) => {
+  const [tripType, setTripType] = useState('oneWay');
   const [flights, setFlights] = useState([]);
+  const [returnFlights, setReturnFlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState('cheapest');
+  const [searchDone, setSearchDone] = useState(false);
   const [searchParams, setSearchParams] = useState({
     origin: initialParams?.origin || '',
     destination: initialParams?.destination || '',
     departureDate: '',
+    returnDate: '',
     cabinClass: 'economy'
   });
+  const [selectedOutbound, setSelectedOutbound] = useState(null);
+  const [selectedReturn, setSelectedReturn] = useState(null);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [purchaseStep, setPurchaseStep] = useState(null);
 
   useEffect(() => {
     if (initialParams?.origin || initialParams?.destination) {
@@ -66,6 +97,8 @@ const FlightShop = ({ initialParams = null }) => {
       setLoading(true);
       const response = await commercialFlightService.getFeaturedFlights(forceRefresh);
       setFlights((response.data || []).filter(isUpcoming));
+      setReturnFlights([]);
+      setSearchDone(false);
     } catch (error) {
       console.error('Error cargando vuelos:', error);
     } finally {
@@ -82,14 +115,31 @@ const FlightShop = ({ initialParams = null }) => {
         return;
       }
       const allResp = await commercialFlightService.getFeaturedFlights(false);
-      const filtered = (allResp.data || []).filter(flight => {
+      const all = allResp.data || [];
+
+      const filtered = all.filter(flight => {
         if (!isUpcoming(flight)) return false;
         if (searchParams.origin && flight.origin.iata !== searchParams.origin.toUpperCase()) return false;
         if (searchParams.destination && flight.destination.iata !== searchParams.destination.toUpperCase()) return false;
-        if (searchParams.departureDate && flight.departure.date !== searchParams.departureDate) return false;
+        if (searchParams.departureDate && flight.departure.date < searchParams.departureDate) return false;
         return true;
       });
       setFlights(filtered);
+
+      if (tripType === 'roundTrip' && searchParams.origin && searchParams.destination) {
+        const returns = all.filter(flight => {
+          if (!isUpcoming(flight)) return false;
+          if (flight.origin.iata !== searchParams.destination.toUpperCase()) return false;
+          if (flight.destination.iata !== searchParams.origin.toUpperCase()) return false;
+          if (searchParams.returnDate && flight.departure.date < searchParams.returnDate) return false;
+          return true;
+        });
+        setReturnFlights(returns);
+      }
+
+      setSearchDone(true);
+      setSelectedOutbound(null);
+      setSelectedReturn(null);
     } catch (error) {
       console.error('Error buscando vuelos:', error);
     } finally {
@@ -98,31 +148,35 @@ const FlightShop = ({ initialParams = null }) => {
   };
 
   const handleBuyFlight = (flight, selectedClass) => {
-    const flightForPurchase = {
-      flight: { iata: flight.flightIATA, number: flight.flightNumber || flight.flightIATA },
-      flightNumber: flight.flightNumber || flight.flightIATA,
-      airline: { name: flight.airline.name, iata: flight.airline.iata },
-      departure: {
-        airport: flight.origin.airport,
-        iata: flight.origin.iata,
-        city: flight.origin.city,
-        scheduled: flight.departure.dateTime || `${flight.departure.date}T${flight.departure.time}:00`
-      },
-      arrival: {
-        airport: flight.destination.airport,
-        iata: flight.destination.iata,
-        city: flight.destination.city,
-        estimated: flight.arrival.dateTime || `${flight.arrival.date}T${flight.arrival.time}:00`,
-        scheduled: flight.arrival.dateTime || `${flight.arrival.date}T${flight.arrival.time}:00`
-      },
-      _commercialOffer: {
-        selectedClass,
-        price: flight.prices[selectedClass],
-        availableSeats: flight.availableSeats[selectedClass]
-      }
-    };
-    setSelectedFlight(flightForPurchase);
+    setSelectedFlight(buildFlightForPurchase(flight, selectedClass));
+    setPurchaseStep(null);
     setShowPurchaseForm(true);
+  };
+
+  const handleBuyRoundTrip = () => {
+    if (!selectedOutbound || !selectedReturn) return;
+    setSelectedFlight(buildFlightForPurchase(selectedOutbound, cabinClass));
+    setPurchaseStep('outbound');
+    setShowPurchaseForm(true);
+  };
+
+  const handlePurchaseSuccess = () => {
+    if (purchaseStep === 'outbound') {
+      setSelectedFlight(buildFlightForPurchase(selectedReturn, cabinClass));
+      setPurchaseStep('return');
+    } else {
+      setShowPurchaseForm(false);
+      setSelectedFlight(null);
+      setPurchaseStep(null);
+      setSelectedOutbound(null);
+      setSelectedReturn(null);
+    }
+  };
+
+  const handlePurchaseClose = () => {
+    setShowPurchaseForm(false);
+    setSelectedFlight(null);
+    setPurchaseStep(null);
   };
 
   const getMinDate = () => {
@@ -142,11 +196,22 @@ const FlightShop = ({ initialParams = null }) => {
     if (sort === 'cheapest') return arr.sort((a, b) => a.prices[cabinClass] - b.prices[cabinClass]);
     if (sort === 'shortest') return arr.sort((a, b) => parseDuration(a.duration.formatted) - parseDuration(b.duration.formatted));
     return arr.sort((a, b) => {
-      const scoreA = a.prices[cabinClass] + parseDuration(a.duration.formatted) * 1.5;
-      const scoreB = b.prices[cabinClass] + parseDuration(b.duration.formatted) * 1.5;
-      return scoreA - scoreB;
+      const sA = a.prices[cabinClass] + parseDuration(a.duration.formatted) * 1.5;
+      const sB = b.prices[cabinClass] + parseDuration(b.duration.formatted) * 1.5;
+      return sA - sB;
     });
   }, [flights, sort, cabinClass]);
+
+  const sortedReturnFlights = useMemo(() => {
+    const arr = [...returnFlights];
+    if (sort === 'cheapest') return arr.sort((a, b) => a.prices[cabinClass] - b.prices[cabinClass]);
+    if (sort === 'shortest') return arr.sort((a, b) => parseDuration(a.duration.formatted) - parseDuration(b.duration.formatted));
+    return arr.sort((a, b) => {
+      const sA = a.prices[cabinClass] + parseDuration(a.duration.formatted) * 1.5;
+      const sB = b.prices[cabinClass] + parseDuration(b.duration.formatted) * 1.5;
+      return sA - sB;
+    });
+  }, [returnFlights, sort, cabinClass]);
 
   const cheapestId = useMemo(() => {
     if (!flights.length) return null;
@@ -180,6 +245,12 @@ const FlightShop = ({ initialParams = null }) => {
     }, flights[0]?.duration.formatted || '');
   }, [flights]);
 
+  const roundTripTotal = selectedOutbound && selectedReturn
+    ? selectedOutbound.prices[cabinClass] + selectedReturn.prices[cabinClass]
+    : null;
+
+  const isRoundTripResults = tripType === 'roundTrip' && searchDone && searchParams.origin && searchParams.destination;
+
   if (loading && flights.length === 0) {
     return (
       <div className={styles.flightShop}>
@@ -193,8 +264,30 @@ const FlightShop = ({ initialParams = null }) => {
 
   return (
     <div className={styles.flightShop}>
-      {/* Barra de búsqueda compacta estilo KAYAK */}
       <div className={styles.searchBar}>
+        <div className={styles.tripToggle}>
+          <button
+            type="button"
+            className={`${styles.tripBtn} ${tripType === 'oneWay' ? styles.tripBtnActive : ''}`}
+            onClick={() => {
+              setTripType('oneWay');
+              setSearchDone(false);
+              setReturnFlights([]);
+              setSelectedOutbound(null);
+              setSelectedReturn(null);
+            }}
+          >
+            Solo ida
+          </button>
+          <button
+            type="button"
+            className={`${styles.tripBtn} ${tripType === 'roundTrip' ? styles.tripBtnActive : ''}`}
+            onClick={() => setTripType('roundTrip')}
+          >
+            Ida y vuelta
+          </button>
+        </div>
+
         <form onSubmit={handleSearch} className={styles.searchBarForm}>
           <div className={styles.searchBarFields}>
             <div className={styles.searchField}>
@@ -235,6 +328,7 @@ const FlightShop = ({ initialParams = null }) => {
 
             <div className={styles.searchField}>
               <Calendar size={15} className={styles.fieldIcon} />
+              <span className={styles.dateLabel}>Ida</span>
               <input
                 type="date"
                 value={searchParams.departureDate}
@@ -243,6 +337,23 @@ const FlightShop = ({ initialParams = null }) => {
                 className={styles.searchFieldInput}
               />
             </div>
+
+            {tripType === 'roundTrip' && (
+              <>
+                <div className={styles.searchDivider} />
+                <div className={styles.searchField}>
+                  <Calendar size={15} className={styles.fieldIcon} />
+                  <span className={styles.dateLabel}>Vuelta</span>
+                  <input
+                    type="date"
+                    value={searchParams.returnDate}
+                    onChange={e => setSearchParams(p => ({ ...p, returnDate: e.target.value }))}
+                    min={searchParams.departureDate || getMinDate()}
+                    className={styles.searchFieldInput}
+                  />
+                </div>
+              </>
+            )}
 
             <div className={styles.searchDivider} />
 
@@ -277,7 +388,6 @@ const FlightShop = ({ initialParams = null }) => {
         </button>
       </div>
 
-      {/* Filter banner */}
       {(searchParams.origin || searchParams.destination) && (
         <div className={styles.filterBanner}>
           <span className={styles.filterBannerText}>
@@ -286,11 +396,16 @@ const FlightShop = ({ initialParams = null }) => {
               : searchParams.destination
                 ? `Vuelos a ${searchParams.destination}`
                 : `Vuelos desde ${searchParams.origin}`}
+            {tripType === 'roundTrip' && ' · Ida y vuelta'}
           </span>
           <button
             className={styles.filterBannerClear}
             onClick={() => {
-              setSearchParams({ origin: '', destination: '', departureDate: '', cabinClass: 'economy' });
+              setSearchParams({ origin: '', destination: '', departureDate: '', returnDate: '', cabinClass: 'economy' });
+              setSearchDone(false);
+              setReturnFlights([]);
+              setSelectedOutbound(null);
+              setSelectedReturn(null);
               loadFeaturedFlights(false);
             }}
           >
@@ -299,73 +414,202 @@ const FlightShop = ({ initialParams = null }) => {
         </div>
       )}
 
-      {/* Área de resultados */}
-      <div className={styles.resultsArea}>
-        {/* Tabs de ordenación */}
-        <div className={styles.sortTabs}>
-          <button
-            className={`${styles.sortTab} ${sort === 'cheapest' ? styles.sortTabActive : ''}`}
-            onClick={() => setSort('cheapest')}
-          >
-            <span className={styles.sortTabLabel}>El más barato</span>
-            {cheapestPrice != null && <span className={styles.sortTabMeta}>{cheapestPrice.toFixed(0)} €</span>}
-          </button>
-          <button
-            className={`${styles.sortTab} ${sort === 'best' ? styles.sortTabActive : ''}`}
-            onClick={() => setSort('best')}
-          >
-            <span className={styles.sortTabLabel}>El mejor</span>
-          </button>
-          <button
-            className={`${styles.sortTab} ${sort === 'shortest' ? styles.sortTabActive : ''}`}
-            onClick={() => setSort('shortest')}
-          >
-            <span className={styles.sortTabLabel}>Menor duración</span>
-            {shortestDuration && <span className={styles.sortTabMeta}>{shortestDuration}</span>}
-          </button>
-          <div className={styles.resultCount}>
-            {sortedFlights.length} vuelo{sortedFlights.length !== 1 ? 's' : ''} disponible{sortedFlights.length !== 1 ? 's' : ''}
-          </div>
-        </div>
+      {isRoundTripResults ? (
+        <div className={styles.roundTripResults}>
+          {/* Outbound leg */}
+          <div className={styles.legSection}>
+            <div className={styles.legHeader}>
+              <ArrowRight size={15} className={styles.legIcon} />
+              <span className={styles.legTitle}>Vuelo de ida</span>
+              <span className={styles.legRoute}>{searchParams.origin} → {searchParams.destination}</span>
+              {searchParams.departureDate && (
+                <span className={styles.legDate}>{searchParams.departureDate}</span>
+              )}
+              <span className={styles.legCount}>{sortedFlights.length} vuelo{sortedFlights.length !== 1 ? 's' : ''}</span>
+            </div>
 
-        {/* Lista de vuelos */}
-        {sortedFlights.length === 0 ? (
-          <div className={styles.emptyResults}>
-            <Plane size={56} />
-            <h3>No se encontraron vuelos</h3>
-            <p>Intenta con otros criterios de búsqueda</p>
-            <button
-              className={styles.resetBtn}
-              onClick={() => {
-                setSearchParams({ origin: '', destination: '', departureDate: '', cabinClass: 'economy' });
-                loadFeaturedFlights(false);
-              }}
-            >
-              Ver todos los vuelos
+            <div className={styles.sortTabs}>
+              <button className={`${styles.sortTab} ${sort === 'cheapest' ? styles.sortTabActive : ''}`} onClick={() => setSort('cheapest')}>
+                <span className={styles.sortTabLabel}>El más barato</span>
+                {cheapestPrice != null && <span className={styles.sortTabMeta}>{cheapestPrice.toFixed(0)} €</span>}
+              </button>
+              <button className={`${styles.sortTab} ${sort === 'best' ? styles.sortTabActive : ''}`} onClick={() => setSort('best')}>
+                <span className={styles.sortTabLabel}>El mejor</span>
+              </button>
+              <button className={`${styles.sortTab} ${sort === 'shortest' ? styles.sortTabActive : ''}`} onClick={() => setSort('shortest')}>
+                <span className={styles.sortTabLabel}>Menor duración</span>
+                {shortestDuration && <span className={styles.sortTabMeta}>{shortestDuration}</span>}
+              </button>
+            </div>
+
+            {sortedFlights.length === 0 ? (
+              <div className={styles.emptyLeg}>
+                <Plane size={28} />
+                <p>No hay vuelos de ida disponibles para esta ruta</p>
+              </div>
+            ) : (
+              <div className={styles.flightList}>
+                {sortedFlights.map(flight => (
+                  <FlightCard
+                    key={flight.id}
+                    flight={flight}
+                    cabinClass={cabinClass}
+                    onBuyClick={(f) => setSelectedOutbound(f)}
+                    isSelected={selectedOutbound?.id === flight.id}
+                    isCheapest={flight.id === cheapestId}
+                    isBest={flight.id === bestId}
+                    isShortest={flight.id === shortestId}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Return leg */}
+          <div className={styles.legSection}>
+            <div className={styles.legHeader}>
+              <ArrowRight size={15} className={`${styles.legIcon} ${styles.legIconReturn}`} />
+              <span className={styles.legTitle}>Vuelo de vuelta</span>
+              <span className={styles.legRoute}>{searchParams.destination} → {searchParams.origin}</span>
+              {searchParams.returnDate && (
+                <span className={styles.legDate}>{searchParams.returnDate}</span>
+              )}
+              <span className={styles.legCount}>{sortedReturnFlights.length} vuelo{sortedReturnFlights.length !== 1 ? 's' : ''}</span>
+            </div>
+
+            {sortedReturnFlights.length === 0 ? (
+              <div className={styles.emptyLeg}>
+                <Plane size={28} />
+                <p>No hay vuelos de vuelta para esta ruta en nuestro inventario</p>
+                <small>Prueba sin fecha de regreso o con otras ciudades</small>
+              </div>
+            ) : (
+              <div className={styles.flightList}>
+                {sortedReturnFlights.map(flight => (
+                  <FlightCard
+                    key={flight.id}
+                    flight={flight}
+                    cabinClass={cabinClass}
+                    onBuyClick={(f) => setSelectedReturn(f)}
+                    isSelected={selectedReturn?.id === flight.id}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Booking summary bar */}
+          {(selectedOutbound || selectedReturn) && (
+            <div className={styles.bookingBar}>
+              <div className={styles.bookingLegs}>
+                <div className={`${styles.bookingLeg} ${selectedOutbound ? styles.bookingLegDone : styles.bookingLegPending}`}>
+                  {selectedOutbound ? (
+                    <>
+                      <span className={styles.bookingLegLabel}>
+                        <Check size={11} /> Ida
+                      </span>
+                      <span className={styles.bookingLegRoute}>
+                        {selectedOutbound.origin.iata} → {selectedOutbound.destination.iata}
+                      </span>
+                      <span className={styles.bookingLegTime}>{selectedOutbound.departure.time}</span>
+                      <span className={styles.bookingLegPrice}>{selectedOutbound.prices[cabinClass].toFixed(0)} €</span>
+                    </>
+                  ) : (
+                    <span className={styles.bookingLegEmpty}>Selecciona vuelo de ida</span>
+                  )}
+                </div>
+                <div className={styles.bookingLegDivider} />
+                <div className={`${styles.bookingLeg} ${selectedReturn ? styles.bookingLegDone : styles.bookingLegPending}`}>
+                  {selectedReturn ? (
+                    <>
+                      <span className={styles.bookingLegLabel}>
+                        <Check size={11} /> Vuelta
+                      </span>
+                      <span className={styles.bookingLegRoute}>
+                        {selectedReturn.origin.iata} → {selectedReturn.destination.iata}
+                      </span>
+                      <span className={styles.bookingLegTime}>{selectedReturn.departure.time}</span>
+                      <span className={styles.bookingLegPrice}>{selectedReturn.prices[cabinClass].toFixed(0)} €</span>
+                    </>
+                  ) : (
+                    <span className={styles.bookingLegEmpty}>Selecciona vuelo de vuelta</span>
+                  )}
+                </div>
+              </div>
+              {roundTripTotal && (
+                <div className={styles.bookingTotal}>
+                  <span className={styles.bookingTotalLabel}>Total</span>
+                  <span className={styles.bookingTotalPrice}>{roundTripTotal.toFixed(0)} €</span>
+                </div>
+              )}
+              <button
+                className={styles.bookingBtn}
+                onClick={handleBuyRoundTrip}
+                disabled={!selectedOutbound || !selectedReturn}
+              >
+                {selectedOutbound && selectedReturn ? 'Comprar ida y vuelta' : 'Selecciona ambos vuelos'}
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={styles.resultsArea}>
+          <div className={styles.sortTabs}>
+            <button className={`${styles.sortTab} ${sort === 'cheapest' ? styles.sortTabActive : ''}`} onClick={() => setSort('cheapest')}>
+              <span className={styles.sortTabLabel}>El más barato</span>
+              {cheapestPrice != null && <span className={styles.sortTabMeta}>{cheapestPrice.toFixed(0)} €</span>}
             </button>
+            <button className={`${styles.sortTab} ${sort === 'best' ? styles.sortTabActive : ''}`} onClick={() => setSort('best')}>
+              <span className={styles.sortTabLabel}>El mejor</span>
+            </button>
+            <button className={`${styles.sortTab} ${sort === 'shortest' ? styles.sortTabActive : ''}`} onClick={() => setSort('shortest')}>
+              <span className={styles.sortTabLabel}>Menor duración</span>
+              {shortestDuration && <span className={styles.sortTabMeta}>{shortestDuration}</span>}
+            </button>
+            <div className={styles.resultCount}>
+              {sortedFlights.length} vuelo{sortedFlights.length !== 1 ? 's' : ''} disponible{sortedFlights.length !== 1 ? 's' : ''}
+            </div>
           </div>
-        ) : (
-          <div className={styles.flightList}>
-            {sortedFlights.map(flight => (
-              <FlightCard
-                key={flight.id}
-                flight={flight}
-                cabinClass={cabinClass}
-                onBuyClick={handleBuyFlight}
-                isCheapest={flight.id === cheapestId}
-                isBest={flight.id === bestId}
-                isShortest={flight.id === shortestId}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+
+          {sortedFlights.length === 0 ? (
+            <div className={styles.emptyResults}>
+              <Plane size={56} />
+              <h3>No se encontraron vuelos</h3>
+              <p>Intenta con otros criterios de búsqueda</p>
+              <button
+                className={styles.resetBtn}
+                onClick={() => {
+                  setSearchParams({ origin: '', destination: '', departureDate: '', returnDate: '', cabinClass: 'economy' });
+                  loadFeaturedFlights(false);
+                }}
+              >
+                Ver todos los vuelos
+              </button>
+            </div>
+          ) : (
+            <div className={styles.flightList}>
+              {sortedFlights.map(flight => (
+                <FlightCard
+                  key={flight.id}
+                  flight={flight}
+                  cabinClass={cabinClass}
+                  onBuyClick={handleBuyFlight}
+                  isCheapest={flight.id === cheapestId}
+                  isBest={flight.id === bestId}
+                  isShortest={flight.id === shortestId}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {showPurchaseForm && selectedFlight && (
         <PurchaseTicketForm
           flight={selectedFlight}
-          onClose={() => { setShowPurchaseForm(false); setSelectedFlight(null); }}
-          onSuccess={() => { setShowPurchaseForm(false); setSelectedFlight(null); }}
+          onClose={handlePurchaseClose}
+          onSuccess={handlePurchaseSuccess}
+          roundTripStep={purchaseStep}
         />
       )}
     </div>

@@ -4,13 +4,13 @@ import styles from './FlightCardShop.module.css';
 
 const CLASS_LABELS = { economy: 'Turista', business: 'Business', first: 'Primera' };
 
-const FlightCard = ({ flight, cabinClass = 'economy', onBuyClick, isCheapest, isBest, isShortest }) => {
+const FlightCard = ({ flight, cabinClass = 'economy', onBuyClick, isCheapest, isBest, isShortest, isSelected }) => {
   const price = flight.prices[cabinClass];
   const classLabel = CLASS_LABELS[cabinClass];
   const isAvailable = flight.availableSeats[cabinClass] > 0;
 
   return (
-    <div className={styles.flightCard}>
+    <div className={`${styles.flightCard} ${isSelected ? styles.flightCardSelected : ''}`}>
       {/* Badges superiores */}
       {(isBest || isCheapest || isShortest) && (
         <div className={styles.badges}>
@@ -72,10 +72,10 @@ const FlightCard = ({ flight, cabinClass = 'economy', onBuyClick, isCheapest, is
               <div className={styles.priceAmount}>{price.toFixed(0)} €</div>
               <div className={styles.priceClass}>{classLabel}</div>
               <button
-                className={styles.selectBtn}
+                className={`${styles.selectBtn} ${isSelected ? styles.selectBtnSelected : ''}`}
                 onClick={() => onBuyClick(flight, cabinClass)}
               >
-                Seleccionar
+                {isSelected ? '✓ Seleccionado' : 'Seleccionar'}
               </button>
             </>
           ) : (

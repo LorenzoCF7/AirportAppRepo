@@ -10,17 +10,38 @@ const statusConfig = {
   pending:    { label: 'Pendiente',  color: '#d97706', bg: '#fffbeb' },
 };
 
+// Parse departure as local datetime so timezone doesn't flip the date
+const depDatetime = (t) => {
+  const d = t.departureDate || '';
+  const tm = t.departureTime || '23:59';
+  const dt = new Date(`${d}T${tm}`);
+  return isNaN(dt.getTime()) ? new Date(0) : dt;
+};
+
+const IATA_CITIES = {
+  BCN: 'Barcelona', MAD: 'Madrid', LHR: 'Londres', CDG: 'París',
+  AMS: 'Ámsterdam', FCO: 'Roma', FRA: 'Frankfurt', MUC: 'Múnich',
+  LIS: 'Lisboa', VIE: 'Viena', ZRH: 'Zúrich', PRG: 'Praga',
+  ARN: 'Estocolmo', CPH: 'Copenhague', DUB: 'Dublín', ATH: 'Atenas',
+  WAW: 'Varsovia', BRU: 'Bruselas', HEL: 'Helsinki', OSL: 'Oslo',
+  SVQ: 'Sevilla', VLC: 'Valencia', AGP: 'Málaga', BIO: 'Bilbao',
+  TFS: 'Tenerife', LPA: 'Gran Canaria', PMI: 'Palma', BER: 'Berlín',
+  MXP: 'Milán', GVA: 'Ginebra', EDI: 'Edimburgo', DUS: 'Düsseldorf',
+  JFK: 'Nueva York', LAX: 'Los Ángeles', ORY: 'París Orly', MAN: 'Mánchester',
+};
+const cityName = (iata, fallback) => IATA_CITIES[iata] || fallback || iata;
+
 const TicketCard = ({ ticket }) => {
-  const status = statusConfig[ticket.status] || statusConfig.confirmed;
-  const depDate = new Date(ticket.departureDate);
-  const formatted = depDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const status = statusConfig[ticket.ticketStatus] || statusConfig.confirmed;
+  const dt = depDatetime(ticket);
+  const formatted = dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
   return (
     <div className={styles.ticketCard}>
       <div className={styles.ticketRoute}>
         <div className={styles.ticketCity}>
           <span className={styles.ticketIata}>{ticket.departureIATA}</span>
-          <span className={styles.ticketCityName}>{ticket.departureCity}</span>
+          <span className={styles.ticketCityName}>{cityName(ticket.departureIATA, ticket.departureCity)}</span>
         </div>
         <div className={styles.ticketArrow}>
           <Plane size={16} className={styles.ticketPlane} />
@@ -28,7 +49,7 @@ const TicketCard = ({ ticket }) => {
         </div>
         <div className={styles.ticketCity}>
           <span className={styles.ticketIata}>{ticket.arrivalIATA}</span>
-          <span className={styles.ticketCityName}>{ticket.arrivalCity}</span>
+          <span className={styles.ticketCityName}>{cityName(ticket.arrivalIATA, ticket.arrivalCity)}</span>
         </div>
       </div>
 
@@ -40,7 +61,7 @@ const TicketCard = ({ ticket }) => {
 
       <div className={styles.ticketFooter}>
         <span className={styles.ticketStatus} style={{ color: status.color, background: status.bg }}>
-          {ticket.status === 'confirmed' ? <CheckCircle size={12} /> : <XCircle size={12} />}
+          {ticket.ticketStatus === 'confirmed' ? <CheckCircle size={12} /> : <XCircle size={12} />}
           {status.label}
         </span>
         <span className={styles.ticketPrice}>{ticket.price} {ticket.currency || '€'}</span>
@@ -76,7 +97,6 @@ const ProfileView = ({ onNavigate }) => {
 
   const username = user?.username || user?.email?.split('@')[0] || 'Viajero';
   const initials = username.slice(0, 2).toUpperCase();
-  const today = new Date();
 
   useEffect(() => {
     ticketService.getUserTickets()
@@ -85,8 +105,9 @@ const ProfileView = ({ onNavigate }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  const upcoming = tickets.filter(t => new Date(t.departureDate) >= today);
-  const past     = tickets.filter(t => new Date(t.departureDate) <  today);
+  const now = new Date();
+  const upcoming = tickets.filter(t => t.ticketStatus === 'confirmed' && depDatetime(t) > now);
+  const past     = tickets.filter(t => t.ticketStatus === 'cancelled'  || depDatetime(t) <= now);
   const shown    = activeTab === 'upcoming' ? upcoming : past;
 
   const totalSpent = tickets.reduce((s, t) => s + (t.price || 0), 0);

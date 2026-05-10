@@ -22,7 +22,7 @@ const generateRandomSeat = () => {
   return `${rows[Math.floor(Math.random() * rows.length)]}${seats[Math.floor(Math.random() * seats.length)]}`;
 };
 
-const PurchaseTicketForm = ({ flight, onClose, onSuccess }) => {
+const PurchaseTicketForm = ({ flight, onClose, onSuccess, roundTripStep }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -168,7 +168,7 @@ const PurchaseTicketForm = ({ flight, onClose, onSuccess }) => {
       }));
 
       if (onSuccess) onSuccess(newTicket);
-      onClose();
+      else onClose();
     } catch (error) {
       console.error('❌ Error comprando billete:', error);
       alert('Error al comprar el billete. Por favor, inténtalo de nuevo.');
@@ -190,7 +190,11 @@ const PurchaseTicketForm = ({ flight, onClose, onSuccess }) => {
         </button>
 
         <div className={styles.modalHeader}>
-          <h2>Comprar Billete</h2>
+          <h2>
+            {roundTripStep === 'outbound' ? 'Vuelo de ida · 1 de 2'
+              : roundTripStep === 'return' ? 'Vuelo de vuelta · 2 de 2'
+              : 'Comprar Billete'}
+          </h2>
           <StepIndicator currentStep={step} />
         </div>
 

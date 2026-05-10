@@ -117,8 +117,8 @@
 /* Chip dropdowns */
 .chipDropdown {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
+  top: 100%;
+  left: 14px;
   z-index: 100;
   background: white;
   border: 1px solid #e5e7eb;
@@ -209,12 +209,17 @@
 }
 
 /**/
+.filtersWrap {
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
 .filters {
   display: flex;
   gap: 8px;
   padding: 0 14px 12px;
   border-bottom: 1px solid #f3f4f6;
-  flex-shrink: 0;
   overflow-x: auto;
 }
 

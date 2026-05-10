@@ -198,213 +198,157 @@ public class FlightServiceImpl implements FlightService {
     private List<Map<String, Object>> generateMockFlights() {
         List<Map<String, Object>> flights = new ArrayList<>();
 
-        String[][] routes = {
-                // España
-                {"MAD", "BCN", "Madrid-Barajas", "Barcelona-El Prat", "Iberia", "IB"},
-                {"MAD", "LHR", "Madrid-Barajas", "London Heathrow", "Iberia", "IB"},
-                {"MAD", "CDG", "Madrid-Barajas", "Paris CDG", "Iberia", "IB"},
-                {"MAD", "FRA", "Madrid-Barajas", "Frankfurt", "Iberia", "IB"},
-                {"MAD", "FCO", "Madrid-Barajas", "Rome Fiumicino", "Iberia", "IB"},
-                {"MAD", "AMS", "Madrid-Barajas", "Amsterdam Schiphol", "Vueling", "VY"},
-                {"MAD", "MUC", "Madrid-Barajas", "Munich", "Lufthansa", "LH"},
-                {"SVQ", "CDG", "Sevilla", "Paris CDG", "Vueling", "VY"},
-                {"SVQ", "BCN", "Sevilla", "Barcelona-El Prat", "Vueling", "VY"},
-                {"SVQ", "LHR", "Sevilla", "London Heathrow", "Ryanair", "FR"},
-                {"SVQ", "MAD", "Sevilla", "Madrid-Barajas", "Iberia Express", "I2"},
-                {"SVQ", "FRA", "Sevilla", "Frankfurt", "Ryanair", "FR"},
-                {"BCN", "LIS", "Barcelona-El Prat", "Lisbon", "Vueling", "VY"},
-                {"BCN", "CDG", "Barcelona-El Prat", "Paris CDG", "Air France", "AF"},
-                {"BCN", "FRA", "Barcelona-El Prat", "Frankfurt", "Vueling", "VY"},
-                {"BCN", "LHR", "Barcelona-El Prat", "London Heathrow", "British Airways", "BA"},
-                {"BCN", "AMS", "Barcelona-El Prat", "Amsterdam Schiphol", "KLM", "KL"},
-                {"BCN", "FCO", "Barcelona-El Prat", "Rome Fiumicino", "Vueling", "VY"},
-                {"VLC", "CDG", "Valencia", "Paris CDG", "Air France", "AF"},
-                {"VLC", "LHR", "Valencia", "London Heathrow", "Ryanair", "FR"},
-                {"VLC", "BCN", "Valencia", "Barcelona-El Prat", "Iberia Express", "I2"},
-                {"VLC", "MAD", "Valencia", "Madrid-Barajas", "Iberia", "IB"},
-                {"AGP", "LHR", "Málaga", "London Heathrow", "British Airways", "BA"},
-                {"AGP", "CDG", "Málaga", "Paris CDG", "Vueling", "VY"},
-                {"AGP", "BCN", "Málaga", "Barcelona-El Prat", "Vueling", "VY"},
-                {"AGP", "FRA", "Málaga", "Frankfurt", "Lufthansa", "LH"},
-                {"BIO", "CDG", "Bilbao", "Paris CDG", "Air France", "AF"},
-                {"BIO", "LHR", "Bilbao", "London Heathrow", "British Airways", "BA"},
-                {"BIO", "MAD", "Bilbao", "Madrid-Barajas", "Iberia", "IB"},
-                {"PMI", "LHR", "Palma de Mallorca", "London Heathrow", "British Airways", "BA"},
-                {"PMI", "DUS", "Palma de Mallorca", "Dusseldorf", "Eurowings", "EW"},
-                {"PMI", "FRA", "Palma de Mallorca", "Frankfurt", "Lufthansa", "LH"},
-                {"PMI", "CDG", "Palma de Mallorca", "Paris CDG", "Air France", "AF"},
-                {"TFS", "LHR", "Tenerife Sur", "London Heathrow", "British Airways", "BA"},
-                {"TFS", "BCN", "Tenerife Sur", "Barcelona-El Prat", "Vueling", "VY"},
-                {"TFS", "MAD", "Tenerife Sur", "Madrid-Barajas", "Iberia", "IB"},
-                {"LPA", "LHR", "Gran Canaria", "London Heathrow", "Ryanair", "FR"},
-                {"LPA", "MAD", "Gran Canaria", "Madrid-Barajas", "Iberia", "IB"},
-                // Europa
-                {"LHR", "CDG", "London Heathrow", "Paris CDG", "British Airways", "BA"},
-                {"LHR", "AMS", "London Heathrow", "Amsterdam Schiphol", "British Airways", "BA"},
-                {"LHR", "FRA", "London Heathrow", "Frankfurt", "British Airways", "BA"},
-                {"LHR", "FCO", "London Heathrow", "Rome Fiumicino", "British Airways", "BA"},
-                {"CDG", "FCO", "Paris CDG", "Rome Fiumicino", "Air France", "AF"},
-                {"CDG", "AMS", "Paris CDG", "Amsterdam Schiphol", "Air France", "AF"},
-                {"CDG", "FRA", "Paris CDG", "Frankfurt", "Air France", "AF"},
-                {"FRA", "AMS", "Frankfurt", "Amsterdam Schiphol", "Lufthansa", "LH"},
-                {"FRA", "FCO", "Frankfurt", "Rome Fiumicino", "Lufthansa", "LH"},
-                {"AMS", "VIE", "Amsterdam Schiphol", "Vienna", "KLM", "KL"},
-                {"MUC", "ZRH", "Munich", "Zurich", "Lufthansa", "LH"},
-                {"LIS", "MAD", "Lisbon", "Madrid-Barajas", "TAP Portugal", "TP"},
-                {"LIS", "CDG", "Lisbon", "Paris CDG", "TAP Portugal", "TP"},
-                {"VIE", "PRG", "Vienna", "Prague", "Austrian", "OS"},
-                {"CPH", "ARN", "Copenhagen", "Stockholm Arlanda", "SAS", "SK"},
-                {"DUB", "EDI", "Dublin", "Edinburgh", "Ryanair", "FR"},
-                {"ATH", "FCO", "Athens", "Rome Fiumicino", "Aegean", "A3"},
-                {"WAW", "BER", "Warsaw", "Berlin Brandenburg", "LOT", "LO"},
-                {"BRU", "GVA", "Brussels", "Geneva", "Brussels Airlines", "SN"},
-                {"HEL", "OSL", "Helsinki", "Oslo", "Finnair", "AY"},
-                {"FCO", "MUC", "Rome Fiumicino", "Munich", "ITA Airways", "AZ"},
+        // Pair index: each "pair" = {outbound, reverse}
+        // Outbound flights go on days +1 to +3; reverse (return) flights go on days +4 to +6
+        // This guarantees valid round-trips are always available: pick outbound day 1-3, return day 4-6
+        String[][] outboundRoutes = {
+                {"MAD", "BCN", "Madrid-Barajas",    "Barcelona-El Prat",  "Iberia",           "IB"},
+                {"MAD", "LHR", "Madrid-Barajas",    "London Heathrow",    "Iberia",           "IB"},
+                {"MAD", "CDG", "Madrid-Barajas",    "Paris CDG",          "Iberia",           "IB"},
+                {"MAD", "FRA", "Madrid-Barajas",    "Frankfurt",          "Iberia",           "IB"},
+                {"MAD", "FCO", "Madrid-Barajas",    "Rome Fiumicino",     "Iberia",           "IB"},
+                {"MAD", "AMS", "Madrid-Barajas",    "Amsterdam Schiphol", "Vueling",          "VY"},
+                {"MAD", "LIS", "Madrid-Barajas",    "Lisbon",             "Iberia Express",   "I2"},
+                {"BCN", "LHR", "Barcelona-El Prat", "London Heathrow",    "British Airways",  "BA"},
+                {"BCN", "CDG", "Barcelona-El Prat", "Paris CDG",          "Air France",       "AF"},
+                {"BCN", "FRA", "Barcelona-El Prat", "Frankfurt",          "Vueling",          "VY"},
+                {"BCN", "AMS", "Barcelona-El Prat", "Amsterdam Schiphol", "KLM",              "KL"},
+                {"BCN", "FCO", "Barcelona-El Prat", "Rome Fiumicino",     "Vueling",          "VY"},
+                {"BCN", "LIS", "Barcelona-El Prat", "Lisbon",             "Vueling",          "VY"},
+                {"SVQ", "CDG", "Sevilla",           "Paris CDG",          "Vueling",          "VY"},
+                {"SVQ", "LHR", "Sevilla",           "London Heathrow",    "Ryanair",          "FR"},
+                {"SVQ", "MAD", "Sevilla",           "Madrid-Barajas",     "Iberia Express",   "I2"},
+                {"VLC", "CDG", "Valencia",          "Paris CDG",          "Air France",       "AF"},
+                {"VLC", "LHR", "Valencia",          "London Heathrow",    "Ryanair",          "FR"},
+                {"AGP", "LHR", "Málaga",            "London Heathrow",    "British Airways",  "BA"},
+                {"PMI", "FRA", "Palma de Mallorca", "Frankfurt",          "Lufthansa",        "LH"},
+                {"TFS", "MAD", "Tenerife Sur",      "Madrid-Barajas",     "Iberia",           "IB"},
+                {"LPA", "MAD", "Gran Canaria",      "Madrid-Barajas",     "Iberia",           "IB"},
+                {"LHR", "CDG", "London Heathrow",   "Paris CDG",          "British Airways",  "BA"},
+                {"LHR", "AMS", "London Heathrow",   "Amsterdam Schiphol", "British Airways",  "BA"},
+                {"LHR", "FCO", "London Heathrow",   "Rome Fiumicino",     "British Airways",  "BA"},
+                {"CDG", "FCO", "Paris CDG",         "Rome Fiumicino",     "Air France",       "AF"},
+                {"CDG", "AMS", "Paris CDG",         "Amsterdam Schiphol", "Air France",       "AF"},
+                {"FRA", "AMS", "Frankfurt",         "Amsterdam Schiphol", "Lufthansa",        "LH"},
+                {"MUC", "ZRH", "Munich",            "Zurich",             "Lufthansa",        "LH"},
+                {"VIE", "PRG", "Vienna",            "Prague",             "Austrian",         "OS"},
+                {"CPH", "ARN", "Copenhagen",        "Stockholm Arlanda",  "SAS",              "SK"},
+                {"DUB", "LHR", "Dublin",            "London Heathrow",    "Aer Lingus",       "EI"},
+                {"ATH", "FCO", "Athens",            "Rome Fiumicino",     "Aegean",           "A3"},
+                {"WAW", "BER", "Warsaw",            "Berlin Brandenburg", "LOT",              "LO"},
+                {"LIS", "CDG", "Lisbon",            "Paris CDG",          "TAP Portugal",     "TP"},
         };
 
-        LocalTime now = LocalTime.now();
+        // Each outbound route has a matching reverse (return) route
+        String[][] returnRoutes = {
+                {"BCN", "MAD", "Barcelona-El Prat", "Madrid-Barajas",     "Vueling",          "VY"},
+                {"LHR", "MAD", "London Heathrow",   "Madrid-Barajas",     "British Airways",  "BA"},
+                {"CDG", "MAD", "Paris CDG",         "Madrid-Barajas",     "Air France",       "AF"},
+                {"FRA", "MAD", "Frankfurt",         "Madrid-Barajas",     "Lufthansa",        "LH"},
+                {"FCO", "MAD", "Rome Fiumicino",    "Madrid-Barajas",     "ITA Airways",      "AZ"},
+                {"AMS", "MAD", "Amsterdam Schiphol","Madrid-Barajas",     "KLM",              "KL"},
+                {"LIS", "MAD", "Lisbon",            "Madrid-Barajas",     "TAP Portugal",     "TP"},
+                {"LHR", "BCN", "London Heathrow",   "Barcelona-El Prat",  "British Airways",  "BA"},
+                {"CDG", "BCN", "Paris CDG",         "Barcelona-El Prat",  "Air France",       "AF"},
+                {"FRA", "BCN", "Frankfurt",         "Barcelona-El Prat",  "Lufthansa",        "LH"},
+                {"AMS", "BCN", "Amsterdam Schiphol","Barcelona-El Prat",  "KLM",              "KL"},
+                {"FCO", "BCN", "Rome Fiumicino",    "Barcelona-El Prat",  "ITA Airways",      "AZ"},
+                {"LIS", "BCN", "Lisbon",            "Barcelona-El Prat",  "TAP Portugal",     "TP"},
+                {"CDG", "SVQ", "Paris CDG",         "Sevilla",            "Air France",       "AF"},
+                {"LHR", "SVQ", "London Heathrow",   "Sevilla",            "British Airways",  "BA"},
+                {"MAD", "SVQ", "Madrid-Barajas",    "Sevilla",            "Iberia",           "IB"},
+                {"CDG", "VLC", "Paris CDG",         "Valencia",           "Air France",       "AF"},
+                {"LHR", "VLC", "London Heathrow",   "Valencia",           "Ryanair",          "FR"},
+                {"LHR", "AGP", "London Heathrow",   "Málaga",             "British Airways",  "BA"},
+                {"FRA", "PMI", "Frankfurt",         "Palma de Mallorca",  "Lufthansa",        "LH"},
+                {"MAD", "TFS", "Madrid-Barajas",    "Tenerife Sur",       "Iberia",           "IB"},
+                {"MAD", "LPA", "Madrid-Barajas",    "Gran Canaria",       "Iberia",           "IB"},
+                {"CDG", "LHR", "Paris CDG",         "London Heathrow",    "Air France",       "AF"},
+                {"AMS", "LHR", "Amsterdam Schiphol","London Heathrow",    "KLM",              "KL"},
+                {"FCO", "LHR", "Rome Fiumicino",    "London Heathrow",    "ITA Airways",      "AZ"},
+                {"FCO", "CDG", "Rome Fiumicino",    "Paris CDG",          "ITA Airways",      "AZ"},
+                {"AMS", "CDG", "Amsterdam Schiphol","Paris CDG",          "KLM",              "KL"},
+                {"AMS", "FRA", "Amsterdam Schiphol","Frankfurt",          "KLM",              "KL"},
+                {"ZRH", "MUC", "Zurich",            "Munich",             "Swiss",            "LX"},
+                {"PRG", "VIE", "Prague",            "Vienna",             "Czech Airlines",   "OK"},
+                {"ARN", "CPH", "Stockholm Arlanda", "Copenhagen",         "SAS",              "SK"},
+                {"LHR", "DUB", "London Heathrow",   "Dublin",             "British Airways",  "BA"},
+                {"FCO", "ATH", "Rome Fiumicino",    "Athens",             "ITA Airways",      "AZ"},
+                {"BER", "WAW", "Berlin Brandenburg","Warsaw",             "Lufthansa",        "LH"},
+                {"CDG", "LIS", "Paris CDG",         "Lisbon",             "Air France",       "AF"},
+        };
+
+        // Time slots for departures spread across the day
+        int[] depHours   = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 7, 9, 11, 13};
+        int[] depMinutes = {0, 30, 15, 45, 0, 20, 0, 35, 10, 0,  25, 5,  30, 0,  15, 45, 0, 0,  30, 0};
+
         LocalDate today = LocalDate.now();
-        Random random = new Random();
 
-        int total = routes.length;
-        int landedCount   = total / 3;
-        int activeCount   = total / 5;
-        // resto → scheduled
+        // Generate outbound flights on days +1 and +2
+        for (int i = 0; i < outboundRoutes.length; i++) {
+            String[] route = outboundRoutes[i];
+            int dayOffset     = 1 + (i % 2);          // days +1 or +2
+            int slot          = i % depHours.length;
+            int durationHours = 1 + (i % 4);
+            int durationMins  = (i % 2 == 0) ? 0 : 30;
 
-        for (int i = 0; i < total; i++) {
-            String[] route = routes[i];
+            LocalDate flightDate = today.plusDays(dayOffset);
+            LocalTime depTime    = LocalTime.of(depHours[slot], depMinutes[slot]);
+            LocalTime arrTime    = depTime.plusHours(durationHours).plusMinutes(durationMins);
 
-            LocalTime depTime;
-            LocalTime arrTime;
-            String status;
-            int flightDuration = 1 + (i % 3);
-
-            if (i < landedCount) {
-                int hoursAgo = 2 + (i % 4);
-                depTime = now.minusHours(hoursAgo).minusMinutes(random.nextInt(30));
-                arrTime = depTime.plusHours(flightDuration).plusMinutes(random.nextInt(30));
-                status = "landed";
-            } else if (i < landedCount + activeCount) {
-                int slot = i - landedCount;
-                int minutesAgo = 15 + slot * 12 + random.nextInt(10);
-                depTime = now.minusMinutes(minutesAgo);
-                arrTime = now.plusMinutes(20 + slot * 10 + random.nextInt(15));
-                status = "active";
-            } else {
-                int slot = i - landedCount - activeCount;
-                int minutesUntil = 20 + slot * 15 + random.nextInt(15);
-                depTime = now.plusMinutes(minutesUntil);
-                arrTime = depTime.plusHours(flightDuration).plusMinutes(random.nextInt(30));
-                status = "scheduled";
-            }
-            
             String flightNum = route[5] + (1000 + i * 11);
+            flights.add(buildMockFlight(route, flightDate, depTime, arrTime, flightNum, i));
+        }
 
-            Map<String, Object> flight = new LinkedHashMap<>();
-            flight.put("flight_date", today.toString());
-            flight.put("flight_status", status);
+        // Generate return flights on days +4 and +5
+        for (int i = 0; i < returnRoutes.length; i++) {
+            String[] route = returnRoutes[i];
+            int dayOffset     = 4 + (i % 2);          // days +4 or +5
+            int slot          = (i + 5) % depHours.length;
+            int durationHours = 1 + (i % 4);
+            int durationMins  = (i % 2 == 0) ? 0 : 30;
 
-            Map<String, Object> flightInfo = new LinkedHashMap<>();
-            flightInfo.put("number", String.valueOf(1000 + i * 11));
-            flightInfo.put("iata", flightNum);
-            flight.put("flight", flightInfo);
+            LocalDate flightDate = today.plusDays(dayOffset);
+            LocalTime depTime    = LocalTime.of(depHours[slot], depMinutes[slot]);
+            LocalTime arrTime    = depTime.plusHours(durationHours).plusMinutes(durationMins);
 
-            Map<String, Object> airline = new LinkedHashMap<>();
-            airline.put("name", route[4]);
-            airline.put("iata", route[5]);
-            flight.put("airline", airline);
-
-            Map<String, Object> departure = new LinkedHashMap<>();
-            departure.put("airport", route[2]);
-            departure.put("iata", route[0]);
-            departure.put("scheduled", today + "T" + depTime.withSecond(0).withNano(0) + ":00");
-            flight.put("departure", departure);
-
-            Map<String, Object> arrival = new LinkedHashMap<>();
-            arrival.put("airport", route[3]);
-            arrival.put("iata", route[1]);
-            arrival.put("scheduled", today + "T" + arrTime.withSecond(0).withNano(0) + ":00");
-            flight.put("arrival", arrival);
-
-            // Añadir datos live para vuelos ACTIVOS (necesario para el mapa)
-            if ("active".equals(status)) {
-                Map<String, Object> live = new LinkedHashMap<>();
-                
-                // Coordenadas de aeropuertos europeos para calcular posición
-                String[] airports = {
-                    "MAD","BCN","LHR","CDG","FRA","AMS","FCO","MUC","LIS","VIE",
-                    "PRG","CPH","ARN","DUB","EDI","ATH","WAW","BER","BRU","GVA",
-                    "HEL","OSL","PMI","DUS","SVQ","VLC","AGP","BIO","TFS","LPA","ZRH"
-                };
-                double[][] airportCoords = {
-                    {40.4168, -3.7038},   // MAD
-                    {41.2974,  2.0833},   // BCN
-                    {51.4700, -0.4543},   // LHR
-                    {49.0097,  2.5479},   // CDG
-                    {50.0379,  8.5622},   // FRA
-                    {52.3105,  4.7683},   // AMS
-                    {41.8003, 12.2389},   // FCO
-                    {48.3538, 11.7861},   // MUC
-                    {38.7742, -9.1342},   // LIS
-                    {48.1103, 16.5697},   // VIE
-                    {50.1008, 14.2600},   // PRG
-                    {55.6180, 12.6508},   // CPH
-                    {59.6519, 17.9186},   // ARN
-                    {53.4264, -6.2499},   // DUB
-                    {55.9500, -3.3725},   // EDI
-                    {37.9364, 23.9445},   // ATH
-                    {52.1657, 20.9671},   // WAW
-                    {52.3667, 13.5033},   // BER
-                    {50.9014,  4.4844},   // BRU
-                    {46.2370,  6.1092},   // GVA
-                    {60.3172, 24.9633},   // HEL
-                    {60.1939, 11.1004},   // OSL
-                    {39.5517,  2.7388},   // PMI
-                    {51.2895,  6.7668},   // DUS
-                    {37.4180, -5.8931},   // SVQ
-                    {39.4893, -0.4816},   // VLC
-                    {36.6749, -4.4991},   // AGP
-                    {43.3011, -2.9106},   // BIO
-                    {28.0445, -16.5726},  // TFS
-                    {27.9319, -15.3866},  // LPA
-                    {47.4582,  8.5555},   // ZRH
-                };
-
-                double progress = 0.3 + (random.nextDouble() * 0.4);
-                
-                int depIdx = java.util.Arrays.asList(airports).indexOf(route[0]);
-                int arrIdx = java.util.Arrays.asList(airports).indexOf(route[1]);
-                
-                if (depIdx == -1) depIdx = 0;
-                if (arrIdx == -1) arrIdx = 1;
-                
-                double depLat = airportCoords[depIdx][0];
-                double depLng = airportCoords[depIdx][1];
-                double arrLat = airportCoords[arrIdx][0];
-                double arrLng = airportCoords[arrIdx][1];
-                
-                // Interpolar posición actual
-                double currentLat = depLat + (arrLat - depLat) * progress;
-                double currentLng = depLng + (arrLng - depLng) * progress;
-                
-                // Calcular dirección (heading)
-                double direction = Math.toDegrees(Math.atan2(arrLng - depLng, arrLat - depLat));
-                if (direction < 0) direction += 360;
-                
-                live.put("latitude", currentLat);
-                live.put("longitude", currentLng);
-                live.put("altitude", 35000 + random.nextInt(5000));
-                live.put("speed", 450 + random.nextInt(100));
-                live.put("direction", direction);
-                live.put("is_ground", false);
-                
-                flight.put("live", live);
-            }
-
-            flights.add(flight);
+            String flightNum = route[5] + (2000 + i * 11);
+            int idx = outboundRoutes.length + i;
+            flights.add(buildMockFlight(route, flightDate, depTime, arrTime, flightNum, idx));
         }
 
         return flights;
+    }
+
+    private Map<String, Object> buildMockFlight(String[] route, LocalDate date, LocalTime depTime,
+                                                 LocalTime arrTime, String flightNum, int idx) {
+        Map<String, Object> flight = new LinkedHashMap<>();
+        flight.put("flight_date",   date.toString());
+        flight.put("flight_status", "scheduled");
+
+        Map<String, Object> flightInfo = new LinkedHashMap<>();
+        flightInfo.put("number", flightNum.replaceAll("[^0-9]", ""));
+        flightInfo.put("iata",   flightNum);
+        flight.put("flight", flightInfo);
+
+        Map<String, Object> airline = new LinkedHashMap<>();
+        airline.put("name", route[4]);
+        airline.put("iata", route[5]);
+        flight.put("airline", airline);
+
+        Map<String, Object> departure = new LinkedHashMap<>();
+        departure.put("airport",   route[2]);
+        departure.put("iata",      route[0]);
+        departure.put("scheduled", date + "T" + depTime.withSecond(0).withNano(0) + ":00");
+        flight.put("departure", departure);
+
+        Map<String, Object> arrival = new LinkedHashMap<>();
+        arrival.put("airport",   route[3]);
+        arrival.put("iata",      route[1]);
+        arrival.put("scheduled", date + "T" + arrTime.withSecond(0).withNano(0) + ":00");
+        flight.put("arrival", arrival);
+
+        return flight;
     }
 
     private List<Map<String, Object>> generateMockOffers(String origin, String destination, String departureDate) {

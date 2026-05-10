@@ -393,8 +393,8 @@ const ExploreView = ({ onNavigate }) => {
         {selected ? (
           <DestDetail dest={selected} onBack={handleBack} onNavigate={onNavigate} originCode={selectedOriginCode} />
         ) : (
-          <>
-            <div className={styles.searchBox} ref={filterRef}>
+          <div ref={filterRef}>
+            <div className={styles.searchBox}>
               <div className={styles.searchRow}>
                 {/* Origin */}
                 <div className={styles.searchField}>
@@ -411,7 +411,7 @@ const ExploreView = ({ onNavigate }) => {
                 </div>
 
                 {/* Destination filter */}
-                <div className={styles.searchField} style={{ position: 'relative' }}>
+                <div className={styles.searchField}>
                   <input
                     className={styles.destInput}
                     placeholder="Destino"
@@ -427,106 +427,101 @@ const ExploreView = ({ onNavigate }) => {
               </div>
 
               {/* Date range field */}
-              <div
-                className={`${styles.searchField} ${styles.searchFieldFull} ${openChip === 'date' ? styles.searchFieldOpen : ''}`}
-                onClick={() => toggleChip('date')}
-                style={{ cursor: 'pointer', userSelect: 'none' }}
-              >
-                <Calendar size={14} style={{ color: '#9ca3af', flexShrink: 0 }} />
-                <span className={dateFrom || dateTo ? styles.searchCode : styles.searchPlaceholder} style={{ flex: 1, marginLeft: 6 }}>
-                  {dateLabel}
-                </span>
-                {(dateFrom || dateTo) && (
-                  <button className={styles.clearBtn} onClick={clearDates}><X size={13} /></button>
-                )}
-                <ChevronDown size={13} style={{ color: '#9ca3af', flexShrink: 0 }} />
-              </div>
-
-              {/* Date dropdown */}
-              {openChip === 'date' && (
-                <div className={styles.chipDropdown}>
-                  <div className={styles.chipDropdownRow}>
-                    <label className={styles.dateLabel}>Salida</label>
-                    <input
-                      type="date"
-                      className={styles.dateInput}
-                      value={dateFrom}
-                      min={new Date().toISOString().split('T')[0]}
-                      onChange={e => setDateFrom(e.target.value)}
-                    />
-                  </div>
-                  <div className={styles.chipDropdownRow}>
-                    <label className={styles.dateLabel}>Vuelta</label>
-                    <input
-                      type="date"
-                      className={styles.dateInput}
-                      value={dateTo}
-                      min={dateFrom || new Date().toISOString().split('T')[0]}
-                      onChange={e => setDateTo(e.target.value)}
-                    />
-                  </div>
-                  <button className={styles.applyBtn} onClick={() => setOpenChip(null)}>Aplicar</button>
+              <div style={{ position: 'relative' }}>
+                <div
+                  className={`${styles.searchField} ${styles.searchFieldFull} ${openChip === 'date' ? styles.searchFieldOpen : ''}`}
+                  onClick={() => toggleChip('date')}
+                  style={{ cursor: 'pointer', userSelect: 'none', marginBottom: 0 }}
+                >
+                  <Calendar size={14} style={{ color: '#9ca3af', flexShrink: 0 }} />
+                  <span className={dateFrom || dateTo ? styles.searchCode : styles.searchPlaceholder} style={{ flex: 1, marginLeft: 6 }}>
+                    {dateLabel}
+                  </span>
+                  {(dateFrom || dateTo) && (
+                    <button className={styles.clearBtn} onClick={clearDates}><X size={13} /></button>
+                  )}
+                  <ChevronDown size={13} style={{ color: '#9ca3af', flexShrink: 0 }} />
                 </div>
-              )}
+
+                {/* Date dropdown — positioned relative to the date field wrapper */}
+                {openChip === 'date' && (
+                  <div className={styles.chipDropdown} style={{ left: 0, right: 0, minWidth: 'unset' }}>
+                    <div className={styles.chipDropdownRow}>
+                      <label className={styles.dateLabel}>Salida</label>
+                      <input
+                        type="date"
+                        className={styles.dateInput}
+                        value={dateFrom}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={e => setDateFrom(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.chipDropdownRow}>
+                      <label className={styles.dateLabel}>Vuelta</label>
+                      <input
+                        type="date"
+                        className={styles.dateInput}
+                        value={dateTo}
+                        min={dateFrom || new Date().toISOString().split('T')[0]}
+                        onChange={e => setDateTo(e.target.value)}
+                      />
+                    </div>
+                    <button className={styles.applyBtn} onClick={() => setOpenChip(null)}>Aplicar</button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Filter chips */}
-            <div className={styles.filters} ref={null}>
-              {/* Escalas chip */}
-              <div style={{ position: 'relative' }}>
+            {/* Filter chips wrapper — position:relative so dropdowns anchor here, above the list */}
+            <div className={styles.filtersWrap}>
+              <div className={styles.filters}>
                 <button
                   className={`${styles.filterChip} ${stopsFilter !== 'all' ? styles.filterChipActive : ''}`}
                   onClick={() => toggleChip('stops')}
                 >
                   Escalas{stopsFilter === 'direct' ? ': Directo' : ''} <ChevronDown size={13} />
                 </button>
-                {openChip === 'stops' && (
-                  <div className={styles.chipDropdown}>
-                    {[['all', 'Todos los vuelos'], ['direct', 'Solo directos']].map(([val, label]) => (
-                      <button
-                        key={val}
-                        className={`${styles.chipOption} ${stopsFilter === val ? styles.chipOptionActive : ''}`}
-                        onClick={() => { setStopsFilter(val); setOpenChip(null); }}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Precio chip */}
-              <div style={{ position: 'relative' }}>
                 <button
-                  className={`${styles.filterChip} ${durationSort ? '' : styles.filterChipActive}`}
+                  className={`${styles.filterChip} ${!durationSort ? styles.filterChipActive : ''}`}
                   onClick={() => toggleChip('price')}
                 >
                   Precio <ChevronDown size={13} />
                 </button>
-                {openChip === 'price' && (
-                  <div className={styles.chipDropdown}>
-                    {[['asc', 'Más barato primero'], ['desc', 'Más caro primero']].map(([val, label]) => (
-                      <button
-                        key={val}
-                        className={`${styles.chipOption} ${!durationSort && priceSort === val ? styles.chipOptionActive : ''}`}
-                        onClick={() => { setPriceSort(val); setDurationSort(false); setOpenChip(null); }}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Duración chip */}
-              <div style={{ position: 'relative' }}>
                 <button
                   className={`${styles.filterChip} ${durationSort ? styles.filterChipActive : ''}`}
                   onClick={() => { setDurationSort(prev => !prev); setOpenChip(null); }}
                 >
-                  Duración del vuelo {durationSort ? '✓' : <ChevronDown size={13} />}
+                  Duración del vuelo <ChevronDown size={13} />
                 </button>
               </div>
+
+              {/* Dropdowns rendered OUTSIDE .filters so overflow-x:auto doesn't clip them */}
+              {openChip === 'stops' && (
+                <div className={styles.chipDropdown}>
+                  {[['all', 'Todos los vuelos'], ['direct', 'Solo directos']].map(([val, label]) => (
+                    <button
+                      key={val}
+                      className={`${styles.chipOption} ${stopsFilter === val ? styles.chipOptionActive : ''}`}
+                      onClick={() => { setStopsFilter(val); setOpenChip(null); }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {openChip === 'price' && (
+                <div className={styles.chipDropdown}>
+                  {[['asc', 'Más barato primero'], ['desc', 'Más caro primero']].map(([val, label]) => (
+                    <button
+                      key={val}
+                      className={`${styles.chipOption} ${!durationSort && priceSort === val ? styles.chipOptionActive : ''}`}
+                      onClick={() => { setPriceSort(val); setDurationSort(false); setOpenChip(null); }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className={styles.list}>
@@ -550,7 +545,7 @@ const ExploreView = ({ onNavigate }) => {
                 ))
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
 

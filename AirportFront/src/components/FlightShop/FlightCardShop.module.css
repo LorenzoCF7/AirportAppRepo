@@ -11,6 +11,15 @@
   background: #fafafa;
 }
 
+.flightCardSelected {
+  background: #f0fdf4;
+  border-left: 3px solid #16a34a;
+}
+
+.flightCardSelected:hover {
+  background: #dcfce7;
+}
+
 /* ── Badges ── */
 
 .badges {
@@ -249,6 +258,15 @@
 
 .selectBtn:active {
   transform: translateY(0);
+}
+
+.selectBtnSelected {
+  background: #16a34a;
+}
+
+.selectBtnSelected:hover {
+  background: #15803d;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 .soldOut {
