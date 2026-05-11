@@ -699,6 +699,49 @@
   text-align: center;
 }
 
+/* ── Stripe Payment Form ── */
+
+.stripeContainer {
+  background: white;
+  border: 1.5px solid #e8edf8;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.stripeContainer > div {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.errorMessage {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #e74c3c;
+}
+
+.inputError {
+  border-color: #e74c3c !important;
+}
+
+.cardInfo {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #f0f7ff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #3b5bdb;
+}
+
+.cardInfo span {
+  font-weight: 600;
+}
+
 /* ── Legacy (kept for backward compat) ── */
 
 .confirmationSummary {

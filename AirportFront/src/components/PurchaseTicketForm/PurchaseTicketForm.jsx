@@ -231,6 +231,7 @@ const PurchaseTicketForm = ({ flight, onClose, onSuccess, roundTripStep }) => {
               loading={loading}
               price={getFinalPrice()}
               basePrice={getBasePrice()}
+              userId={user?.id || 1}
               onBack={() => setStep(2)}
               onSubmit={handleSubmit}
             />

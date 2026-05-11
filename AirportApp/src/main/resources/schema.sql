@@ -102,3 +102,43 @@ CREATE TABLE IF NOT EXISTS tickets (
 --     INDEX idx_username (username),
 --     INDEX idx_email (email)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===================================
+-- TABLA: payment
+-- Transacciones de pago de Stripe
+-- ===================================
+CREATE TABLE IF NOT EXISTS payment (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    
+    -- ID de Stripe
+    stripe_payment_intent_id VARCHAR(255) NOT NULL UNIQUE,
+    
+    -- Información del usuario y ticket
+    user_id BIGINT NOT NULL,
+    ticket_id VARCHAR(255),
+    
+    -- Monto y moneda
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'EUR',
+    
+    -- Estado del pago
+    status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+    
+    -- Información de la tarjeta
+    card_brand VARCHAR(50),
+    card_last_four VARCHAR(4),
+    
+    -- Mensaje de error si aplica
+    error_message TEXT,
+    
+    -- Timestamps
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Índices
+    INDEX idx_stripe_payment_intent_id (stripe_payment_intent_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_ticket_id (ticket_id),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

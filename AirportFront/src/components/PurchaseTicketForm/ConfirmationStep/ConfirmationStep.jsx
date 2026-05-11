@@ -1,11 +1,17 @@
-import { memo } from 'react';
+import { memo, useState, useRef } from 'react';
 import { User, CreditCard, ArrowLeft } from 'lucide-react';
 import styles from '../PurchaseTicketForm.module.css';
 import { BAGGAGE_OPTIONS, ADDON_OPTIONS, MEAL_OPTIONS } from '../PassengerInfoStep/PassengerInfoStep';
+import StripePaymentForm from '../StripePaymentForm/StripePaymentForm';
+import { paymentService } from '../../../services/paymentService';
 
 const getClassLabel = (c) => ({ economy: 'Turista', business: 'Business', first: 'Primera Clase' }[c] || 'Turista');
 
-const ConfirmationStep = memo(({ formData, flight, loading, price, basePrice, onBack, onSubmit }) => {
+const ConfirmationStep = memo(({ formData, flight, loading, price, basePrice, onBack, onSubmit, userId }) => {
+  const [paymentError, setPaymentError] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const stripePaymentRef = useRef(null);
+
   const basePriceNum  = parseFloat(basePrice)  || 0;
   const totalPriceNum = parseFloat(price)       || basePriceNum;
   const extrasCost    = totalPriceNum - basePriceNum;
@@ -13,6 +19,57 @@ const ConfirmationStep = memo(({ formData, flight, loading, price, basePrice, on
   const baggageOpt = BAGGAGE_OPTIONS.find(o => o.id === formData.baggage);
   const mealOpt    = MEAL_OPTIONS.find(o => o.value === formData.meal);
   const activeAddons = ADDON_OPTIONS.filter(o => formData.extras[o.id]);
+
+  const handlePaymentSuccess = () => {
+    setPaymentError('');
+  };
+
+  const handlePaymentError = (error) => {
+    setPaymentError(error);
+  };
+
+  const handleSubmitWithStripe = async (e) => {
+    e.preventDefault();
+    setIsProcessingPayment(true);
+    setPaymentError('');
+
+    try {
+      // Verificar que el formulario de pago está listo
+      if (!stripePaymentRef.current || !stripePaymentRef.current.isPaymentReady()) {
+        throw new Error('El sistema de pago no está listo. Por favor, recarga la página.');
+      }
+
+      // Crear PaymentIntent en el backend
+      const { clientSecret, paymentIntentId } = await paymentService.createPaymentIntent(
+        userId,
+        `ticket-${Date.now()}`,
+        totalPriceNum,
+        'EUR'
+      );
+
+      // Procesar el pago con Stripe
+      const cardElement = stripePaymentRef.current.getCardElement();
+      const paymentResult = await paymentService.processPayment(
+        clientSecret,
+        cardElement
+      );
+
+      if (paymentResult.success) {
+        // Confirmar pago en backend
+        await paymentService.confirmPayment(paymentIntentId);
+        
+        // Llamar al onSubmit original para crear el ticket
+        onSubmit(e);
+      } else {
+        setPaymentError('El pago requiere autenticación adicional');
+      }
+    } catch (error) {
+      console.error('❌ Error en pago:', error);
+      setPaymentError(error.message || 'Error procesando el pago');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   return (
     <div className={styles.confirmationStep}>
@@ -98,54 +155,31 @@ const ConfirmationStep = memo(({ formData, flight, loading, price, basePrice, on
         </div>
       </div>
 
-      {/* ── Pago (simulado) ── */}
-      <div className={styles.paymentSection}>
-        <h4 className={styles.confirmSectionTitle}><CreditCard size={14} /> Pago con tarjeta</h4>
+      {/* ── Pago con Stripe ── */}
+      <StripePaymentForm
+        ref={stripePaymentRef}
+        amount={totalPriceNum}
+        currency="EUR"
+        userId={userId}
+        ticketId={`ticket-${Date.now()}`}
+        onPaymentSuccess={handlePaymentSuccess}
+        onPaymentError={handlePaymentError}
+        isProcessing={isProcessingPayment}
+      />
 
-        <div className={styles.cardVisual}>
-          <div className={styles.cardChip} />
-          <div className={styles.cardNumber}>•••• •••• •••• ••••</div>
-          <div className={styles.cardMeta}>
-            <span className={styles.cardHolder}>TITULAR DE LA TARJETA</span>
-            <span className={styles.cardExpiry}>MM / AA</span>
-          </div>
+      {paymentError && (
+        <div className={styles.errorMessage} style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fee', borderRadius: '4px', color: '#c33' }}>
+          ❌ {paymentError}
         </div>
+      )}
 
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label>Número de tarjeta</label>
-            <input type="text" placeholder="1234 5678 9012 3456" maxLength={19} />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Nombre en la tarjeta</label>
-            <input
-              type="text"
-              placeholder={`${formData.firstName} ${formData.lastName}`.trim() || 'Juan García'}
-            />
-          </div>
-        </div>
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label>Caducidad</label>
-            <input type="text" placeholder="MM / AA" maxLength={7} />
-          </div>
-          <div className={styles.formGroup}>
-            <label>CVV</label>
-            <input type="text" placeholder="•••" maxLength={4} />
-          </div>
-        </div>
-        <p className={styles.paymentNote}>
-          🔒 Pago seguro · Todos los datos están protegidos con cifrado SSL
-        </p>
-      </div>
-
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmitWithStripe}>
         <div className={styles.formActions}>
-          <button type="button" className={styles.btnBack} onClick={onBack} disabled={loading}>
+          <button type="button" className={styles.btnBack} onClick={onBack} disabled={loading || isProcessingPayment}>
             <ArrowLeft size={18} /> Volver
           </button>
-          <button type="submit" className={styles.btnSubmit} disabled={loading}>
-            {loading ? 'Procesando...' : `Pagar ${totalPriceNum.toFixed(0)} €`}
+          <button type="submit" className={styles.btnSubmit} disabled={loading || isProcessingPayment}>
+            {isProcessingPayment ? '⏳ Procesando pago...' : (loading ? 'Finalizando...' : `Pagar ${totalPriceNum.toFixed(0)} €`)}
           </button>
         </div>
       </form>
