@@ -86,11 +86,14 @@
   cursor: pointer;
   font-family: inherit;
   text-align: left;
+  text-decoration: none;
+  display: inline-block;
   transition: color 0.15s;
 }
 
 .colLink:hover {
   color: #FF690F;
+  text-decoration: none;
 }
 
 /**/
@@ -109,6 +112,111 @@
 .bottomRight {
   color: #6b7280;
 }
+
+/* ── Coming soon modal ── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem 1.75rem 1.75rem;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modalClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: background 0.15s;
+}
+
+.modalClose:hover { background: #e5e7eb; }
+
+.modalIconWrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  background: #fff7ed;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.modalIcon { color: #FF690F; }
+
+.modalIconSmall {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  color: #f59e0b;
+  background: white;
+  border-radius: 50%;
+  padding: 1px;
+}
+
+.modalTitle {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.4rem;
+}
+
+.modalSection {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #FF690F;
+  margin-bottom: 0.75rem;
+}
+
+.modalDesc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.modalBtn {
+  background: #FF690F;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 2rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.modalBtn:hover { background: #E55A00; }
 
 /**/
 @media (max-width: 960px) {

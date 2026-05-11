@@ -162,7 +162,7 @@ function App() {
       />
       <main className="main-content" ref={mainContentRef}>
         {renderView()}
-        {activeView !== APP_VIEW.MAP && activeView !== APP_VIEW.EXPLORE && <Footer />}
+        {activeView !== APP_VIEW.MAP && activeView !== APP_VIEW.EXPLORE && <Footer onNavigate={handleViewChange} />}
       </main>
       <NotificationToast />
 

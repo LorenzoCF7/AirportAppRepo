@@ -18,7 +18,7 @@ class FlightSimulator {
     flightsData.forEach(flight => {
       const flightId = flight.id || flight.flightNumber;
 
-      if (flight.flight_status === 'active' && flight.live) {
+      if (flight.flight_status === 'active') {
         this._initializeActiveFlight(flight, flightId);
       } else if (flight.flight_status === 'scheduled') {
         this.scheduledFlights.set(flightId, flight);

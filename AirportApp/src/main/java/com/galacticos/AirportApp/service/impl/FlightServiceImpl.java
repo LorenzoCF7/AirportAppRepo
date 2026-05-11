@@ -439,18 +439,28 @@ public class FlightServiceImpl implements FlightService {
 
                 if (depScheduled == null || arrScheduled == null) { result.add(flight); continue; }
 
-                LocalDateTime depDt = LocalDateTime.parse(depScheduled.substring(0, 19));
-                LocalDateTime arrDt = LocalDateTime.parse(arrScheduled.substring(0, 19));
+                LocalDateTime depDt = parseFlightDateTime(depScheduled);
+                LocalDateTime arrDt = parseFlightDateTime(arrScheduled);
+                if (depDt == null || arrDt == null) { result.add(flight); continue; }
                 long durationMins = Math.max(Duration.between(depDt, arrDt).toMinutes(), 60);
 
-                // Spread flights across next 7 days so the shop always has variety
-                int dayOffset = i % 7;
-                LocalDateTime newDep = LocalDateTime.of(LocalDate.now().plusDays(dayOffset), depDt.toLocalTime());
-                // If the slot has already passed today or tomorrow, push one more day
-                if (newDep.isBefore(now.plusHours(2))) {
-                    newDep = newDep.plusDays(1);
+                String originalStatus = (String) flight.get("flight_status");
+                LocalDateTime newDep, newArr;
+                if ("active".equals(originalStatus)) {
+                    // Spread active flights across 20%-80% of their route using index as seed
+                    double progress = 0.2 + (i % 7) * 0.1; // 20%, 30%, 40%, 50%, 60%, 70%, 80%
+                    long elapsedMins = (long) (durationMins * progress);
+                    newDep = now.minusMinutes(elapsedMins);
+                    newArr = newDep.plusMinutes(durationMins);
+                } else {
+                    // Spread scheduled/landed flights across next 7 days for the shop
+                    int dayOffset = i % 7;
+                    newDep = LocalDateTime.of(LocalDate.now().plusDays(dayOffset), depDt.toLocalTime());
+                    if (newDep.isBefore(now.plusHours(2))) {
+                        newDep = newDep.plusDays(1);
+                    }
+                    newArr = newDep.plusMinutes(durationMins);
                 }
-                LocalDateTime newArr = newDep.plusMinutes(durationMins);
 
                 Map<String, Object> newDepMap = new LinkedHashMap<>(rawDep);
                 Map<String, Object> newArrMap = new LinkedHashMap<>(rawArr);
@@ -486,8 +496,9 @@ public class FlightServiceImpl implements FlightService {
                             String arrScheduled = (String) arrival.get("scheduled");
 
                             if (depScheduled != null && arrScheduled != null) {
-                                LocalDateTime depTime = LocalDateTime.parse(depScheduled.substring(0, 19));
-                                LocalDateTime arrTime = LocalDateTime.parse(arrScheduled.substring(0, 19));
+                                LocalDateTime depTime = parseFlightDateTime(depScheduled);
+                                LocalDateTime arrTime = parseFlightDateTime(arrScheduled);
+                                if (depTime == null || arrTime == null) return updated;
 
                                 if (now.isBefore(depTime)) {
                                     updated.put("flight_status", "scheduled");
@@ -504,6 +515,19 @@ public class FlightServiceImpl implements FlightService {
                     return updated;
                 })
                 .toList();
+    }
+
+    private LocalDateTime parseFlightDateTime(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        try {
+            // Handle ISO with offset: "2026-05-11T23:55:00+00:00" → take first 19 chars
+            // Handle short date only: "2026-05-11" → append midnight
+            String s = raw.length() >= 19 ? raw.substring(0, 19) : raw;
+            if (s.length() == 10) s = s + "T00:00:00"; // date only
+            return LocalDateTime.parse(s);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void cacheFlights(List<Map<String, Object>> flights) {

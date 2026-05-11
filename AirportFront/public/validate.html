@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validación de Billete</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    .card-header {
+      background: #0f172a;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .airline-icon { font-size: 1.4rem; }
+
+    .airline-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .status-badge {
+      margin-left: auto;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .status-valid   { background: #d1fae5; color: #065f46; }
+    .status-invalid { background: #fee2e2; color: #991b1b; }
+
+    .route-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      gap: 0.75rem;
+    }
+
+    .airport { text-align: center; }
+
+    .iata {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .city {
+      font-size: 0.7rem;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    .time-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 8px;
+    }
+
+    .time {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .flight-line {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .line-track {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 4px;
+    }
+
+    .dot { width: 6px; height: 6px; background: #6366f1; border-radius: 50%; flex-shrink: 0; }
+    .dash { flex: 1; height: 1.5px; background: #e5e7eb; }
+
+    .plane-icon { color: #6366f1; font-size: 0.9rem; }
+
+    .flight-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #6b7280;
+      letter-spacing: 0.05em;
+    }
+
+    .duration {
+      font-size: 0.65rem;
+      color: #6366f1;
+      font-weight: 600;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1.5px dashed #e5e7eb;
+      margin: 0 1.5rem;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .detail-item {}
+
+    .detail-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .detail-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .detail-value.blue { color: #6366f1; }
+
+    .valid-stamp {
+      margin: 0 1.5rem 1.5rem;
+      padding: 1.25rem;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .valid-stamp.ok {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border: 2px solid #34d399;
+    }
+
+    .valid-stamp.fail {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border: 2px solid #f87171;
+    }
+
+    .stamp-icon { font-size: 2rem; }
+
+    .stamp-text { }
+
+    .stamp-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .stamp-title.ok   { color: #065f46; }
+    .stamp-title.fail { color: #991b1b; }
+
+    .stamp-sub {
+      font-size: 0.72rem;
+      color: #374151;
+      margin-top: 2px;
+    }
+
+    .footer {
+      background: #f8fafc;
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .price { font-size: 1.1rem; font-weight: 900; color: #0f172a; }
+    .price span { font-size: 0.7rem; font-weight: 500; color: #6b7280; display: block; }
+
+    .ref { font-size: 1rem; font-weight: 800; color: #374151; letter-spacing: 0.08em; }
+    .ref span { font-size: 0.6rem; font-weight: 500; color: #9ca3af; display: block; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    .scan-time {
+      text-align: center;
+      padding: 0 1.5rem 1rem;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="card-header">
+    <span class="airline-icon">✈️</span>
+    <span class="airline-name" id="airline">Aerolínea</span>
+    <span class="status-badge status-valid" id="status-badge">✓ CONFIRMADO</span>
+  </div>
+
+  <div class="route-section">
+    <div class="airport">
+      <div class="iata" id="from-iata">---</div>
+      <div class="city" id="from-city"></div>
+      <div class="time-label">SALIDA</div>
+      <div class="time" id="dep-time">--:--</div>
+    </div>
+
+    <div class="flight-line">
+      <div class="line-track">
+        <div class="dot"></div>
+        <div class="dash"></div>
+        <div class="plane-icon">✈</div>
+        <div class="dash"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="duration" id="duration"></div>
+      <div class="flight-num" id="flight-num"></div>
+    </div>
+
+    <div class="airport" style="text-align:right">
+      <div class="iata" id="to-iata">---</div>
+      <div class="city" id="to-city"></div>
+      <div class="time-label">LLEGADA</div>
+      <div class="time" id="arr-time">--:--</div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="details">
+    <div class="detail-item">
+      <div class="detail-label">Pasajero</div>
+      <div class="detail-value" id="passenger">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Asiento</div>
+      <div class="detail-value blue" id="seat">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Fecha</div>
+      <div class="detail-value" id="date">—</div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Clase</div>
+      <div class="detail-value" id="class">—</div>
+    </div>
+  </div>
+
+  <div class="valid-stamp ok" id="stamp">
+    <span class="stamp-icon">✅</span>
+    <div class="stamp-text">
+      <div class="stamp-title ok" id="stamp-title">VÁLIDO</div>
+      <div class="stamp-sub" id="stamp-sub">Billete verificado correctamente</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="price">
+      <span>Precio total</span>
+      <span id="price">— EUR</span>
+    </div>
+    <div class="ref">
+      <span>Localizador</span>
+      <span id="ref">——</span>
+    </div>
+  </div>
+
+  <div class="scan-time" id="scan-time"></div>
+</div>
+
+<script>
+  const p = new URLSearchParams(location.search);
+  const get = (k, def = '—') => p.get(k) || def;
+
+  document.getElementById('airline').textContent    = get('airline', 'Aerolínea');
+  document.getElementById('from-iata').textContent  = get('from');
+  document.getElementById('from-city').textContent  = get('fromCity', '');
+  document.getElementById('dep-time').textContent   = get('depTime', '--:--');
+  document.getElementById('to-iata').textContent    = get('to');
+  document.getElementById('to-city').textContent    = get('toCity', '');
+  document.getElementById('arr-time').textContent   = get('arrTime', '--:--');
+  document.getElementById('flight-num').textContent = get('flight', '');
+  document.getElementById('duration').textContent   = get('duration', '');
+  document.getElementById('passenger').textContent  = get('passenger');
+  document.getElementById('seat').textContent       = get('seat');
+  document.getElementById('date').textContent       = get('date');
+  document.getElementById('class').textContent      = get('cls', 'TURISTA');
+  document.getElementById('price').textContent      = get('price', '—') + ' EUR';
+  document.getElementById('ref').textContent        = get('ref');
+
+  const status = get('status', 'confirmed');
+  const isCancelled = status === 'cancelled';
+
+  if (isCancelled) {
+    document.getElementById('status-badge').className = 'status-badge status-invalid';
+    document.getElementById('status-badge').textContent = '✗ CANCELADO';
+    const stamp = document.getElementById('stamp');
+    stamp.className = 'valid-stamp fail';
+    document.getElementById('stamp-title').className = 'stamp-title fail';
+    document.getElementById('stamp-title').textContent = 'INVÁLIDO';
+    document.getElementById('stamp-sub').textContent = 'Este billete ha sido cancelado';
+    document.querySelector('.stamp-icon').textContent = '❌';
+  }
+
+  const now = new Date();
+  document.getElementById('scan-time').textContent =
+    'Escaneado el ' + now.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) +
+    ' a las ' + now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+</script>
+</body>
+</html>

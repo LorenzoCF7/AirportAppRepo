@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, Plane, Wallet } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { ticketService } from '../../services/ticketService';
 import { useScrollLock } from '../../hooks';
 import styles from './TicketsModal.module.css';
@@ -37,48 +38,63 @@ const MEAL_LABELS = {
   glutenfree: 'Sin gluten', halal: 'Halal', lowsodium: 'Bajo sodio', diabetic: 'Diabético',
 };
 
-// ── Mini QR visual (deterministic from booking reference) ─────────────────────
+// ── Real QR code linking to validation page ───────────────────────────────────
 
-const QRVisual = ({ seed = 'XXXXXX' }) => {
-  const SIZE = 21;
-  const CELL = 4;
-  const dark = (r, c) => {
-    // Finder patterns
-    const inTL = r < 7 && c < 7;
-    const inTR = r < 7 && c >= SIZE - 7;
-    const inBL = r >= SIZE - 7 && c < 7;
-    if (inTL || inTR || inBL) {
-      let lr = r, lc = c;
-      if (inTR) lc = c - (SIZE - 7);
-      if (inBL) lr = r - (SIZE - 7);
-      if (lr === 0 || lr === 6 || lc === 0 || lc === 6) return true;
-      if (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4) return true;
-      return false;
-    }
-    // Timing patterns
-    if (r === 6 || c === 6) return (r + c) % 2 === 0;
-    // Data (pseudo-random based on seed)
-    const idx = r * SIZE + c;
-    return (seed.charCodeAt(idx % seed.length) * 31 + idx * 7) % 3 !== 0;
-  };
+const CLASS_LABEL = { economy: 'TURISTA', business: 'BUSINESS', first: 'PRIMERA' };
 
-  const rects = [];
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      if (dark(r, c)) {
-        rects.push(<rect key={`${r}-${c}`} x={c * CELL} y={r * CELL} width={CELL} height={CELL} fill="#111" />);
-      }
-    }
+const buildQRValue = (ticket) => {
+  const host = window.location.hostname;
+  const isLocal = host === 'localhost' || host === '127.0.0.1';
+
+  const params = new URLSearchParams({
+    ref:       ticket.bookingReference || ticket.flightIATA || '',
+    airline:   ticket.airlineName      || 'Aerolínea',
+    from:      ticket.departureIATA    || '---',
+    fromCity:  ticket.departureCity    || '',
+    to:        ticket.arrivalIATA      || '---',
+    toCity:    ticket.arrivalCity      || '',
+    depTime:   ticket.departureTime    || '--:--',
+    arrTime:   ticket.arrivalTime      || '--:--',
+    flight:    ticket.flightIATA       || ticket.flightNumber || '',
+    passenger: ticket.passengerName    || '',
+    seat:      ticket.seatNumber       || '',
+    date:      ticket.departureDate    || '',
+    cls:       CLASS_LABEL[ticket.ticketClass] || 'TURISTA',
+    price:     String(ticket.price     || ''),
+    status:    ticket.ticketStatus     || 'confirmed',
+  });
+
+  if (!isLocal) {
+    return `${window.location.origin}/validate.html?${params.toString()}`;
   }
 
-  return (
-    <svg width={SIZE * CELL} height={SIZE * CELL} viewBox={`0 0 ${SIZE * CELL} ${SIZE * CELL}`}
-      style={{ display: 'block' }}>
-      <rect width={SIZE * CELL} height={SIZE * CELL} fill="white" />
-      {rects}
-    </svg>
-  );
+  // Localhost: plain ASCII text (no emoji/special chars = smaller QR = easier to scan)
+  const isCancelled = ticket.ticketStatus === 'cancelled';
+  const cls = CLASS_LABEL[ticket.ticketClass] || 'TURISTA';
+  const lines = [
+    isCancelled ? 'BILLETE CANCELADO' : 'BILLETE VALIDO',
+    `VUELO: ${ticket.flightIATA || ticket.flightNumber || ''}`,
+    `${ticket.departureIATA || '---'} -> ${ticket.arrivalIATA || '---'}`,
+    `FECHA: ${ticket.departureDate || ''}`,
+    `${ticket.departureTime || '--:--'} -> ${ticket.arrivalTime || '--:--'}`,
+    `PASAJERO: ${(ticket.passengerName || '').toUpperCase()}`,
+    `ASIENTO: ${ticket.seatNumber || ''} | ${cls}`,
+    `REF: ${ticket.bookingReference || ''}`,
+    `PRECIO: ${ticket.price || ''} EUR`,
+  ];
+  return lines.join('\n');
 };
+
+const TicketQR = ({ ticket }) => (
+  <QRCodeSVG
+    value={buildQRValue(ticket)}
+    size={120}
+    bgColor="#ffffff"
+    fgColor="#0f172a"
+    level="L"
+    style={{ display: 'block' }}
+  />
+);
 
 // ── Boarding pass card ────────────────────────────────────────────────────────
 
@@ -203,7 +219,7 @@ const BoardingPass = ({ ticket }) => {
           <span className={styles.passDoc}>{ticket.passengerDocument || ''}</span>
         </div>
         <div className={styles.passQrWrap}>
-          <QRVisual seed={ticket.bookingReference || ticket.flightIATA || 'ABC123'} />
+          <TicketQR ticket={ticket} />
           <span className={styles.passQrLabel}>{ticket.bookingReference || ''}</span>
         </div>
       </div>

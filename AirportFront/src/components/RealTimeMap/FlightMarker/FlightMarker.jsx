@@ -3,6 +3,7 @@ import { Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Plane, Navigation, Gauge, TrendingUp, MapPin as MapPinIcon } from 'lucide-react';
 import { formatAltitude, formatSpeed } from '../../../utils/formatters';
+import { getAirportCoordinates } from '../../../constants/airports';
 import styles from '../RealTimeMap.module.css';
 
 // Crea un icono SVG de avión con rotación y efectos visuales
@@ -49,21 +50,19 @@ export const createPlaneIcon = (rotation = 0, isActive = false, flightId = '') =
 // Calcula la ruta visual del vuelo (simplificada)
 const getFlightPath = (flight) => {
   if (!flight.live || !flight.departure || !flight.arrival) return null;
-  
-  // Posiciones simuladas basadas en la posición actual
-  const dummyDepartureCoords = [
-    flight.live.latitude - 5,
-    flight.live.longitude - 5
-  ];
-  const dummyArrivalCoords = [
-    flight.live.latitude + 5,
-    flight.live.longitude + 5
-  ];
-  
+
+  const sim = flight.simulation;
+  const originLat = sim?.originLat ?? getAirportCoordinates(flight.departure.iata)?.lat;
+  const originLng = sim?.originLng ?? getAirportCoordinates(flight.departure.iata)?.lng;
+  const destLat   = sim?.destLat   ?? getAirportCoordinates(flight.arrival.iata)?.lat;
+  const destLng   = sim?.destLng   ?? getAirportCoordinates(flight.arrival.iata)?.lng;
+
+  if (originLat == null || destLat == null) return null;
+
   return [
-    dummyDepartureCoords,
+    [originLat, originLng],
     [flight.live.latitude, flight.live.longitude],
-    dummyArrivalCoords
+    [destLat, destLng],
   ];
 };
 

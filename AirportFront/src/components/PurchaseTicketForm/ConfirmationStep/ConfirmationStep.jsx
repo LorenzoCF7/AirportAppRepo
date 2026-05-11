@@ -34,31 +34,27 @@ const ConfirmationStep = memo(({ formData, flight, loading, price, basePrice, on
     setPaymentError('');
 
     try {
-      // Verificar que el formulario de pago está listo
-      if (!stripePaymentRef.current || !stripePaymentRef.current.isPaymentReady()) {
+      const paymentRef = stripePaymentRef.current;
+
+      // Demo mode (no Stripe key configured) — skip payment processing
+      if (!paymentRef || paymentRef.isDemoMode()) {
+        onSubmit(e);
+        return;
+      }
+
+      if (!paymentRef.isPaymentReady()) {
         throw new Error('El sistema de pago no está listo. Por favor, recarga la página.');
       }
 
-      // Crear PaymentIntent en el backend
       const { clientSecret, paymentIntentId } = await paymentService.createPaymentIntent(
-        userId,
-        `ticket-${Date.now()}`,
-        totalPriceNum,
-        'EUR'
+        userId, `ticket-${Date.now()}`, totalPriceNum, 'EUR'
       );
 
-      // Procesar el pago con Stripe
-      const cardElement = stripePaymentRef.current.getCardElement();
-      const paymentResult = await paymentService.processPayment(
-        clientSecret,
-        cardElement
-      );
+      const cardElement  = paymentRef.getCardElement();
+      const paymentResult = await paymentService.processPayment(clientSecret, cardElement);
 
       if (paymentResult.success) {
-        // Confirmar pago en backend
         await paymentService.confirmPayment(paymentIntentId);
-        
-        // Llamar al onSubmit original para crear el ticket
         onSubmit(e);
       } else {
         setPaymentError('El pago requiere autenticación adicional');
