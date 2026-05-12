@@ -8,6 +8,7 @@
 4. [Requisitos Funcionales y No Funcionales](#4-requisitos-funcionales-y-no-funcionales)
 5. [Esquema Entidad-Relación y Normalización](#5-esquema-entidad-relación-y-normalización)
 6. [Análisis DAFO](#6-análisis-dafo)
+7. [Apéndice: API Endpoints](#7-apéndice-api-endpoints-completa)
 
 ---
 
@@ -26,12 +27,12 @@
 │            │                                                        │
 │   ┌────────▼─────────┐     ┌──────────────────────────────────┐    │
 │   │ CU-02: Iniciar   │     │ CU-07: Ver mapa en tiempo real   │    │
-│   │ sesión            │     │ (posición de aviones)            │    │
+│   │ sesión            │     │ (buscar y seguir aviones)        │    │
 │   └────────┬─────────┘     └──────────────────────────────────┘    │
 │            │                                                        │
 │   ┌────────▼─────────┐     ┌──────────────────────────────────┐    │
 │   │ CU-03: Cerrar    │     │ CU-08: Buscar vuelos             │    │
-│   │ sesión            │     │ (por número o aeropuerto)        │    │
+│   │ sesión            │     │ (origen, destino, fecha, clase)  │    │
 │   └──────────────────┘     └──────────────────────────────────┘    │
 │                                                                     │
 │   ┌──────────────────┐     ┌──────────────────────────────────┐    │
@@ -48,10 +49,20 @@
 │   │ CU-11: Buscar    │     │ CU-12: Ver detalles de vuelo     │    │
 │   │ ofertas de vuelos│     │                                   │    │
 │   └──────────────────┘     └──────────────────────────────────┘    │
+│                                                                     │
+│   ┌──────────────────┐     ┌──────────────────────────────────┐    │
+│   │ CU-13: Pagar con │     │ CU-14: Escanear/validar QR       │    │
+│   │ Stripe o demo    │     │ del billete                       │    │
+│   └──────────────────┘     └──────────────────────────────────┘    │
+│                                                                     │
+│   ┌──────────────────┐                                             │
+│   │ CU-15: Consultar │                                             │
+│   │ AirBot (IA)      │                                             │
+│   └──────────────────┘                                             │
 └─────────────────────────────────────────────────────────────────────┘
 
 Actores:
-  👤 Usuario no autenticado → CU-01, CU-02, CU-06, CU-07, CU-08, CU-11, CU-12
+  👤 Usuario no autenticado → CU-01, CU-02, CU-06, CU-07, CU-08, CU-11, CU-12, CU-14, CU-15
   🔑 Usuario autenticado   → Todos los casos de uso
 ```
 
@@ -108,9 +119,9 @@ Actores:
 | **Actor** | Usuario autenticado |
 | **Descripción** | El usuario compra un billete de avión seleccionando vuelo, clase y asiento |
 | **Precondiciones** | El usuario está autenticado; existen vuelos disponibles |
-| **Flujo principal** | 1. El usuario accede a "Comprar Billetes" desde el sidebar<br>2. Se muestran vuelos disponibles (reales o mock)<br>3. El usuario selecciona un vuelo<br>4. Elige clase (Economy, Business, First)<br>5. Selecciona asiento disponible<br>6. Introduce datos del pasajero (nombre, documento)<br>7. Confirma la compra<br>8. El sistema genera un código de reserva único (6 caracteres)<br>9. El billete se almacena en base de datos |
-| **Flujo alternativo** | 1a. Si no está autenticado → Se abre el modal de login<br>3a. No hay vuelos disponibles → Se muestra mensaje informativo |
-| **Postcondiciones** | El billete queda registrado con estado CONFIRMED |
+| **Flujo principal** | 1. El usuario accede a "Comprar Billetes" desde el sidebar<br>2. Se muestran vuelos disponibles con autocompletado de origen/destino<br>3. El usuario filtra por fecha (ida / ida y vuelta), clase y número de pasajeros<br>4. Selecciona un vuelo de los resultados<br>5. Elige clase (Economy, Business, First)<br>6. Selecciona asiento disponible en el mapa de asientos<br>7. Introduce datos del pasajero (nombre, documento)<br>8. Completa el pago con Stripe o en modo demo<br>9. El sistema genera un código de reserva único (6 caracteres)<br>10. El billete se almacena en base de datos con código QR |
+| **Flujo alternativo** | 1a. Si no está autenticado → Se abre el modal de login<br>3a. No hay vuelos disponibles → Se muestra mensaje informativo<br>8a. Si no hay clave Stripe configurada → Se activa modo demo automáticamente |
+| **Postcondiciones** | El billete queda registrado con estado CONFIRMED y QR escaneable |
 
 ---
 
@@ -122,7 +133,7 @@ Actores:
 | **Actor** | Usuario autenticado |
 | **Descripción** | El usuario consulta y gestiona sus billetes comprados |
 | **Precondiciones** | El usuario está autenticado |
-| **Flujo principal** | 1. El usuario accede a "Wallet" desde el sidebar<br>2. Se muestran todos sus billetes<br>3. Puede ver detalles de cada billete<br>4. Puede cancelar billetes |
+| **Flujo principal** | 1. El usuario accede a "Wallet" desde el sidebar<br>2. Se muestran todos sus billetes<br>3. Puede ver detalles de cada billete incluyendo el QR<br>4. Puede cancelar billetes |
 | **Postcondiciones** | El usuario visualiza el estado actual de sus billetes |
 
 ---
@@ -133,10 +144,10 @@ Actores:
 |----------|-------------|
 | **ID**   | CU-06 |
 | **Actor** | Usuario (autenticado o no) |
-| **Descripción** | El usuario visualiza el panel principal con estadísticas de vuelos |
+| **Descripción** | El usuario visualiza el panel principal con ofertas de vuelo y destinos populares |
 | **Precondiciones** | Ninguna |
-| **Flujo principal** | 1. El usuario accede a la aplicación<br>2. Se muestra el Dashboard con estadísticas: vuelos activos, programados y aterrizados<br>3. Los datos se actualizan mediante el simulador de vuelos |
-| **Postcondiciones** | Se muestran las estadísticas en tiempo real |
+| **Flujo principal** | 1. El usuario accede a la aplicación<br>2. Se muestra el hero con buscador integrado<br>3. Se muestran estadísticas (vuelos activos, programados, aterrizados)<br>4. Se muestran ofertas de vuelo con imágenes y precios<br>5. Se muestran destinos populares con fotos |
+| **Postcondiciones** | Se muestra el panel principal con información actualizada |
 
 ---
 
@@ -146,10 +157,11 @@ Actores:
 |----------|-------------|
 | **ID**   | CU-07 |
 | **Actor** | Usuario (autenticado o no) |
-| **Descripción** | El usuario visualiza la posición de los aviones en un mapa interactivo |
+| **Descripción** | El usuario busca y sigue la posición de aviones en un mapa interactivo |
 | **Precondiciones** | Ninguna |
-| **Flujo principal** | 1. El usuario selecciona "Mapa" desde el sidebar<br>2. Se carga un mapa con Leaflet<br>3. Se muestran los aviones en sus posiciones actuales<br>4. Las posiciones se actualizan periódicamente<br>5. El usuario puede hacer zoom, desplazarse y clicar aviones |
-| **Postcondiciones** | El mapa muestra las posiciones actualizadas de los aviones |
+| **Flujo principal** | 1. El usuario selecciona "Mapa" desde el Header<br>2. Se carga el mapa satelital (MapTiler)<br>3. El usuario introduce un número o prefijo de vuelo (ej: IB, LH1088)<br>4. El sistema busca en AviationStack o en datos mock<br>5. Se muestran los aviones con iconos animados y ruta origen→posición→destino<br>6. Las posiciones se actualizan cada 2 segundos<br>7. El usuario puede clicar un avión para ver datos (altitud, velocidad, dirección)<br>8. Puede activar seguimiento automático del avión |
+| **Flujo alternativo** | 4a. Límite de API alcanzado → Se usan datos mock con vuelos simulados<br>4b. Vuelo no encontrado → Mensaje "Vuelo no encontrado" |
+| **Postcondiciones** | El mapa muestra los aviones moviéndose en tiempo real con su ruta |
 
 ---
 
@@ -159,11 +171,11 @@ Actores:
 |----------|-------------|
 | **ID**   | CU-08 |
 | **Actor** | Usuario (autenticado o no) |
-| **Descripción** | El usuario busca vuelos por número de vuelo o aeropuerto |
+| **Descripción** | El usuario busca vuelos por origen, destino, fecha y clase |
 | **Precondiciones** | Ninguna |
-| **Flujo principal** | 1. El usuario selecciona "Buscar" desde el sidebar<br>2. Introduce un término de búsqueda<br>3. El sistema filtra los vuelos coincidentes<br>4. Se muestran los resultados con información detallada |
-| **Flujo alternativo** | 3a. No se encuentran resultados → Se muestra mensaje "Sin resultados" |
-| **Postcondiciones** | Se presenta la lista de vuelos que coinciden con la búsqueda |
+| **Flujo principal** | 1. El usuario accede a la tienda de billetes<br>2. Usa el autocompletado de aeropuertos para origen y destino<br>3. Selecciona fecha(s) con el calendario desplegable<br>4. Elige tipo de viaje (solo ida / ida y vuelta)<br>5. El sistema filtra los vuelos del backend<br>6. Se muestran los resultados con aerolínea, horarios, duración y precio |
+| **Flujo alternativo** | 6a. Sin resultados → Mensaje informativo |
+| **Postcondiciones** | Se presenta la lista de vuelos disponibles para esa ruta y fecha |
 
 ---
 
@@ -175,7 +187,7 @@ Actores:
 | **Actor** | Usuario autenticado |
 | **Descripción** | El usuario selecciona la clase del billete y un asiento específico |
 | **Precondiciones** | El usuario ha seleccionado un vuelo para comprar |
-| **Flujo principal** | 1. Se muestra el selector de clase (Economy, Business, First)<br>2. El precio se actualiza según la clase<br>3. Se muestra el mapa de asientos<br>4. El usuario selecciona un asiento disponible<br>5. Se confirma la selección |
+| **Flujo principal** | 1. Se muestra el selector de clase (Economy, Business, First)<br>2. El precio se actualiza según la clase seleccionada<br>3. Se muestra el mapa de asientos del avión<br>4. El usuario selecciona un asiento disponible (verde)<br>5. Se confirma la selección |
 | **Postcondiciones** | La clase y el asiento quedan asociados al billete |
 
 ---
@@ -219,6 +231,47 @@ Actores:
 
 ---
 
+#### CU-13: Pagar con Stripe o modo demo
+
+| Campo    | Descripción |
+|----------|-------------|
+| **ID**   | CU-13 |
+| **Actor** | Usuario autenticado |
+| **Descripción** | El usuario completa el pago del billete mediante Stripe o modo demo si no hay clave configurada |
+| **Precondiciones** | El usuario ha seleccionado vuelo, asiento y clase; ha introducido datos del pasajero |
+| **Flujo principal** | 1. Se detecta automáticamente si hay clave Stripe configurada<br>2a. **Con Stripe**: Se carga el formulario de tarjeta de Stripe Elements; el usuario introduce sus datos y confirma el pago; Stripe procesa el cobro<br>2b. **Sin Stripe (demo)**: Se muestran campos de tarjeta simulados; cualquier dato es válido; el sistema simula el pago exitoso<br>3. Se confirma la transacción y se genera el billete |
+| **Flujo alternativo** | 2a-error. Tarjeta rechazada → Mensaje de error de Stripe |
+| **Postcondiciones** | El billete queda confirmado y se añade a la Wallet del usuario |
+
+---
+
+#### CU-14: Escanear y validar QR del billete
+
+| Campo    | Descripción |
+|----------|-------------|
+| **ID**   | CU-14 |
+| **Actor** | Cualquier usuario / personal de control |
+| **Descripción** | El QR del billete puede escanearse con cualquier lector para validar su autenticidad |
+| **Precondiciones** | El billete ha sido comprado y tiene estado CONFIRMED |
+| **Flujo principal** | 1. El usuario abre su billete desde la Wallet<br>2. Se muestra el boarding pass con un QR real (generado con qrcode.react)<br>3. El personal o el usuario escanea el QR con la cámara del móvil<br>4. En entorno local: el QR codifica texto con los datos del vuelo y pasajero<br>5. En producción: el QR abre la URL `/validate.html?ref=...` con los parámetros del vuelo<br>6. La página de validación muestra el sello "VÁLIDO" en verde o "INVÁLIDO" si el billete está cancelado |
+| **Postcondiciones** | Se muestra la información del billete con su estado de validez |
+
+---
+
+#### CU-15: Consultar AirBot (IA)
+
+| Campo    | Descripción |
+|----------|-------------|
+| **ID**   | CU-15 |
+| **Actor** | Usuario (autenticado o no) |
+| **Descripción** | El usuario consulta al asistente IA para recomendaciones de vuelos y ayuda con la app |
+| **Precondiciones** | Ninguna |
+| **Flujo principal** | 1. El usuario hace clic en el botón "AirBot" flotante<br>2. Se abre el panel del chatbot<br>3. El usuario escribe su consulta (destinos, precios, fechas, etc.)<br>4. El sistema consulta Claude (Anthropic) o LLaMA3 (Groq) según disponibilidad<br>5. Se muestra la respuesta con recomendaciones personalizadas<br>6. El bot puede sugerir navegar directamente a la tienda con parámetros prefijados |
+| **Flujo alternativo** | 4a. Sin API key IA configurada → Respuestas predefinidas de fallback |
+| **Postcondiciones** | El usuario recibe orientación sobre vuelos y funcionalidades de la app |
+
+---
+
 ## 2. Diagrama de Gantt
 
 ### 2.1 Planificación del Proyecto
@@ -244,22 +297,24 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
   API REST de Tickets             │      │      │      │██████│      │      │      │      │      │    │    │    │
   Autenticación (JWT)             │      │      │      │      │██████│      │      │      │      │    │    │    │
   Integración APIs externas       │      │      │      │      │██████│      │      │      │      │    │    │    │
+  Integración Stripe              │      │      │      │      │██████│      │      │      │      │    │    │    │
                                   │      │      │      │      │      │      │      │      │      │    │    │    │
-🎨 FASE 3: FRONTEND (React)      │      │      │      │      │██████│██████│██████│      │      │    │    │    │
+🎨 FASE 3: FRONTEND (React)      │      │      │      │      │██████│██████│██████│██████│      │    │    │    │
   Estructura y componentes base   │      │      │      │      │██████│      │      │      │      │    │    │    │
   Dashboard y estadísticas        │      │      │      │      │      │██████│      │      │      │    │    │    │
   Mapa en tiempo real (Leaflet)   │      │      │      │      │      │██████│      │      │      │    │    │    │
-  Búsqueda de vuelos              │      │      │      │      │      │      │██████│      │      │    │    │    │
+  Búsqueda con autocompletado     │      │      │      │      │      │      │██████│      │      │    │    │    │
   Tienda + Selector asientos      │      │      │      │      │      │      │██████│      │      │    │    │    │
   Wallet y gestión de billetes    │      │      │      │      │      │      │██████│      │      │    │    │    │
-  Header + Login/Register         │      │      │      │      │      │      │██████│      │      │    │    │    │
+  Pago Stripe + modo demo         │      │      │      │      │      │      │██████│      │      │    │    │    │
+  QR codes en billetes            │      │      │      │      │      │      │      │██████│      │    │    │    │
+  Footer + AirBot IA              │      │      │      │      │      │      │      │██████│      │    │    │    │
                                   │      │      │      │      │      │      │      │      │      │    │    │    │
-📱 FASE 4: FLUTTER (Móvil)       │      │      │      │      │      │      │      │██████│██████│████│    │    │
-  Setup proyecto Flutter          │      │      │      │      │      │      │      │██████│      │    │    │    │
-  Pantallas principales           │      │      │      │      │      │      │      │██████│██████│    │    │    │
-  Integración con API backend     │      │      │      │      │      │      │      │      │██████│    │    │    │
+📱 FASE 4: FLUTTER (Móvil)       │      │      │      │      │      │      │      │      │██████│████│    │    │
+  Setup proyecto Flutter          │      │      │      │      │      │      │      │      │██████│    │    │    │
+  Pantallas principales           │      │      │      │      │      │      │      │      │██████│████│    │    │
+  Integración con API backend     │      │      │      │      │      │      │      │      │      │████│    │    │
   Build Android (APK/AAB)         │      │      │      │      │      │      │      │      │      │████│    │    │
-  Build macOS (si Apple Dev)      │      │      │      │      │      │      │      │      │      │████│    │    │
                                   │      │      │      │      │      │      │      │      │      │    │    │    │
 🧪 FASE 5: TESTING Y DEPLOY      │      │      │      │      │      │      │      │      │      │    │████│    │
   Pruebas unitarias               │      │      │      │      │      │      │      │      │      │    │████│    │
@@ -278,8 +333,8 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 |------|----------|---------|
 | **Fase 1:** Análisis y Diseño | 2 semanas | S1 - S2 |
 | **Fase 2:** Backend (Spring Boot) | 3 semanas | S3 - S5 |
-| **Fase 3:** Frontend (React + Vite) | 3 semanas | S5 - S7 |
-| **Fase 4:** Flutter (Android + macOS) | 3 semanas | S8 - S10 |
+| **Fase 3:** Frontend (React + Vite) | 4 semanas | S5 - S8 |
+| **Fase 4:** Flutter (Android) | 2 semanas | S9 - S10 |
 | **Fase 5:** Testing y Deploy | 1 semana | S11 |
 | **Fase 6:** Documentación | 1 semana | S12 |
 | **TOTAL** | **12 semanas** | |
@@ -288,7 +343,7 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 
 ## 3. Tecnologías y Plataformas
 
-### 3.1 Stack Tecnológico Actual
+### 3.1 Stack Tecnológico
 
 | Capa | Tecnología | Versión | Propósito |
 |------|------------|---------|-----------|
@@ -298,37 +353,76 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | | JWT (jjwt) | 0.12.3 | Tokens de autenticación |
 | | Lombok | - | Reducción de boilerplate |
 | | Jakarta Validation | - | Validación de datos |
+| | Stripe Java SDK | - | Pasarela de pago |
 | **Base de datos** | MySQL | 8+ | Base de datos relacional |
 | **Frontend Web** | React | 19 | Librería UI |
 | | Vite | 6 | Bundler y dev server |
 | | Axios | - | Cliente HTTP |
-| | Leaflet | - | Mapas interactivos |
+| | Leaflet / React-Leaflet | - | Mapas interactivos |
 | | GSAP | - | Animaciones |
 | | CSS Modules | - | Estilos con scope |
+| | qrcode.react | 4.2.0 | Generación de QR codes reales |
+| | Stripe.js / React Stripe | - | Formularios de pago seguros |
+| | Lucide React | - | Iconografía |
+| **APIs externas** | AviationStack | Free/Basic | Vuelos en tiempo real |
+| | Amadeus | Test | Ofertas de vuelos comerciales |
+| | MapTiler | - | Tiles del mapa satelital |
+| | Anthropic Claude | API | Asistente IA AirBot (opción premium) |
+| | Groq / LLaMA3 | API | Asistente IA AirBot (opción gratuita) |
+| | Stripe | Test/Live | Procesamiento de pagos |
 
-### 3.2 Flutter - Migración a Móvil
+### 3.2 Arquitectura del Sistema
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CLIENTE (Navegador)                       │
+│  React 19 + Vite │ CSS Modules │ Leaflet │ qrcode.react     │
+│  Stripe.js Elements │ AirBot chatbot                        │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTP / REST (JSON)
+                           │ localhost:5173 → localhost:8080
+┌──────────────────────────▼──────────────────────────────────┐
+│                   BACKEND (Spring Boot)                      │
+│                                                              │
+│  Controller Layer  →  Service Layer  →  Repository Layer     │
+│  /api/auth            FlightService      UserRepository      │
+│  /api/flights         TicketService      TicketRepository    │
+│  /api/tickets         AuthService                           │
+│                                                              │
+│  Spring Security + JWT Filter                               │
+│  Stripe SDK (pagos)                                         │
+└────────┬──────────────────────────────┬─────────────────────┘
+         │                              │
+         ▼                              ▼
+┌─────────────────┐          ┌──────────────────────────┐
+│   MySQL 8+      │          │   APIs Externas           │
+│   airport_db    │          │   • AviationStack (HTTP)  │
+│   - users       │          │   • Amadeus (HTTPS)       │
+│   - tickets     │          │   • Stripe (pagos)        │
+└─────────────────┘          │   • Anthropic/Groq (IA)   │
+                             └──────────────────────────┘
+```
+
+### 3.3 Modo Mock vs APIs Reales
+
+El sistema detecta automáticamente la disponibilidad de APIs externas:
+
+| API | Sin configurar | Con API key |
+|-----|---------------|-------------|
+| **AviationStack** | Genera 70+ vuelos mock (10 activos en vuelo) | Datos reales; fallback a mock si 429 |
+| **Amadeus** | Genera ofertas mock aleatorias | Ofertas reales de vuelo |
+| **Stripe** | Modo demo (tarjeta simulada) | Cobro real con Stripe Elements |
+| **Claude/Groq** | Respuestas predefinidas de fallback | IA generativa con LLM |
+
+### 3.4 Flutter - Migración a Móvil
 
 | Aspecto | Detalle |
 |---------|---------|
 | **Framework** | Flutter (Dart) |
 | **IDE** | Visual Studio Code con extensiones Flutter/Dart |
-| **Plataformas objetivo** | Android (APK/AAB) y macOS |
+| **Plataformas objetivo** | Android (APK/AAB) |
 | **Estrategia** | Reutilizar la API REST existente del backend Spring Boot |
-| **Paquetes clave** | `http` (API), `flutter_map` o `google_maps_flutter` (mapas), `provider`/`riverpod` (estado), `shared_preferences` (sesión) |
-
-#### Pasos para la migración a Flutter:
-
-1. **Configurar el proyecto Flutter** en VS Code con extensiones Flutter y Dart
-2. **Crear las pantallas** equivalentes a las vistas React:
-   - Dashboard → `DashboardScreen`
-   - Mapa → `MapScreen` (usando `flutter_map`)
-   - Búsqueda → `SearchScreen`
-   - Tienda → `ShopScreen`
-   - Wallet → `WalletScreen`
-   - Login/Register → `AuthScreen`
-3. **Conectar con la API REST** existente usando el paquete `http` o `dio`
-4. **Build Android**: `flutter build apk` / `flutter build appbundle`
-5. **Build macOS**: `flutter build macos` (requiere macOS con Xcode)
+| **Paquetes clave** | `http` (API), `flutter_map` (mapas), `provider`/`riverpod` (estado), `shared_preferences` (sesión) |
 
 ---
 
@@ -341,9 +435,9 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | **RF-01** | El sistema debe permitir a los usuarios registrarse con username, email y contraseña | Alta | ✅ Implementado |
 | **RF-02** | El sistema debe permitir iniciar sesión con email y contraseña | Alta | ✅ Implementado |
 | **RF-03** | El sistema debe generar tokens JWT para la autenticación | Alta | ✅ Implementado |
-| **RF-04** | El sistema debe mostrar un dashboard con estadísticas de vuelos (activos, programados, aterrizados) | Alta | ✅ Implementado |
-| **RF-05** | El sistema debe mostrar un mapa interactivo con la posición en tiempo real de los aviones | Alta | ✅ Implementado |
-| **RF-06** | El sistema debe permitir buscar vuelos por número de vuelo o aeropuerto | Media | ✅ Implementado |
+| **RF-04** | El sistema debe mostrar un dashboard con estadísticas y ofertas de vuelos | Alta | ✅ Implementado |
+| **RF-05** | El sistema debe mostrar un mapa interactivo con búsqueda y seguimiento de aviones | Alta | ✅ Implementado |
+| **RF-06** | El sistema debe permitir buscar vuelos por origen, destino, fecha y clase con autocompletado | Media | ✅ Implementado |
 | **RF-07** | El sistema debe permitir la compra de billetes con selección de clase (Economy, Business, First) | Alta | ✅ Implementado |
 | **RF-08** | El sistema debe ofrecer un selector de asientos interactivo | Media | ✅ Implementado |
 | **RF-09** | El sistema debe generar un código de reserva único de 6 caracteres por billete | Alta | ✅ Implementado |
@@ -353,8 +447,16 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | **RF-13** | El sistema debe integrarse con la API de AviationStack para obtener vuelos reales | Baja | ✅ Implementado |
 | **RF-14** | El sistema debe integrarse con la API de Amadeus para ofertas comerciales | Baja | ✅ Implementado |
 | **RF-15** | El sistema debe proteger las rutas de compra para usuarios no autenticados | Alta | ✅ Implementado |
-| **RF-16** | Al cerrar sesión, el sistema debe redirigir al Dashboard | Baja | ✅ Implementado |
-| **RF-17** | El sistema debe simular movimiento de aviones cuando no hay datos reales | Media | ✅ Implementado |
+| **RF-16** | El sistema debe simular movimiento de aviones con coordenadas calculadas entre aeropuertos | Media | ✅ Implementado |
+| **RF-17** | El sistema debe integrarse con Stripe para procesar pagos reales con tarjeta | Alta | ✅ Implementado |
+| **RF-18** | El sistema debe activar modo de pago demo automáticamente si no hay clave Stripe | Media | ✅ Implementado |
+| **RF-19** | Cada billete debe incluir un código QR real y escaneable con los datos del vuelo | Alta | ✅ Implementado |
+| **RF-20** | Debe existir una página de validación de billetes accesible por QR | Media | ✅ Implementado |
+| **RF-21** | El mapa debe dibujar la ruta real del vuelo (origen → posición actual → destino) | Media | ✅ Implementado |
+| **RF-22** | El sistema debe incluir un asistente IA (AirBot) para recomendaciones de vuelos | Baja | ✅ Implementado |
+| **RF-23** | Los datos mock deben incluir vuelos activos en vuelo para poder demostrarse en el mapa | Media | ✅ Implementado |
+| **RF-24** | El sistema debe detectar el límite de API (429) y hacer fallback a mock automáticamente | Media | ✅ Implementado |
+| **RF-25** | El footer debe enlazar a páginas externas, vistas internas o mostrar modal "Próximamente" | Baja | ✅ Implementado |
 
 ### 4.2 Requisitos No Funcionales
 
@@ -364,17 +466,19 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | **RNF-02** | Seguridad | Seguridad | Las contraseñas deben almacenarse cifradas con BCrypt |
 | **RNF-03** | Seguridad | Seguridad | La autenticación debe basarse en tokens JWT con expiración configurable (24h por defecto) |
 | **RNF-04** | Seguridad | Seguridad | Los endpoints de la API deben estar protegidos con CORS configurado |
-| **RNF-05** | Disponibilidad | Fiabilidad | El sistema debe funcionar en modo offline con datos Mock si las APIs externas no están disponibles |
-| **RNF-06** | Usabilidad | Usabilidad | La interfaz debe ser responsive y adaptarse a diferentes tamaños de pantalla |
-| **RNF-07** | Usabilidad | Usabilidad | La navegación debe ser intuitiva mediante sidebar con iconos descriptivos |
-| **RNF-08** | Mantenibilidad | Mantenibilidad | El código frontend debe usar CSS Modules para evitar conflictos de estilos |
-| **RNF-09** | Mantenibilidad | Mantenibilidad | El backend debe seguir arquitectura por capas (Controller → Service → Repository) |
-| **RNF-10** | Portabilidad | Portabilidad | La aplicación móvil (Flutter) debe compilar para Android y macOS desde el mismo código base |
-| **RNF-11** | Escalabilidad | Eficiencia | La base de datos debe usar índices en campos de búsqueda frecuente (email, username, flight_iata) |
-| **RNF-12** | Compatibilidad | Compatibilidad | El frontend debe ser compatible con navegadores modernos (Chrome, Firefox, Safari, Edge) |
-| **RNF-13** | Internacionalización | Usabilidad | La interfaz debe soportar el idioma español |
-| **RNF-14** | Infraestructura | Despliegue | El backend requiere Java 21+ y MySQL 8+ |
-| **RNF-15** | Infraestructura | Despliegue | El frontend requiere Node.js 18+ |
+| **RNF-05** | Seguridad | Seguridad | Los secretos (claves API, Stripe) nunca deben commitearse en el repositorio; usar variables de entorno |
+| **RNF-06** | Disponibilidad | Fiabilidad | El sistema debe funcionar en modo offline con datos Mock si las APIs externas no están disponibles |
+| **RNF-07** | Usabilidad | Usabilidad | La interfaz debe ser responsive y adaptarse a diferentes tamaños de pantalla |
+| **RNF-08** | Usabilidad | Usabilidad | La navegación debe ser intuitiva mediante sidebar con iconos descriptivos |
+| **RNF-09** | Mantenibilidad | Mantenibilidad | El código frontend debe usar CSS Modules para evitar conflictos de estilos |
+| **RNF-10** | Mantenibilidad | Mantenibilidad | El backend debe seguir arquitectura por capas (Controller → Service → Repository) |
+| **RNF-11** | Portabilidad | Portabilidad | La aplicación móvil (Flutter) debe compilar para Android desde el mismo código base |
+| **RNF-12** | Escalabilidad | Eficiencia | La base de datos debe usar índices en campos de búsqueda frecuente (email, username, flight_iata) |
+| **RNF-13** | Compatibilidad | Compatibilidad | El frontend debe ser compatible con navegadores modernos (Chrome, Firefox, Safari, Edge) |
+| **RNF-14** | Internacionalización | Usabilidad | La interfaz debe estar en idioma español |
+| **RNF-15** | Infraestructura | Despliegue | El backend requiere Java 21+ y MySQL 8+ |
+| **RNF-16** | Infraestructura | Despliegue | El frontend requiere Node.js 18+ |
+| **RNF-17** | Fiabilidad | Robustez | El simulador de vuelos debe seguir funcionando sin datos GPS reales, calculando posiciones por interpolación |
 
 ---
 
@@ -486,7 +590,7 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | `departure_*` / `arrival_*` | Datos históricos del vuelo en el momento de la compra |
 | `passenger_name` + `passenger_document` | El pasajero puede no ser el usuario registrado |
 
-> **Nota**: Los datos de vuelos en tiempo real (posiciones, estados) NO se almacenan en la base de datos. Se obtienen en tiempo real de las APIs externas (AviationStack/Amadeus) o del simulador Mock y se mantienen en memoria.
+> **Nota**: Los datos de vuelos en tiempo real (posiciones, estados) NO se almacenan en la base de datos. Se obtienen en tiempo real de las APIs externas (AviationStack/Amadeus) o del simulador Mock y se mantienen en memoria caché del backend.
 
 ---
 
@@ -503,26 +607,32 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 │           (Internas)                    │           (Internas)                     │
 │                                         │                                         │
 │  • Stack tecnológico moderno            │  • Dependencia de APIs externas         │
-│    (Spring Boot 4, React 19, Java 21)   │    (AviationStack, Amadeus)             │
+│    (Spring Boot 4, React 19, Java 21)   │    con planes freemium limitados        │
+│                                         │    (AviationStack: 100 req/mes)         │
+│  • Arquitectura por capas bien          │                                         │
+│    definida (MVC + REST)                │  • Datos de vuelos no persistidos       │
+│                                         │    (solo en memoria/cache)              │
+│  • Modo Mock completo con vuelos        │                                         │
+│    activos simulados en el mapa         │  • Falta de testing automatizado        │
+│                                         │    (unitarios, integración)             │
+│  • Autenticación segura con JWT         │                                         │
+│    y contraseñas cifradas (BCrypt)      │  • Un solo rol de usuario               │
+│                                         │    (sin admin/moderador)                │
+│  • Pasarela de pago real (Stripe)       │                                         │
+│    con modo demo automático             │  • Sin persistencia de historial        │
+│                                         │    de posiciones de vuelo               │
+│  • QR codes reales y escaneables        │                                         │
+│    en los billetes                      │                                         │
 │                                         │                                         │
-│  • Arquitectura por capas bien          │  • Datos de vuelos no persistidos       │
-│    definida (MVC + REST)                │    (solo en memoria/cache)              │
+│  • Asistente IA (AirBot) integrado      │                                         │
+│    con Claude y Groq como fallback      │                                         │
 │                                         │                                         │
-│  • Modo Mock integrado que permite      │  • Falta de testing automatizado        │
-│    funcionar sin APIs externas          │    (unitarios, integración)             │
+│  • UI moderna con animaciones,          │                                         │
+│    mapa satelital y seguimiento         │                                         │
+│    de vuelos en tiempo real             │                                         │
 │                                         │                                         │
-│  • Autenticación segura con JWT         │  • Un solo rol de usuario               │
-│    y contraseñas cifradas (BCrypt)      │    (sin admin/moderador)                │
-│                                         │                                         │
-│  • UI moderna con animaciones           │  • Sin sistema de pago real             │
-│    (GSAP) y mapas interactivos          │    (simulación de compra)               │
-│    (Leaflet)                            │                                         │
-│                                         │  • Documentación técnica limitada       │
-│  • Frontend con code splitting          │    durante el desarrollo inicial        │
-│    y lazy loading (rendimiento)         │                                         │
-│                                         │                                         │
-│  • Multiplataforma con Flutter          │                                         │
-│    (Android + macOS)                    │                                         │
+│  • Seguridad: secretos por variables    │                                         │
+│    de entorno, nunca en el código       │                                         │
 │                                         │                                         │
 ├─────────────────────────────────────────┼─────────────────────────────────────────┤
 │                                         │                                         │
@@ -538,17 +648,14 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 │  • Añadir notificaciones push          │  • Regulaciones de datos de aviación    │
 │    de cambios en vuelos                 │    (restricciones de acceso)            │
 │                                         │                                         │
-│  • Implementar sistema de pagos        │  • Requisitos de seguridad cada vez     │
-│    real (Stripe, PayPal)               │    más estrictos (GDPR, etc.)           │
+│  • Despliegue en la nube              │  • Requisitos de seguridad cada vez     │
+│    (AWS, Azure, GCP, Railway)          │    más estrictos (GDPR, PCI-DSS)        │
 │                                         │                                         │
-│  • Despliegue en la nube              │  • Costes de APIs en producción         │
-│    (AWS, Azure, GCP)                   │    (planes freemium limitados)          │
+│  • Añadir comparador de precios        │  • Costes de APIs en producción         │
+│    entre aerolíneas                     │    (planes freemium limitados)          │
 │                                         │                                         │
-│  • Añadir comparador de precios        │  • Evolución rápida de frameworks       │
-│    entre aerolíneas                     │    que puede hacer obsoleto el stack    │
-│                                         │                                         │
-│  • Gamificación (puntos de             │                                         │
-│    fidelización, logros)               │                                         │
+│  • Gamificación (puntos de             │  • Evolución rápida de frameworks       │
+│    fidelización, logros de viaje)       │    que puede hacer obsoleto el stack    │
 │                                         │                                         │
 └─────────────────────────────────────────┴─────────────────────────────────────────┘
 ```
@@ -557,12 +664,13 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 
 | Estrategia | Tipo | Descripción |
 |------------|------|-------------|
-| **E1: Explotar el modo Mock** | FO (Fortaleza + Oportunidad) | Usar el modo Mock como demo comercial para captar usuarios antes de integrar APIs reales de pago |
-| **E2: Flutter multiplataforma** | FO | Lanzar en Android (mayor cuota de mercado) y macOS para diferenciarse con una app nativa fluida |
+| **E1: Explotar el modo Mock** | FO (Fortaleza + Oportunidad) | Usar el modo Mock + vuelos activos simulados como demo completa sin necesidad de APIs reales de pago |
+| **E2: Flutter multiplataforma** | FO | Lanzar en Android reutilizando la API REST existente |
 | **E3: Implementar testing** | DA (Debilidad + Amenaza) | Añadir tests unitarios y de integración para garantizar estabilidad ante cambios en APIs externas |
 | **E4: Sistema de roles** | DO (Debilidad + Oportunidad) | Implementar roles (admin, usuario premium) para monetización y gestión avanzada |
-| **E5: Cache de datos** | DA | Implementar cache Redis para reducir dependencia de APIs externas y mejorar rendimiento |
+| **E5: Cache con Redis** | DA | Implementar cache Redis para reducir dependencia de APIs externas y mejorar rendimiento |
 | **E6: Abstracción de APIs** | FA (Fortaleza + Amenaza) | La arquitectura por capas permite cambiar proveedores de API sin afectar al frontend |
+| **E7: Stripe en producción** | FO | Activar pagos reales configurando las claves de producción de Stripe sin cambiar el código |
 
 ---
 
@@ -580,9 +688,10 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| GET | `/api/flights` | Obtener todos los vuelos | ❌ No |
-| GET | `/api/flights/refresh` | Forzar actualización | ❌ No |
-| GET | `/api/flights/offers?origin=&destination=&departureDate=&adults=&cabinClass=` | Buscar ofertas | ❌ No |
+| GET | `/api/flights` | Obtener todos los vuelos (real o mock) | ❌ No |
+| GET | `/api/flights?forceRefresh=true` | Forzar actualización desde API | ❌ No |
+| GET | `/api/flights/refresh` | Alias de forceRefresh | ❌ No |
+| GET | `/api/flights/offers?origin=&destination=&departureDate=&adults=&cabinClass=` | Buscar ofertas de vuelo | ❌ No |
 
 ### Tickets (`/api/tickets`)
 
@@ -598,3 +707,32 @@ Fase                              │ Sem1 │ Sem2 │ Sem3 │ Sem4 │ Sem5 �
 | PATCH | `/api/tickets/{id}` | Actualizar ticket | ✅ Sí |
 | PATCH | `/api/tickets/{id}/cancel` | Cancelar ticket | ✅ Sí |
 | DELETE | `/api/tickets/{id}` | Eliminar ticket | ✅ Sí |
+
+---
+
+## 8. Variables de Entorno
+
+### Frontend (`AirportFront/.env`)
+
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `VITE_MAPTILER_API_KEY` | Clave para los tiles del mapa satelital | ✅ Sí |
+| `VITE_AVIATION_API_KEY` | Clave AviationStack (100 req/mes gratis) | ⚠️ Opcional |
+| `VITE_STRIPE_PUBLIC_KEY` | Clave pública Stripe (`pk_test_...`) | ⚠️ Opcional |
+| `VITE_AMADEUS_CLIENT_ID` | ID de cliente Amadeus | ⚠️ Opcional |
+| `VITE_AMADEUS_CLIENT_SECRET` | Secreto de cliente Amadeus | ⚠️ Opcional |
+| `VITE_USE_MOCK_FLIGHTS` | Forzar datos mock (`true`/`false`) | ❌ No |
+
+### Backend (variables de entorno del sistema)
+
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `STRIPE_API_KEY` | Clave secreta Stripe (`sk_test_...`) | ⚠️ Opcional* |
+| `STRIPE_PUBLISHABLE_KEY` | Clave pública Stripe | ⚠️ Opcional* |
+| `AVIATIONSTACK_API_KEY` | Clave AviationStack | ⚠️ Opcional* |
+| `AMADEUS_CLIENT_ID` | ID de cliente Amadeus | ⚠️ Opcional* |
+| `AMADEUS_CLIENT_SECRET` | Secreto de cliente Amadeus | ⚠️ Opcional* |
+| `ANTHROPIC_API_KEY` | Clave API de Claude (IA) | ⚠️ Opcional* |
+| `GROQ_API_KEY` | Clave API de Groq/LLaMA3 (IA gratuita) | ⚠️ Opcional* |
+
+> **(*) Opcional con fallback**: Si no se configura, el sistema activa el modo mock/demo correspondiente automáticamente. La app es completamente funcional sin ninguna API key externa.

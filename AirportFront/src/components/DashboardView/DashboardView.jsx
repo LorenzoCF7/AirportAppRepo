@@ -41,7 +41,7 @@ const heroPhotos = [
   { city: 'Marrakech', image: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=600&h=320&q=80' },
   { city: 'Santorini', image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&h=320&q=80' },
   { city: 'Lisboa',    image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=600&h=320&q=80' },
-  { city: 'Ámsterdam', image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=600&h=320&q=80' },
+  { city: 'Ámsterdam', image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&h=320&q=80' },
   { city: 'Tokio',     image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&h=320&q=80' },
   { city: 'París',     image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=600&h=320&q=80' },
 ];
@@ -53,8 +53,8 @@ const dealCards = [
   { city: 'Roma',      iata: 'FCO', time: '2 h 20 min, directo',   price: 89,  dateFrom: '13/6', dateTo: '20/6',  image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=500&h=280&q=80' },
   { city: 'Lisboa',    iata: 'LIS', time: '2 h 05 min, directo',   price: 54,  dateFrom: '10/6', dateTo: '17/6',  image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&h=280&q=80' },
   { city: 'Berlín',    iata: 'BER', time: '2 h 35 min, directo',   price: 71,  dateFrom: '15/6', dateTo: '22/6',  image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Ámsterdam', iata: 'AMS', time: '2 h 25 min, directo',   price: 82,  dateFrom: '18/6', dateTo: '25/6',  image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5702?auto=format&fit=crop&w=500&h=280&q=80' },
-  { city: 'Viena',     iata: 'VIE', time: '2 h 45 min, directo',   price: 95,  dateFrom: '22/6', dateTo: '29/6',  image: 'https://images.unsplash.com/photo-1516550135131-9de3cb85cd33?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Ámsterdam', iata: 'AMS', time: '2 h 25 min, directo',   price: 82,  dateFrom: '18/6', dateTo: '25/6',  image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=500&h=280&q=80' },
+  { city: 'Viena',     iata: 'VIE', time: '2 h 45 min, directo',   price: 95,  dateFrom: '22/6', dateTo: '29/6',  image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=500&h=280&q=80' },
   { city: 'Praga',     iata: 'PRG', time: '2 h 50 min, directo',   price: 67,  dateFrom: '1/7',  dateTo: '8/7',   image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?auto=format&fit=crop&w=500&h=280&q=80' },
   { city: 'Tokio',     iata: 'TYO', time: '13 h 10 min, 1 escala', price: 420, dateFrom: '3/7',  dateTo: '17/7',  image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=500&h=280&q=80' },
 ];

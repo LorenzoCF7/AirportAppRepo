@@ -73,11 +73,16 @@ public class FlightServiceImpl implements FlightService {
         log.info("✅ API key de AviationStack detectada - Obteniendo vuelos reales");
         try {
             List<Map<String, Object>> flights = fetchFromAviationStack();
+            if (flights.isEmpty()) {
+                log.warn("⚠️ AviationStack no devolvió vuelos (límite agotado o sin datos) - Usando datos MOCK");
+                List<Map<String, Object>> mockFlights = generateMockFlights();
+                cacheFlights(mockFlights);
+                return buildResponse(mockFlights, false, "mock-fallback");
+            }
             cacheFlights(flights);
             return buildResponse(flights, false, "aviationstack-api");
         } catch (Exception e) {
             log.error("Error obteniendo vuelos de AviationStack: {}", e.getMessage());
-            // Fallback a mock data
             List<Map<String, Object>> mockFlights = generateMockFlights();
             cacheFlights(mockFlights);
             return buildResponse(mockFlights, false, "mock-fallback");
@@ -124,14 +129,18 @@ public class FlightServiceImpl implements FlightService {
 
                 if (response.getBody() != null && response.getBody().containsKey("data")) {
                     List<Map<String, Object>> flights = (List<Map<String, Object>>) response.getBody().get("data");
-
-                    // Filtrar vuelos europeos
                     flights.stream()
                             .filter(this::isValidEuropeanFlight)
                             .forEach(allFlights::add);
-
                     log.info("Obtenidos {} vuelos desde {}", flights.size(), hub);
                 }
+            } catch (org.springframework.web.client.HttpClientErrorException e) {
+                String body = e.getResponseBodyAsString();
+                if (e.getStatusCode().value() == 429 || body.contains("usage_limit_reached")) {
+                    log.warn("⚠️ Límite mensual de AviationStack alcanzado - abortando consultas");
+                    break; // No seguir quemando requests
+                }
+                log.warn("Error consultando {}: {}", hub, e.getMessage());
             } catch (Exception e) {
                 log.warn("Error consultando {}: {}", hub, e.getMessage());
             }
@@ -317,7 +326,49 @@ public class FlightServiceImpl implements FlightService {
             flights.add(buildMockFlight(route, flightDate, depTime, arrTime, flightNum, idx));
         }
 
+        // Generate active (in-flight) mock flights for the real-time map
+        LocalDateTime now = LocalDateTime.now();
+        for (int i = 0; i < 10; i++) {
+            String[] route = outboundRoutes[i];
+            long totalMins = 90 + (i % 5) * 30L; // 90 to 210 min flights
+            double progress = 0.20 + (i % 7) * 0.09; // spread 20%–74% through route
+            LocalDateTime dep = now.minusMinutes((long)(totalMins * progress));
+            LocalDateTime arr = dep.plusMinutes(totalMins);
+            String flightNum = route[5] + (5000 + i * 13);
+            flights.add(buildActiveFlightMock(route, dep, arr, flightNum));
+        }
+
         return flights;
+    }
+
+    private Map<String, Object> buildActiveFlightMock(String[] route, LocalDateTime dep, LocalDateTime arr, String flightNum) {
+        Map<String, Object> flight = new LinkedHashMap<>();
+        flight.put("flight_date",   dep.toLocalDate().toString());
+        flight.put("flight_status", "active");
+
+        Map<String, Object> flightInfo = new LinkedHashMap<>();
+        flightInfo.put("number", flightNum.replaceAll("[^0-9]", ""));
+        flightInfo.put("iata",   flightNum);
+        flight.put("flight", flightInfo);
+
+        Map<String, Object> airline = new LinkedHashMap<>();
+        airline.put("name", route[4]);
+        airline.put("iata", route[5]);
+        flight.put("airline", airline);
+
+        Map<String, Object> departure = new LinkedHashMap<>();
+        departure.put("airport",   route[2]);
+        departure.put("iata",      route[0]);
+        departure.put("scheduled", dep.withSecond(0).withNano(0).toString());
+        flight.put("departure", departure);
+
+        Map<String, Object> arrival = new LinkedHashMap<>();
+        arrival.put("airport",   route[3]);
+        arrival.put("iata",      route[1]);
+        arrival.put("scheduled", arr.withSecond(0).withNano(0).toString());
+        flight.put("arrival", arrival);
+
+        return flight;
     }
 
     private Map<String, Object> buildMockFlight(String[] route, LocalDate date, LocalTime depTime,
