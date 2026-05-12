@@ -145,11 +145,11 @@ const Header = ({ activeView, onViewChange, onLogout, onOpenTicketsModal, onOpen
           <div className={styles.drawerDivider} />
 
           <div className={styles.drawerGroup}>
-            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={closeDrawer}>
+            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={() => { closeDrawer(); window.dispatchEvent(new CustomEvent('flight-notification', { detail: { title: 'Próximamente', message: 'El soporte multiidioma se implementará en futuras versiones.', type: 'info' } })); }}>
               <span className={styles.drawerIcon}>🇪🇸</span>
               <span className={styles.drawerLabel}>Español</span>
             </button>
-            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={closeDrawer}>
+            <button className={`${styles.drawerItem} ${styles.drawerItemMuted}`} onClick={() => { closeDrawer(); window.dispatchEvent(new CustomEvent('flight-notification', { detail: { title: 'Próximamente', message: 'El formulario de contacto se implementará en futuras versiones.', type: 'info' } })); }}>
               <span className={styles.drawerIcon}><MessageSquare size={19} /></span>
               <span className={styles.drawerLabel}>Escríbenos</span>
             </button>

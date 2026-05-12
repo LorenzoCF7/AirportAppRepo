@@ -158,7 +158,6 @@ const DashboardView = ({ onNavigate }) => {
               >
                 {tripType === 'roundtrip' ? 'Ida y vuelta' : 'Solo ida'} ▾
               </button>
-              <button className={styles.tripOptionBtn}>0 piezas ▾</button>
             </div>
 
             {/**/}
